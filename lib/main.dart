@@ -6,14 +6,16 @@ import 'package:http/retry.dart';
 final httpClient = RetryClient(Client());
 
 void main() {
-  runApp(MaterialApp(home: HomePage()));
-}
-
-class MyDrawer extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(children: [ListTile(title: Text("yo"))]),
-    );
-  }
+  runApp(
+    MaterialApp(
+      home: HomePage(),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+          // ···
+          brightness: Brightness.light,
+        ),
+      ),
+    ),
+  );
 }

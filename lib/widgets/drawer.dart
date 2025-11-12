@@ -6,7 +6,25 @@ class MapDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(children: [ListTile(title: Text("yo"))]),
+      child: ListView(
+        children: [
+          SizedBox(
+            height: 100,
+            child: DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              child: Text(
+                'Map Elements',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+            ),
+          ),
+          ListTile(title: Text("yo")),
+        ],
+      ),
     );
   }
 }

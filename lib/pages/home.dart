@@ -7,6 +7,7 @@ import 'package:mapify/widgets/floating_appbar.dart';
 import 'package:mapify/widgets/speed_dial_fab.dart';
 
 class HomePage extends StatefulWidget {
+  static const String route = "/";
   const HomePage({super.key});
 
   @override
@@ -23,7 +24,9 @@ class _HomePageState extends State<HomePage> {
       drawer: MapDrawer(),
       extendBodyBehindAppBar: true,
       appBar: FloatingAppBar(
+        borderRadius: 16,
         drawer: MapDrawer(),
+        onTapSettings: () {},
         onSearch: (searchText) {
           setState(() {
             if (searchText.isNotEmpty) {

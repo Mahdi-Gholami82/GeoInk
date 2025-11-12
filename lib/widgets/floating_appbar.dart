@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 class FloatingAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget drawer;
   final Function(String searchText) onSearch;
-  final Color backgroundColor;
+  final Function onTapSettings;
+  final Color? backgroundColor;
   final double borderRadius;
   const FloatingAppBar({
     super.key,
     required this.drawer,
     required this.onSearch,
-    this.backgroundColor = Colors.white,
+    required this.onTapSettings,
+    this.backgroundColor,
     this.borderRadius = 6,
   });
 
@@ -37,7 +39,9 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
               height: 45,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(widget.borderRadius),
-                color: widget.backgroundColor,
+                color:
+                    widget.backgroundColor ??
+                    Theme.of(context).colorScheme.surface,
                 boxShadow: [
                   BoxShadow(
                     color: DefaultSelectionStyle.defaultColor,
@@ -74,6 +78,12 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
                         ),
                       ),
                     ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      widget.onTapSettings();
+                    },
+                    icon: Icon(Icons.settings),
                   ),
                 ],
               ),

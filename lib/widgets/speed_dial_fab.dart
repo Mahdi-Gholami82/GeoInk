@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class AddMapElementFab extends StatelessWidget {
-  const AddMapElementFab({super.key});
+  const AddMapElementFab({super.key, on});
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +13,27 @@ class AddMapElementFab extends StatelessWidget {
       children: [
         SpeedDialChild(
           child: Icon(Icons.polyline),
-          label: 'Polyline',
+          label: "Polyline",
           onTap: null,
         ),
         SpeedDialChild(
           child: Icon(Icons.adjust),
-          label: 'Circular',
+          label: "Circular",
+          onTap: null,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.hexagon_outlined),
+          label: "Polygon",
+          onTap: null,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.location_on),
+          label: "Marker",
+          onTap: null,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.image_outlined),
+          label: "Overlay Image",
           onTap: null,
         ),
       ],

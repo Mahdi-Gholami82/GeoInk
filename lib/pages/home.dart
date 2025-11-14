@@ -26,7 +26,9 @@ class _HomePageState extends State<HomePage> {
       appBar: FloatingAppBar(
         borderRadius: 16,
         drawer: MapDrawer(),
-        onTapSettings: () {},
+        onTapSettings: () {
+          Navigator.of(context).pushNamed("/settings");
+        },
         onSearch: (searchText) {
           setState(() {
             if (searchText.isNotEmpty) {

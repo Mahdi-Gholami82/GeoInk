@@ -38,6 +38,8 @@ dependencies:
   latlong2: ^0.9.1
   http: ^1.6.0
   flutter_speed_dial: ^7.0.0
+  settings_ui: ^2.0.2
+  provider: ^6.1.5+1
 
 dev_dependencies:
   flutter_test:

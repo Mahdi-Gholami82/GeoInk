@@ -3,8 +3,10 @@ import 'package:mapify/pages/home.dart';
 import 'package:http/http.dart';
 import 'package:http/retry.dart';
 import 'package:mapify/pages/settings.dart';
+import 'package:mapify/providers/input_list_coordinates_provider.dart';
+import 'package:mapify/providers/map_layers_provider.dart';
+import 'package:mapify/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:mapify/misc/theme.dart' as theme;
 
 final httpClient = RetryClient(Client());
 
@@ -12,7 +14,11 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => theme.ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => EntriesProvider()),
+        ChangeNotifierProvider(
+          create: (context) => InputListCoordinatesProvider(),
+        ),
       ],
       child: MapifyApp(),
     ),
@@ -31,7 +37,7 @@ class _MapifyAppState extends State<MapifyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: HomePage(),
-      theme: Provider.of<theme.ThemeProvider>(context).themeData,
+      theme: context.watch<ThemeProvider>().themeData,
       routes: {SettingsPage.route: (context) => SettingsPage()},
     );
   }

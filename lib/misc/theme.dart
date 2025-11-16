@@ -11,18 +11,3 @@ ThemeData darkMode = ThemeData(
   brightness: Brightness.dark,
   colorSchemeSeed: themeColor,
 );
-
-class ThemeProvider with ChangeNotifier {
-  ThemeData _themeData = lightMode;
-
-  ThemeData get themeData => _themeData;
-
-  set themeData(ThemeData themeData) {
-    _themeData = themeData;
-    notifyListeners();
-  }
-
-  void toggleMode() {
-    themeData = themeData == lightMode ? darkMode : lightMode;
-  }
-}

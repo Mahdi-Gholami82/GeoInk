@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:mapify/widgets/add_map_layer/add_marker_dialogue.dart';
 
 class AddMapElementFab extends StatelessWidget {
   const AddMapElementFab({super.key, on});
@@ -11,6 +12,16 @@ class AddMapElementFab extends StatelessWidget {
       activeIcon: Icons.close,
       spacing: 3,
       children: [
+        SpeedDialChild(
+          child: Icon(Icons.location_on),
+          label: "Marker",
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (context) => AddMarkerDialogue(),
+            );
+          },
+        ),
         SpeedDialChild(
           child: Icon(Icons.polyline),
           label: "Polyline",
@@ -24,11 +35,6 @@ class AddMapElementFab extends StatelessWidget {
         SpeedDialChild(
           child: Icon(Icons.hexagon_outlined),
           label: "Polygon",
-          onTap: null,
-        ),
-        SpeedDialChild(
-          child: Icon(Icons.location_on),
-          label: "Marker",
           onTap: null,
         ),
         SpeedDialChild(

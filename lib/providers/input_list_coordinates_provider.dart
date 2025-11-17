@@ -2,8 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
 class InputListCoordinatesProvider with ChangeNotifier {
-  int? _editingIndex = 0;
-  List<LatLng?> coordinates = [null];
+  InputListCoordinatesProvider() {
+    initCoordinatesProvider();
+  }
+
+  void initCoordinatesProvider() {
+    _editingIndex = 0;
+    coordinates = [null];
+  }
+
+  int? _editingIndex;
+  late List<LatLng?> coordinates;
 
   set editingIndex(int? editingIndex) {
     _editingIndex = editingIndex;
@@ -28,5 +37,12 @@ class InputListCoordinatesProvider with ChangeNotifier {
   void removeNull() {
     coordinates.removeWhere((item) => item == null);
     notifyListeners();
+  }
+
+  Set<LatLng> takeFinalCoordinates() {
+    final result = coordinates.whereType<LatLng>().toSet();
+    initCoordinatesProvider();
+    notifyListeners();
+    return result;
   }
 }

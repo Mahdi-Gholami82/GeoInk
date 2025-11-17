@@ -12,25 +12,6 @@ class InputListView extends StatefulWidget {
 }
 
 class _InputListViewState extends State<InputListView> {
-  List<InputListTile> tiles = [];
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => InputListCoordinatesProvider(),
-      child: InnerInputListView(),
-    );
-  }
-}
-
-class InnerInputListView extends StatefulWidget {
-  const InnerInputListView({super.key});
-
-  @override
-  State<InnerInputListView> createState() => _InnerInputListViewState();
-}
-
-class _InnerInputListViewState extends State<InnerInputListView> {
   late List<LatLng?> coordinates;
 
   @override

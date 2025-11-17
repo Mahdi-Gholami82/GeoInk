@@ -1,0 +1,278 @@
+{
+  "Primary": {
+    "prefix": "cs.primary",
+    "body": [
+      "Theme.of(context).colorScheme.primary"
+    ]
+  },
+  "OnPrimary": {
+    "prefix": "cs.onPrimary",
+    "body": [
+      "Theme.of(context).colorScheme.onPrimary"
+    ]
+  },
+  "PrimaryContainer": {
+    "prefix": "cs.primaryContainer",
+    "body": [
+      "Theme.of(context).colorScheme.primaryContainer"
+    ]
+  },
+  "OnPrimaryContainer": {
+    "prefix": "cs.onPrimaryContainer",
+    "body": [
+      "Theme.of(context).colorScheme.onPrimaryContainer"
+    ]
+  },
+  "PrimaryFixed": {
+    "prefix": "cs.primaryFixed",
+    "body": [
+      "Theme.of(context).colorScheme.primaryFixed"
+    ]
+  },
+  "PrimaryFixedDim": {
+    "prefix": "cs.primaryFixedDim",
+    "body": [
+      "Theme.of(context).colorScheme.primaryFixedDim"
+    ]
+  },
+  "OnPrimaryFixed": {
+    "prefix": "cs.onPrimaryFixed",
+    "body": [
+      "Theme.of(context).colorScheme.onPrimaryFixed"
+    ]
+  },
+  "OnPrimaryFixedVariant": {
+    "prefix": "cs.onPrimaryFixedVariant",
+    "body": [
+      "Theme.of(context).colorScheme.onPrimaryFixedVariant"
+    ]
+  },
+  "Secondary": {
+    "prefix": "cs.secondary",
+    "body": [
+      "Theme.of(context).colorScheme.secondary"
+    ]
+  },
+  "OnSecondary": {
+    "prefix": "cs.onSecondary",
+    "body": [
+      "Theme.of(context).colorScheme.onSecondary"
+    ]
+  },
+  "SecondaryContainer": {
+    "prefix": "cs.secondaryContainer",
+    "body": [
+      "Theme.of(context).colorScheme.secondaryContainer"
+    ]
+  },
+  "OnSecondaryContainer": {
+    "prefix": "cs.onSecondaryContainer",
+    "body": [
+      "Theme.of(context).colorScheme.onSecondaryContainer"
+    ]
+  },
+  "SecondaryFixed": {
+    "prefix": "cs.secondaryFixed",
+    "body": [
+      "Theme.of(context).colorScheme.secondaryFixed"
+    ]
+  },
+  "SecondaryFixedDim": {
+    "prefix": "cs.secondaryFixedDim",
+    "body": [
+      "Theme.of(context).colorScheme.secondaryFixedDim"
+    ]
+  },
+  "OnSecondaryFixed": {
+    "prefix": "cs.onSecondaryFixed",
+    "body": [
+      "Theme.of(context).colorScheme.onSecondaryFixed"
+    ]
+  },
+  "OnSecondaryFixedVariant": {
+    "prefix": "cs.onSecondaryFixedVariant",
+    "body": [
+      "Theme.of(context).colorScheme.onSecondaryFixedVariant"
+    ]
+  },
+  "Tertiary": {
+    "prefix": "cs.tertiary",
+    "body": [
+      "Theme.of(context).colorScheme.tertiary"
+    ]
+  },
+  "OnTertiary": {
+    "prefix": "cs.onTertiary",
+    "body": [
+      "Theme.of(context).colorScheme.onTertiary"
+    ]
+  },
+  "TertiaryContainer": {
+    "prefix": "cs.tertiaryContainer",
+    "body": [
+      "Theme.of(context).colorScheme.tertiaryContainer"
+    ]
+  },
+  "OnTertiaryContainer": {
+    "prefix": "cs.onTertiaryContainer",
+    "body": [
+      "Theme.of(context).colorScheme.onTertiaryContainer"
+    ]
+  },
+  "TertiaryFixed": {
+    "prefix": "cs.tertiaryFixed",
+    "body": [
+      "Theme.of(context).colorScheme.tertiaryFixed"
+    ]
+  },
+  "TertiaryFixedDim": {
+    "prefix": "cs.tertiaryFixedDim",
+    "body": [
+      "Theme.of(context).colorScheme.tertiaryFixedDim"
+    ]
+  },
+  "OnTertiaryFixed": {
+    "prefix": "cs.onTertiaryFixed",
+    "body": [
+      "Theme.of(context).colorScheme.onTertiaryFixed"
+    ]
+  },
+  "OnTertiaryFixedVariant": {
+    "prefix": "cs.onTertiaryFixedVariant",
+    "body": [
+      "Theme.of(context).colorScheme.onTertiaryFixedVariant"
+    ]
+  },
+  "Error": {
+    "prefix": "cs.error",
+    "body": [
+      "Theme.of(context).colorScheme.error"
+    ]
+  },
+  "OnError": {
+    "prefix": "cs.onError",
+    "body": [
+      "Theme.of(context).colorScheme.onError"
+    ]
+  },
+  "ErrorContainer": {
+    "prefix": "cs.errorContainer",
+    "body": [
+      "Theme.of(context).colorScheme.errorContainer"
+    ]
+  },
+  "OnErrorContainer": {
+    "prefix": "cs.onErrorContainer",
+    "body": [
+      "Theme.of(context).colorScheme.onErrorContainer"
+    ]
+  },
+  "Surface": {
+    "prefix": "cs.surface",
+    "body": [
+      "Theme.of(context).colorScheme.surface"
+    ]
+  },
+  "OnSurface": {
+    "prefix": "cs.onSurface",
+    "body": [
+      "Theme.of(context).colorScheme.onSurface"
+    ]
+  },
+  "SurfaceDim": {
+    "prefix": "cs.surfaceDim",
+    "body": [
+      "Theme.of(context).colorScheme.surfaceDim"
+    ]
+  },
+  "SurfaceBright": {
+    "prefix": "cs.surfaceBright",
+    "body": [
+      "Theme.of(context).colorScheme.surfaceBright"
+    ]
+  },
+  "SurfaceContainerLowest": {
+    "prefix": "cs.surfaceContainerLowest",
+    "body": [
+      "Theme.of(context).colorScheme.surfaceContainerLowest"
+    ]
+  },
+  "SurfaceContainerLow": {
+    "prefix": "cs.surfaceContainerLow",
+    "body": [
+      "Theme.of(context).colorScheme.surfaceContainerLow"
+    ]
+  },
+  "SurfaceContainer": {
+    "prefix": "cs.surfaceContainer",
+    "body": [
+      "Theme.of(context).colorScheme.surfaceContainer"
+    ]
+  },
+  "SurfaceContainerHigh": {
+    "prefix": "cs.surfaceContainerHigh",
+    "body": [
+      "Theme.of(context).colorScheme.surfaceContainerHigh"
+    ]
+  },
+  "SurfaceContainerHighest": {
+    "prefix": "cs.surfaceContainerHighest",
+    "body": [
+      "Theme.of(context).colorScheme.surfaceContainerHighest"
+    ]
+  },
+  "OnSurfaceVariant": {
+    "prefix": "cs.onSurfaceVariant",
+    "body": [
+      "Theme.of(context).colorScheme.onSurfaceVariant"
+    ]
+  },
+  "Outline": {
+    "prefix": "cs.outline",
+    "body": [
+      "Theme.of(context).colorScheme.outline"
+    ]
+  },
+  "OutlineVariant": {
+    "prefix": "cs.outlineVariant",
+    "body": [
+      "Theme.of(context).colorScheme.outlineVariant"
+    ]
+  },
+  "Shadow": {
+    "prefix": "cs.shadow",
+    "body": [
+      "Theme.of(context).colorScheme.shadow"
+    ]
+  },
+  "Scrim": {
+    "prefix": "cs.scrim",
+    "body": [
+      "Theme.of(context).colorScheme.scrim"
+    ]
+  },
+  "InverseSurface": {
+    "prefix": "cs.inverseSurface",
+    "body": [
+      "Theme.of(context).colorScheme.inverseSurface"
+    ]
+  },
+  "OnInverseSurface": {
+    "prefix": "cs.onInverseSurface",
+    "body": [
+      "Theme.of(context).colorScheme.onInverseSurface"
+    ]
+  },
+  "InversePrimary": {
+    "prefix": "cs.inversePrimary",
+    "body": [
+      "Theme.of(context).colorScheme.inversePrimary"
+    ]
+  },
+  "SurfaceTint": {
+    "prefix": "cs.surfaceTint",
+    "body": [
+      "Theme.of(context).colorScheme.surfaceTint"
+    ]
+  }
+}

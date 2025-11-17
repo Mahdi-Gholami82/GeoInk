@@ -19,7 +19,9 @@ class AddMapElementFab extends StatelessWidget {
             showModalBottomSheet(
               context: context,
               builder: (context) => AddMarkerDialogue(),
-            );
+            ).then((value) {
+              print(value);
+            });
           },
         ),
         SpeedDialChild(

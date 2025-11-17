@@ -75,18 +75,17 @@ Map flutterMapObjects = {
   EntryType.polyline: Polyline,
 };
 
-class MapLayer {
-  final String name;
+class MapEntries {
   final EntryType type;
-  final List<MapEntry> entries;
+  final List<MapEntry> elements;
 
-  MapLayer({required this.name, required this.type, List<MapEntry>? entries})
-    : entries = entries ?? [];
+  MapEntries({required this.type, List<MapEntry>? entries})
+    : elements = entries ?? [];
 
   dynamic toFlutterMapObject() {
     switch (type) {
       case EntryType.marker:
-        final markers = entries.cast<MarkerEntry>();
+        final markers = elements.cast<MarkerEntry>();
         return MarkerLayer(
           markers: markers.map((marker) {
             return Marker(
@@ -99,7 +98,7 @@ class MapLayer {
         );
 
       case EntryType.polyline:
-        final lines = entries.cast<PolylineEntry>();
+        final lines = elements.cast<PolylineEntry>();
         return PolylineLayer(
           polylines: lines.map((line) {
             return Polyline(
@@ -111,7 +110,7 @@ class MapLayer {
         );
 
       case EntryType.polygon:
-        final polys = entries.cast<PolygonEntry>();
+        final polys = elements.cast<PolygonEntry>();
         return PolygonLayer(
           polygons: polys.map((poly) {
             return Polygon(
@@ -124,7 +123,7 @@ class MapLayer {
         );
 
       case EntryType.circle:
-        final circles = entries.cast<CircleEntry>();
+        final circles = elements.cast<CircleEntry>();
         return CircleLayer(
           circles: circles.map((circle) {
             return CircleMarker(

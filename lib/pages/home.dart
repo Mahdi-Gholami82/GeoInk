@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mapify/misc/tile_providers.dart';
+import 'package:mapify/providers/map_tiles_provider.dart';
 import 'package:mapify/widgets/drawer.dart';
 import 'package:mapify/widgets/floating_appbar.dart';
 import 'package:mapify/widgets/speed_dial_fab.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   static const String route = "/";
@@ -49,7 +51,12 @@ class _HomePageState extends State<HomePage> {
           initialCenter: LatLng(51.5, -0.09),
           initialZoom: 5,
         ),
-        children: [openStreetMapTileLayer],
+        children: [
+          openStreetMapTileLayer,
+          ...context.watch<TileEntriesProvider>().mapEntriesCollection.map(
+            (entries) => entries.toFlutterMapObject(),
+          ),
+        ],
       ),
     );
   }

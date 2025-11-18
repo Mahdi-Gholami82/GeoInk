@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 
 class InputListView extends StatefulWidget {
   const InputListView({super.key});
-
   @override
   State<InputListView> createState() => _InputListViewState();
 }
@@ -32,7 +31,7 @@ class _InputListViewState extends State<InputListView> {
       itemBuilder: (context, index) {
         return InputListTile(
           tileIndex: index,
-          title: Text(coordinateToText(coordinates[index])),
+          title: coordinateToText(coordinates[index]),
           onEditPressed: () {
             provider.editingIndex = index;
             if (provider.editingIndex < provider.coordinates.length - 1) {

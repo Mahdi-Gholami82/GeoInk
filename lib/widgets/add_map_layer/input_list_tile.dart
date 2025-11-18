@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 class InputListTile extends StatefulWidget {
   final int tileIndex;
-  final Text title;
+  final String title;
   final Function(String) onSubmit;
   final Function onEditPressed;
   const InputListTile({
@@ -26,7 +26,7 @@ class _InputListTileState extends State<InputListTile> {
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.title.data ?? "";
+    _controller.text = widget.title;
   }
 
   @override

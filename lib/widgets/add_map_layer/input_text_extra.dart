@@ -12,7 +12,7 @@ class InputTextExtra extends StatelessWidget {
   final bool isBeingEdited;
   final TextEditingController controller;
   final Function(String) onSubmit;
-  final Text title;
+  final String title;
   @override
   Widget build(BuildContext context) {
     if (isBeingEdited) {
@@ -25,6 +25,6 @@ class InputTextExtra extends StatelessWidget {
         },
       );
     }
-    return title;
+    return Text(title);
   }
 }

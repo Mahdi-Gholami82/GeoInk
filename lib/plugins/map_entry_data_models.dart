@@ -51,7 +51,7 @@ class PolylineEntry extends MapEntry {
 
 class CircleEntry extends MapEntry {
   final LatLng center;
-  final double radius; // meters
+  final double radius;
   final Color borderColor;
   final double borderWidth;
   final Color fillColor;
@@ -68,37 +68,33 @@ class CircleEntry extends MapEntry {
 
 enum EntryType { marker, polygon, polyline, circle }
 
-Map flutterMapObjects = {
-  EntryType.marker: Marker,
-  EntryType.polygon: Polygon,
-  EntryType.circle: CircleMarker,
-  EntryType.polyline: Polyline,
-};
-
 class MapEntries {
   final EntryType type;
-  final List<MapEntry> elements;
+  final List<MapEntry> items;
 
   MapEntries({required this.type, List<MapEntry>? entries})
-    : elements = entries ?? [];
+    : items = entries ?? [];
 
   dynamic toFlutterMapObject() {
+    List<MapEntry> filteredItems = items
+        .where((element) => element.visible)
+        .toList();
     switch (type) {
       case EntryType.marker:
-        final markers = elements.cast<MarkerEntry>();
+        final markers = filteredItems.cast<MarkerEntry>();
         return MarkerLayer(
           markers: markers.map((marker) {
             return Marker(
               point: marker.coordinate,
               width: 64,
               height: 64,
-              child: Icon(Icons.location_pin, size: 60, color: marker.color),
+              child: Icon(Icons.location_pin, size: 40, color: marker.color),
             );
           }).toList(),
         );
 
       case EntryType.polyline:
-        final lines = elements.cast<PolylineEntry>();
+        final lines = filteredItems.cast<PolylineEntry>();
         return PolylineLayer(
           polylines: lines.map((line) {
             return Polyline(
@@ -110,7 +106,7 @@ class MapEntries {
         );
 
       case EntryType.polygon:
-        final polys = elements.cast<PolygonEntry>();
+        final polys = filteredItems.cast<PolygonEntry>();
         return PolygonLayer(
           polygons: polys.map((poly) {
             return Polygon(
@@ -123,7 +119,7 @@ class MapEntries {
         );
 
       case EntryType.circle:
-        final circles = elements.cast<CircleEntry>();
+        final circles = filteredItems.cast<CircleEntry>();
         return CircleLayer(
           circles: circles.map((circle) {
             return CircleMarker(

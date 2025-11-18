@@ -3,14 +3,15 @@ import 'package:mapify/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/widgets/add_map_layer/input_list_view.dart';
 import 'package:provider/provider.dart';
 
-class AddMarkerDialogue extends StatefulWidget {
-  const AddMarkerDialogue({super.key});
+class AddCoordinatesSheet extends StatefulWidget {
+  const AddCoordinatesSheet({super.key, required this.title});
+  final String title;
 
   @override
-  State<AddMarkerDialogue> createState() => _AddMarkerDialogueState();
+  State<AddCoordinatesSheet> createState() => _AddCoordinatesSheetState();
 }
 
-class _AddMarkerDialogueState extends State<AddMarkerDialogue> {
+class _AddCoordinatesSheetState extends State<AddCoordinatesSheet> {
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -20,7 +21,7 @@ class _AddMarkerDialogueState extends State<AddMarkerDialogue> {
           child: Column(
             spacing: 20,
             children: [
-              Text("Add Marker", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold)),
               Expanded(child: InputListView()),
             ],
           ),

@@ -1,31 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:mapify/providers/input_list_coordinates_provider.dart';
-import 'package:mapify/widgets/add_map_layer/input_list_view.dart';
+import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
+import 'package:mapify/features/add_map_layer/input_list_view.dart';
 import 'package:provider/provider.dart';
-
-const List<Color> colors = [
-  Colors.red,
-  Colors.pink,
-  Colors.purple,
-  Colors.deepPurple,
-  Colors.indigo,
-  Colors.blue,
-  Colors.lightBlue,
-  Colors.cyan,
-  Colors.teal,
-  Colors.green,
-  Colors.lightGreen,
-  Colors.lime,
-  Colors.yellow,
-  Colors.amber,
-  Colors.orange,
-  Colors.deepOrange,
-  Colors.brown,
-  Colors.grey,
-  Colors.blueGrey,
-  Colors.black,
-];
 
 class AddCoordinatesSheet extends StatefulWidget {
   const AddCoordinatesSheet({super.key, required this.title});
@@ -49,18 +26,10 @@ class _AddCoordinatesSheetState extends State<AddCoordinatesSheet> {
             children: [
               Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold)),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 40),
                 child: Row(
                   spacing: 15,
                   children: [
-                    Tooltip(
-                      message: "Change layer color",
-                      child: Icon(
-                        Icons.palette_outlined,
-                        size: 18,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
                     FloatingActionButton.small(
                       backgroundColor: chosenColor,
                       onPressed: () {
@@ -77,7 +46,6 @@ class _AddCoordinatesSheetState extends State<AddCoordinatesSheet> {
                                       chosenColor = value;
                                     });
                                   },
-                                  availableColors: colors,
                                 ),
                               ),
                             );
@@ -93,6 +61,10 @@ class _AddCoordinatesSheetState extends State<AddCoordinatesSheet> {
                         color: Colors.white,
                         size: 18,
                       ),
+                    ),
+                    Text(
+                      "Change layer color",
+                      style: TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),

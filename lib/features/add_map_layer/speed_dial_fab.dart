@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:mapify/providers/map_tiles_provider.dart';
-import 'package:mapify/widgets/add_map_layer/add_coordinates_sheet.dart';
+import 'package:mapify/data/providers/map_tiles_provider.dart';
+import 'package:mapify/features/add_map_layer/add_coordinates_sheet.dart';
 import 'package:provider/provider.dart';
 
 class AddMapElementFab extends StatelessWidget {
@@ -20,8 +20,13 @@ class AddMapElementFab extends StatelessWidget {
           onTap: () {
             showModalBottomSheet(
               isDismissible: false,
+              showDragHandle: true,
               context: context,
-              builder: (context) => AddCoordinatesSheet(title: "Add Marker"),
+              builder: (context) => DraggableScrollableSheet(
+                initialChildSize: 1,
+                builder: (context, scrollController) =>
+                    AddCoordinatesSheet(title: "Add Marker"),
+              ),
             ).then((value) {
               if (value != null) {
                 context.read<TileEntriesProvider>().addMarker(value);

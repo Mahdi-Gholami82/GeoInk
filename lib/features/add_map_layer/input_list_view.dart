@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:mapify/providers/input_list_coordinates_provider.dart';
-import 'package:mapify/widgets/add_map_layer/input_list_tile.dart';
+import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
+import 'package:mapify/features/add_map_layer/input_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class InputListView extends StatefulWidget {

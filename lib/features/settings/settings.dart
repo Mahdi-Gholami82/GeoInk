@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/misc/theme.dart' as theme;
-import 'package:mapify/providers/theme_provider.dart' as theme;
+import 'package:mapify/core/theme/theme.dart' as theme;
+import 'package:mapify/data/providers/theme_provider.dart' as theme;
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 

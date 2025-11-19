@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/pages/home.dart';
+import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
+import 'package:mapify/data/providers/map_tiles_provider.dart';
+import 'package:mapify/data/providers/theme_provider.dart';
+import 'package:mapify/features/home/home.dart';
+import 'package:mapify/features/settings/settings.dart';
 import 'package:http/http.dart';
 import 'package:http/retry.dart';
-import 'package:mapify/pages/settings.dart';
-import 'package:mapify/providers/input_list_coordinates_provider.dart';
-import 'package:mapify/providers/map_tiles_provider.dart';
-import 'package:mapify/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 final httpClient = RetryClient(Client());

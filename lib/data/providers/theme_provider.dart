@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/misc/theme.dart';
+import 'package:mapify/core/theme/theme.dart';
 
 class ThemeProvider with ChangeNotifier {
   ThemeData _themeData = lightMode;

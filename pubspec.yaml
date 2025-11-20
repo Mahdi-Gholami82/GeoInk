@@ -41,6 +41,8 @@ dependencies:
   settings_ui: ^2.0.2
   provider: ^6.1.5+1
   flutter_colorpicker: ^1.1.0
+  wtf_sliding_sheet: ^1.1.5
+  bottom_sheet: ^4.0.4
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
-import 'package:mapify/features/add_map_layer/add_coordinates_sheet.dart';
+import 'package:mapify/features/add_map_layer/draggable_coordinates_sheet.dart';
 import 'package:provider/provider.dart';
+
+void showCoordinatesButtomSheet(
+  BuildContext context, {
+  required Function(dynamic) then,
+}) {
+  showModalBottomSheet(
+    isDismissible: false,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    context: context,
+    builder: (context) => DraggableCoordinatesSheet("Add Marker"),
+  ).then(then);
+}
 
 class AddMapElementFab extends StatelessWidget {
   const AddMapElementFab({super.key, on});
@@ -18,35 +31,28 @@ class AddMapElementFab extends StatelessWidget {
           child: Icon(Icons.location_on),
           label: "Marker",
           onTap: () {
-            showModalBottomSheet(
-              isDismissible: false,
-              showDragHandle: true,
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                initialChildSize: 1,
-                builder: (context, scrollController) =>
-                    AddCoordinatesSheet(title: "Add Marker"),
-              ),
-            ).then((value) {
-              if (value != null) {
-                context.read<TileEntriesProvider>().addMarker(value);
-              }
-            });
+            showCoordinatesButtomSheet(
+              context,
+              then: (value) {
+                if (value != null) {
+                  context.read<TileEntriesProvider>().addMarker(value);
+                }
+              },
+            );
           },
         ),
         SpeedDialChild(
           child: Icon(Icons.polyline),
           label: "Polyline",
           onTap: () {
-            showModalBottomSheet(
-              isDismissible: false,
-              context: context,
-              builder: (context) => AddCoordinatesSheet(title: "Add Polyline"),
-            ).then((value) {
-              if (value != null) {
-                context.read<TileEntriesProvider>().addPolyLine(value);
-              }
-            });
+            showCoordinatesButtomSheet(
+              context,
+              then: (value) {
+                if (value != null) {
+                  context.read<TileEntriesProvider>().addPolyLine(value);
+                }
+              },
+            );
           },
         ),
         SpeedDialChild(child: Icon(Icons.adjust), label: "Circle", onTap: null),
@@ -54,15 +60,14 @@ class AddMapElementFab extends StatelessWidget {
           child: Icon(Icons.hexagon_outlined),
           label: "Polygon",
           onTap: () {
-            showModalBottomSheet(
-              isDismissible: false,
-              context: context,
-              builder: (context) => AddCoordinatesSheet(title: "Add Polygon"),
-            ).then((value) {
-              if (value != null) {
-                context.read<TileEntriesProvider>().addPolygon(value);
-              }
-            });
+            showCoordinatesButtomSheet(
+              context,
+              then: (value) {
+                if (value != null) {
+                  context.read<TileEntriesProvider>().addPolygon(value);
+                }
+              },
+            );
           },
         ),
         SpeedDialChild(

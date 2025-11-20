@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
-import 'package:mapify/features/add_map_layer/input_list_view.dart';
-import 'package:provider/provider.dart';
 
 class AddCoordinatesSheet extends StatefulWidget {
   const AddCoordinatesSheet({super.key, required this.title});
@@ -19,10 +16,10 @@ class _AddCoordinatesSheetState extends State<AddCoordinatesSheet> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
+        Padding(
           padding: EdgeInsets.all(20),
           child: Column(
-            spacing: 20,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold)),
               Container(
@@ -67,27 +64,6 @@ class _AddCoordinatesSheetState extends State<AddCoordinatesSheet> {
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ],
-                ),
-              ),
-              Expanded(child: InputListView()),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  minimumSize: Size(80, 45),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop(
-                    context
-                        .read<InputListCoordinatesProvider>()
-                        .takeFinalCoordinates(),
-                  );
-                },
-                child: Text(
-                  "Apply",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
                 ),
               ),
             ],

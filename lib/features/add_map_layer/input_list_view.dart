@@ -27,6 +27,8 @@ class _InputListViewState extends State<InputListView> {
     final provider = context.watch<InputListCoordinatesProvider>();
     coordinates = provider.coordinates;
     return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       itemCount: coordinates.length,
       itemBuilder: (context, index) {
         return InputListTile(

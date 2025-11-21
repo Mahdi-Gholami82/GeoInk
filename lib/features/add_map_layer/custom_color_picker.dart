@@ -29,9 +29,7 @@ class _CustomColorPickerState extends State<CustomColorPicker> {
                 child: BlockPicker(
                   pickerColor: widget.initialColor,
                   onColorChanged: (Color value) {
-                    setState(() {
-                      widget.onColorChanged(value);
-                    });
+                    widget.onColorChanged(value);
                   },
                 ),
               ),

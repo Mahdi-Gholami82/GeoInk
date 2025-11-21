@@ -8,12 +8,14 @@ class DraggableCoordinatesSheet extends StatefulWidget {
     this.initialChildSize = 0.5,
     this.maxChildSize = 1.0,
     this.minChildSize = 0.15,
+    this.pullDownOffset = 0.15,
   });
   final String title;
 
   final double initialChildSize;
   final double maxChildSize;
   final double minChildSize;
+  final double pullDownOffset;
 
   @override
   State<DraggableCoordinatesSheet> createState() =>
@@ -63,7 +65,9 @@ class _DraggableCoordinatesSheetState extends State<DraggableCoordinatesSheet> {
             pixelsMoved = -controller.pixelsToSize(
               details.delta.dy / _dragSensitivity,
             );
-            if ((widget.initialChildSize < sheetNextPosition || isGoingDown) &&
+            if ((widget.initialChildSize - widget.pullDownOffset <
+                        sheetNextPosition ||
+                    isGoingDown) &&
                 (sheetNextPosition < widget.maxChildSize || isGoingUp)) {
               if (sheetNextPosition < widget.maxChildSize &&
                   sheetNextPosition > 0) {
@@ -74,13 +78,11 @@ class _DraggableCoordinatesSheetState extends State<DraggableCoordinatesSheet> {
           onVerticalDragEnd: (details) {
             if (controller.size < minMaxAverage && controller.size > 0) {
               _animateSheetTo(widget.initialChildSize);
-              return;
-            }
-            if (controller.size > minMaxAverage && controller.size < 1) {
+            } else if (controller.size > minMaxAverage && controller.size < 1) {
               _animateSheetTo(widget.maxChildSize);
-              return;
+            } else {
+              _animateSheetTo(initDragPosition);
             }
-            _animateSheetTo(initDragPosition);
           },
           child: Material(
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

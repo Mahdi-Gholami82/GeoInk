@@ -13,7 +13,8 @@ void showCoordinatesButtomSheet(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     context: context,
-    builder: (context) => DraggableCoordinatesSheet("Add Marker"),
+    builder: (context) =>
+        DraggableCoordinatesSheet("Add Marker", initialChildSize: 0.6),
   ).then(then);
 }
 

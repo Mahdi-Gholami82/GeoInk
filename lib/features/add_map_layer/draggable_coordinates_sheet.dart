@@ -2,8 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:mapify/features/add_map_layer/coordinates_sheet.dart';
 
 class DraggableCoordinatesSheet extends StatefulWidget {
-  const DraggableCoordinatesSheet(this.title, {super.key});
+  const DraggableCoordinatesSheet(
+    this.title, {
+    super.key,
+    this.initialChildSize = 0.5,
+    this.maxChildSize = 1.0,
+    this.minChildSize = 0.15,
+  });
   final String title;
+
+  final double initialChildSize;
+  final double maxChildSize;
+  final double minChildSize;
 
   @override
   State<DraggableCoordinatesSheet> createState() =>
@@ -12,13 +22,22 @@ class DraggableCoordinatesSheet extends StatefulWidget {
 
 class _DraggableCoordinatesSheetState extends State<DraggableCoordinatesSheet> {
   final double _dragSensitivity = 1;
-  double pixelsMoved = 0;
-  double initDragPosition = 0.5;
+  late double pixelsMoved;
+  late double initDragPosition;
   bool get isGoingUp => pixelsMoved.isNegative;
   bool get isGoingDown => !isGoingUp;
   double get sheetNextPosition => controller.size + pixelsMoved;
+  double get minMaxAverage =>
+      (widget.initialChildSize + widget.maxChildSize) / 2;
 
   DraggableScrollableController controller = DraggableScrollableController();
+
+  @override
+  void initState() {
+    initDragPosition = widget.initialChildSize;
+    pixelsMoved = 0;
+    super.initState();
+  }
 
   void _animateSheetTo(double size) {
     controller.animateTo(
@@ -33,8 +52,8 @@ class _DraggableCoordinatesSheetState extends State<DraggableCoordinatesSheet> {
     return DraggableScrollableSheet(
       controller: controller,
       shouldCloseOnMinExtent: false,
-      initialChildSize: 0.5,
-      minChildSize: 0.15,
+      initialChildSize: widget.initialChildSize,
+      minChildSize: widget.minChildSize,
       builder: (BuildContext context, ScrollController scrollController) {
         return GestureDetector(
           onVerticalDragStart: (details) {
@@ -44,20 +63,21 @@ class _DraggableCoordinatesSheetState extends State<DraggableCoordinatesSheet> {
             pixelsMoved = -controller.pixelsToSize(
               details.delta.dy / _dragSensitivity,
             );
-            if ((0.45 < sheetNextPosition || isGoingDown) &&
-                (sheetNextPosition < 1 || isGoingUp)) {
-              if (sheetNextPosition < 1 && sheetNextPosition > 0) {
+            if ((widget.initialChildSize < sheetNextPosition || isGoingDown) &&
+                (sheetNextPosition < widget.maxChildSize || isGoingUp)) {
+              if (sheetNextPosition < widget.maxChildSize &&
+                  sheetNextPosition > 0) {
                 controller.jumpTo(sheetNextPosition);
               }
             }
           },
           onVerticalDragEnd: (details) {
-            if (controller.size < 0.70 && controller.size > 0) {
-              _animateSheetTo(0.5);
+            if (controller.size < minMaxAverage && controller.size > 0) {
+              _animateSheetTo(widget.initialChildSize);
               return;
             }
-            if (controller.size > 0.70 && controller.size < 1) {
-              _animateSheetTo(1);
+            if (controller.size > minMaxAverage && controller.size < 1) {
+              _animateSheetTo(widget.maxChildSize);
               return;
             }
             _animateSheetTo(initDragPosition);

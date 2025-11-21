@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+/// Data models to keep track of map features or layers.
+
+/// Base class for all Entries which are used to generate map features.
 abstract class MapEntry {
   final String name;
   bool visible;
 
+  /// will be overridden in each entry subclass.
+  get feature;
+
   MapEntry({required this.name, this.visible = true});
 }
 
+/// Keeps track of a [Marker] feature that will be added to map layers later.
 class MarkerEntry extends MapEntry {
   LatLng coordinate;
   Color color;
@@ -19,8 +26,18 @@ class MarkerEntry extends MapEntry {
     this.color = Colors.black,
     super.visible,
   });
+
+  /// Generates a [Marker] from a [MarkerEntry] to be used in a [MarkerLayer].
+  @override
+  Marker get feature => Marker(
+    point: coordinate,
+    width: 64,
+    height: 64,
+    child: Icon(Icons.location_pin, size: 40, color: color),
+  );
 }
 
+/// Keeps track of a [Polygon] feature that will be added to map layers later.
 class PolygonEntry extends MapEntry {
   final List<LatLng> points;
   final Color fillColor;
@@ -33,8 +50,18 @@ class PolygonEntry extends MapEntry {
     required this.borderColor,
     this.borderWidth = 2.0,
   });
+
+  /// Generates a [Polygon] from a [PolygonEntry] to be used in a [PolygonLayer].
+  @override
+  Polygon get feature => Polygon(
+    points: points,
+    borderColor: borderColor,
+    borderStrokeWidth: borderWidth,
+    color: fillColor,
+  );
 }
 
+/// Keeps track of a [Polyline] feature that will be added to map layers later.
 class PolylineEntry extends MapEntry {
   List<LatLng> points;
   Color color;
@@ -47,8 +74,14 @@ class PolylineEntry extends MapEntry {
     this.strokeWidth = 3.0,
     super.visible,
   });
+
+  /// Generates a [Polyline] from a [PolylineEntry] to be used in a [PolylineLayer].
+  @override
+  Polyline get feature =>
+      Polyline(points: points, strokeWidth: strokeWidth, color: color);
 }
 
+/// Keeps track of a [CircleMarker] feature that will be added to map layers later.
 class CircleEntry extends MapEntry {
   final LatLng center;
   final double radius;
@@ -64,10 +97,22 @@ class CircleEntry extends MapEntry {
     this.borderWidth = 2.0,
     required this.fillColor,
   });
+
+  /// Generates a [CircleMarker] from a [CircleEntry] to be used in a [CircleLayer].
+  @override
+  CircleMarker get feature => CircleMarker(
+    point: center,
+    radius: radius,
+    borderColor: borderColor,
+    borderStrokeWidth: borderWidth,
+    color: fillColor,
+  );
 }
 
+/// Differant types of [MapEntries]
 enum EntryType { marker, polygon, polyline, circle }
 
+/// Collection of [MapEntry] sub classes, which have the same type.
 class MapEntries {
   final EntryType type;
   final List<MapEntry> items;
@@ -75,6 +120,7 @@ class MapEntries {
   MapEntries({required this.type, List<MapEntry>? entries})
     : items = entries ?? [];
 
+  /// Converts all [MapEntry] sub classes in [items] to a map layer which will be added to the [FlutterMap] children.
   dynamic toFlutterMapObject() {
     List<MapEntry> filteredItems = items
         .where((element) => element.visible)
@@ -83,53 +129,25 @@ class MapEntries {
       case EntryType.marker:
         final markers = filteredItems.cast<MarkerEntry>();
         return MarkerLayer(
-          markers: markers.map((marker) {
-            return Marker(
-              point: marker.coordinate,
-              width: 64,
-              height: 64,
-              child: Icon(Icons.location_pin, size: 40, color: marker.color),
-            );
-          }).toList(),
+          markers: markers.map((marker) => marker.feature).toList(),
         );
 
       case EntryType.polyline:
         final lines = filteredItems.cast<PolylineEntry>();
         return PolylineLayer(
-          polylines: lines.map((line) {
-            return Polyline(
-              points: line.points,
-              strokeWidth: line.strokeWidth,
-              color: line.color,
-            );
-          }).toList(),
+          polylines: lines.map((line) => line.feature).toList(),
         );
 
       case EntryType.polygon:
         final polys = filteredItems.cast<PolygonEntry>();
         return PolygonLayer(
-          polygons: polys.map((poly) {
-            return Polygon(
-              points: poly.points,
-              borderColor: poly.borderColor,
-              borderStrokeWidth: poly.borderWidth,
-              color: poly.fillColor,
-            );
-          }).toList(),
+          polygons: polys.map((poly) => poly.feature).toList(),
         );
 
       case EntryType.circle:
         final circles = filteredItems.cast<CircleEntry>();
         return CircleLayer(
-          circles: circles.map((circle) {
-            return CircleMarker(
-              point: circle.center,
-              radius: circle.radius,
-              borderColor: circle.borderColor,
-              borderStrokeWidth: circle.borderWidth,
-              color: circle.fillColor,
-            );
-          }).toList(),
+          circles: circles.map((circle) => circle.feature).toList(),
         );
     }
   }

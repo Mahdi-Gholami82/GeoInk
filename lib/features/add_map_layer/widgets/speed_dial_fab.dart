@@ -1,38 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
-import 'package:mapify/features/add_map_layer/draggable_coordinates_sheet.dart';
+import 'package:mapify/features/add_map_layer/utils/show_coordinates_buttom_sheet.dart';
 import 'package:provider/provider.dart';
-
-void showCoordinatesButtomSheet(
-  BuildContext context, {
-  required Function(dynamic) then,
-
-  /// Whether to be able to input radius in [DraggableCoordinatesSheet]
-  ///
-  /// if set to true, only one coordinate input field will be shown.
-  bool needsRadiusField = false,
-  int minNumberOfCoordinatesFields = 1,
-  int? maxNumberOfCoordinatesFields,
-  required String title,
-}) {
-  InputListCoordinatesProvider coordinatesProvider = context
-      .read<InputListCoordinatesProvider>();
-  coordinatesProvider.needsRadiusField = needsRadiusField;
-  coordinatesProvider.minNumberOfCoordinatesFields =
-      minNumberOfCoordinatesFields;
-  coordinatesProvider.maxNumberOfCoordinatesFields =
-      maxNumberOfCoordinatesFields;
-  showModalBottomSheet(
-    isDismissible: false,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    context: context,
-    builder: (context) =>
-        DraggableCoordinatesSheet(title, initialChildSize: 0.6),
-  ).then(then);
-}
 
 class AddMapElementFab extends StatelessWidget {
   const AddMapElementFab({super.key, on});

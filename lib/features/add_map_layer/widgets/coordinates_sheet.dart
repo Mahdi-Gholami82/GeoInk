@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
-import 'package:mapify/features/add_map_layer/custom_color_picker.dart';
-import 'package:mapify/features/add_map_layer/input_list_view.dart';
+import 'package:mapify/features/add_map_layer/widgets/custom_color_picker.dart';
+import 'package:mapify/features/add_map_layer/widgets/input_list_view.dart';
 import 'package:provider/provider.dart';
 
 class CoordinatesSheet extends StatefulWidget {

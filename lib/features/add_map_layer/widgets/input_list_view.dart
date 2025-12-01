@@ -68,9 +68,7 @@ class _InputListViewState extends State<InputListView> {
 
   @override
   Widget build(BuildContext context) {
-    final providerWatch = context.watch<InputListCoordinatesProvider>();
-    final providerRead = context.read<InputListCoordinatesProvider>();
-
+    context.watch<InputListCoordinatesProvider>();
     void onSubmit(SheetListInput currentInput) {}
 
     return Form(

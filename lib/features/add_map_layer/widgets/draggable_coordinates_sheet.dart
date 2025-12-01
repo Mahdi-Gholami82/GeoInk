@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/features/add_map_layer/coordinates_sheet.dart';
+import 'package:mapify/features/add_map_layer/widgets/coordinates_sheet.dart';
 
 class DraggableCoordinatesSheet extends StatefulWidget {
   const DraggableCoordinatesSheet(

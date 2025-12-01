@@ -14,12 +14,16 @@ void showCoordinatesButtomSheet(
   /// if set to true, only one coordinate input field will be shown.
   bool needsRadiusField = false,
   int minNumberOfCoordinatesFields = 1,
+  int? maxNumberOfCoordinatesFields,
   required String title,
 }) {
-  context.read<InputListCoordinatesProvider>().needsRadiusField =
-      needsRadiusField;
-  context.read<InputListCoordinatesProvider>().minNumberOfCoordinatesFields =
+  InputListCoordinatesProvider coordinatesProvider = context
+      .read<InputListCoordinatesProvider>();
+  coordinatesProvider.needsRadiusField = needsRadiusField;
+  coordinatesProvider.minNumberOfCoordinatesFields =
       minNumberOfCoordinatesFields;
+  coordinatesProvider.maxNumberOfCoordinatesFields =
+      maxNumberOfCoordinatesFields;
   showModalBottomSheet(
     isDismissible: false,
     isScrollControlled: true,
@@ -48,6 +52,7 @@ class AddMapElementFab extends StatelessWidget {
               context,
               title: "Add Marker",
               minNumberOfCoordinatesFields: 1,
+              maxNumberOfCoordinatesFields: 1,
               then: (value) {
                 if (value != null) {
                   context.read<TileEntriesProvider>().addMarker(value);
@@ -78,6 +83,7 @@ class AddMapElementFab extends StatelessWidget {
           onTap: () {
             showCoordinatesButtomSheet(
               context,
+              maxNumberOfCoordinatesFields: 1,
               title: "Add Circle",
               then: (value) {
                 if (value != null) {

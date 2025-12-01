@@ -20,7 +20,10 @@ class TileEntriesProvider with ChangeNotifier {
     int count = entries.items.length;
     entries.items.addAll(
       result.coordinates.map((coordinate) {
-        return MarkerEntry(coordinate: coordinate, name: "marker-${count++}");
+        return MarkerEntry(
+          coordinate: coordinate,
+          name: result.name ?? "marker-${count++}",
+        );
       }).toList(),
     );
     notifyListeners();
@@ -31,7 +34,7 @@ class TileEntriesProvider with ChangeNotifier {
     int count = entries.items.length;
     entries.items.add(
       PolylineEntry(
-        name: "polyline-${count++}",
+        name: result.name ?? "polyline-${count++}",
         points: result.coordinates.toList(),
       ),
     );
@@ -43,10 +46,10 @@ class TileEntriesProvider with ChangeNotifier {
     int count = entries.items.length;
     entries.items.add(
       PolygonEntry(
-        name: "polygon-${count++}",
+        name: result.name ?? "polygon-${count++}",
         points: result.coordinates.toList(),
-        fillColor: Colors.red.withAlpha(128),
-        borderColor: Colors.red,
+        borderColor: result.color,
+        fillColor: result.color.withAlpha(128),
       ),
     );
     notifyListeners();

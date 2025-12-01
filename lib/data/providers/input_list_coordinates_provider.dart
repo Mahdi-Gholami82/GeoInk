@@ -25,6 +25,7 @@ class InputListCoordinatesProvider with ChangeNotifier {
   bool needsRadiusField = false;
   late List<SheetListInput> inputs;
   late int minNumberOfCoordinatesFields;
+  late int? maxNumberOfCoordinatesFields;
 
   void initCoordinatesProvider() {
     color = Colors.red;
@@ -43,6 +44,11 @@ class InputListCoordinatesProvider with ChangeNotifier {
     if (needsRadiusField) {
       inputs.add(SheetListInput.radiusField(input: radius ?? ""));
     }
+  }
+
+  void addCoordinatesField() {
+    inputs.add(SheetListInput.coordinateField());
+    notifyListeners();
   }
 
   InputCoordinatesSheetResult takeFinalResult() {

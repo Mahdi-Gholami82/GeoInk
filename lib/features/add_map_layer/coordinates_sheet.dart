@@ -20,14 +20,12 @@ class CoordinatesSheet extends StatefulWidget {
 class _CoordinatesSheetState extends State<CoordinatesSheet> {
   Color chosenColor = Colors.red;
   final formGlobalKey = GlobalKey<FormState>();
-  late final bool needsRadiusField;
+  late InputListCoordinatesProvider coordinatesProvider;
 
   @override
   void initState() {
     super.initState();
-    needsRadiusField = context
-        .read<InputListCoordinatesProvider>()
-        .needsRadiusField;
+    coordinatesProvider = context.read<InputListCoordinatesProvider>();
   }
 
   @override
@@ -89,7 +87,9 @@ class _CoordinatesSheetState extends State<CoordinatesSheet> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       spacing: 20,
                       children: [
-                        if (!needsRadiusField)
+                        if (!coordinatesProvider.needsRadiusField &&
+                            coordinatesProvider.maxNumberOfCoordinatesFields !=
+                                1)
                           TextButton(
                             style: TextButton.styleFrom(
                               backgroundColor: Theme.of(
@@ -106,7 +106,11 @@ class _CoordinatesSheetState extends State<CoordinatesSheet> {
                               ),
                               shape: const StadiumBorder(),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              context
+                                  .read<InputListCoordinatesProvider>()
+                                  .addCoordinatesField();
+                            },
                             child: Text(
                               "Add Coordinates",
                               style: TextStyle(

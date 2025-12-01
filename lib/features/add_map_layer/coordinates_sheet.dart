@@ -19,6 +19,16 @@ class CoordinatesSheet extends StatefulWidget {
 
 class _CoordinatesSheetState extends State<CoordinatesSheet> {
   Color chosenColor = Colors.red;
+  final formGlobalKey = GlobalKey<FormState>();
+  late final bool needsRadiusField;
+
+  @override
+  void initState() {
+    super.initState();
+    needsRadiusField = context
+        .read<InputListCoordinatesProvider>()
+        .needsRadiusField;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +49,7 @@ class _CoordinatesSheetState extends State<CoordinatesSheet> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(25),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
                     Text(
@@ -68,31 +78,76 @@ class _CoordinatesSheetState extends State<CoordinatesSheet> {
                         ],
                       ),
                     ),
+                    Padding(padding: EdgeInsets.symmetric(vertical: 10)),
                     Expanded(
                       child: SingleChildScrollView(
                         controller: widget.scrollController,
-                        child: InputListView(),
+                        child: InputListView(formGlobalKey: formGlobalKey),
                       ),
                     ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        minimumSize: Size(80, 45),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop(
-                          context
-                              .read<InputListCoordinatesProvider>()
-                              .takeFinalCoordinates(),
-                        );
-                      },
-                      child: Text(
-                        "Apply",
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Theme.of(context).colorScheme.onPrimary,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 20,
+                      children: [
+                        if (!needsRadiusField)
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.surface,
+                              foregroundColor: Theme.of(
+                                context,
+                              ).colorScheme.onSurface,
+                              minimumSize: const Size(110, 50),
+                              side: BorderSide(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.outlineVariant,
+                              ),
+                              shape: const StadiumBorder(),
+                            ),
+                            onPressed: () {},
+                            child: Text(
+                              "Add Coordinates",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                            ),
+                          ),
+
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            minimumSize: Size(110, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (formGlobalKey.currentState!.validate()) {
+                              context
+                                      .read<InputListCoordinatesProvider>()
+                                      .color =
+                                  chosenColor;
+                              Navigator.of(context).pop(
+                                context
+                                    .read<InputListCoordinatesProvider>()
+                                    .takeFinalResult(),
+                              );
+                            }
+                          },
+                          child: Text(
+                            "Apply",
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),

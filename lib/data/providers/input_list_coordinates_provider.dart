@@ -1,46 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:mapify/data/models/coordinates_sheet_data_models.dart';
 
 class InputListCoordinatesProvider with ChangeNotifier {
-  InputListCoordinatesProvider() {
-    initCoordinatesProvider();
-  }
+  String get name => inputs
+      .firstWhere(
+        (input) => input.type == SheetInputFieldType.name,
+        orElse: () => SheetListInput.nameField(),
+      )
+      .value;
+
+  List<String> get coordinates => inputs
+      .where((input) => input.type == SheetInputFieldType.coordinate)
+      .map((input) => input.value)
+      .toList();
+
+  String? get radius => inputs
+      .firstWhere(
+        (input) => input.type == SheetInputFieldType.radius,
+        orElse: () => SheetListInput.radiusField(),
+      )
+      .value;
+
+  late Color color;
+  bool needsRadiusField = false;
+  late List<SheetListInput> inputs;
+  late int minNumberOfCoordinatesFields;
 
   void initCoordinatesProvider() {
-    _editingIndex = 0;
-    coordinates = [null];
+    color = Colors.red;
+    inputs = [];
   }
 
-  int? _editingIndex;
-  late List<LatLng?> coordinates;
-
-  set editingIndex(int? editingIndex) {
-    _editingIndex = editingIndex;
-    notifyListeners();
-  }
-
-  get editingIndex => _editingIndex;
-
-  void addCoordinates(String? value) {
-    if (value == null) {
-      coordinates.add(null);
-    } else {
-      List<String> splitted = value.split(",");
-      coordinates[coordinates.length - 1] = LatLng(
-        double.parse(splitted[0]),
-        double.parse(splitted[1]),
-      );
+  void initSheetListInput() {
+    initCoordinatesProvider();
+    inputs.add(SheetListInput.nameField());
+    inputs.addAll(
+      List.generate(
+        minNumberOfCoordinatesFields,
+        (index) => SheetListInput.coordinateField(),
+      ),
+    );
+    if (needsRadiusField) {
+      inputs.add(SheetListInput.radiusField(input: radius ?? ""));
     }
-    notifyListeners();
   }
 
-  void removeNull() {
-    coordinates.removeWhere((item) => item == null);
-    notifyListeners();
-  }
-
-  Set<LatLng> takeFinalCoordinates() {
-    final result = coordinates.whereType<LatLng>().toSet();
+  InputCoordinatesSheetResult takeFinalResult() {
+    InputCoordinatesSheetResult result = InputCoordinatesSheetResult(
+      coordinates: coordinates,
+      color: color,
+      radius: radius,
+    );
     initCoordinatesProvider();
     notifyListeners();
     return result;

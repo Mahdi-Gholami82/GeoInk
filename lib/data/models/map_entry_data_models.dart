@@ -93,7 +93,7 @@ class CircleEntry extends MapEntry {
     required super.name,
     required this.center,
     required this.radius,
-    this.borderColor = Colors.black,
+    required this.borderColor,
     this.borderWidth = 2.0,
     required this.fillColor,
   });
@@ -101,11 +101,12 @@ class CircleEntry extends MapEntry {
   /// Generates a [CircleMarker] from a [CircleEntry] to be used in a [CircleLayer].
   @override
   CircleMarker get feature => CircleMarker(
+    useRadiusInMeter: true,
     point: center,
     radius: radius,
     borderColor: borderColor,
     borderStrokeWidth: borderWidth,
-    color: fillColor,
+    color: fillColor.withAlpha(128),
   );
 }
 

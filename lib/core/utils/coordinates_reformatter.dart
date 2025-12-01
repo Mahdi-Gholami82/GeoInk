@@ -47,8 +47,8 @@ class CoordinatesMatcher {
 class CoordinatesParser {
   Map<CoordinatesFormatTypes, CoordinatesMatcher> matchers = {
     CoordinatesFormatTypes.decimalDegrees: CoordinatesMatcher(
-      latPattern: r"[+-]?\d{1,3}\.\d+",
-      longPattern: r"[+-]?\d{1,3}\.\d+",
+      latPattern: r"[+-]?\d{1,3}(?:\.\d+)?",
+      longPattern: r"[+-]?\d{1,3}(?:\.\d+)?",
       formatType: CoordinatesFormatTypes.decimalDegrees,
     ),
     CoordinatesFormatTypes.degreesDecimalMinutesSymbolic: CoordinatesMatcher(

@@ -4,8 +4,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:mapify/core/services/tile_providers.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:mapify/features/add_map_layer/speed_dial_fab.dart';
-import 'package:mapify/features/home/drawer.dart';
-import 'package:mapify/features/home/floating_appbar.dart';
+import 'package:mapify/features/home/widgets/drawer.dart';
+import 'package:mapify/features/home/widgets/floating_appbar.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {

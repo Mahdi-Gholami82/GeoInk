@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:mapify/data/models/coordinates_sheet_data_models.dart';
 import 'package:mapify/data/models/map_entry_data_models.dart';
 

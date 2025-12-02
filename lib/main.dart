@@ -7,10 +7,28 @@ import 'package:http/http.dart';
 import 'package:http/retry.dart';
 import 'package:mapify/features/settings/page.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 
 final httpClient = RetryClient(Client());
 
-void main() {
+void main() async {
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+
+  WindowOptions windowOptions = WindowOptions(
+    size: Size(1000, 700),
+    minimumSize: Size(500, 700),
+    center: true,
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.normal,
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+  
   runApp(
     MultiProvider(
       providers: [

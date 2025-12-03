@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:mapify/core/utils/map_icons.dart' as map_icons;
-import 'package:mapify/data/models/map_entry_data_models.dart';
+import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:provider/provider.dart';
 

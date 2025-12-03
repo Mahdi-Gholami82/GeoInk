@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/data/models/coordinates_sheet_data_models.dart';
+import 'package:mapify/data/models/coordinates_sheet_data.dart';
 
 class InputListCoordinatesProvider with ChangeNotifier {
   String get name => inputs

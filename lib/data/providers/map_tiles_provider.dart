@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/data/models/coordinates_sheet_data_models.dart';
-import 'package:mapify/data/models/map_entry_data_models.dart';
+import 'package:mapify/data/models/coordinates_sheet_data.dart';
+import 'package:mapify/data/models/flutter_map_entry.dart';
 
 class TileEntriesProvider with ChangeNotifier {
   List<MapLayerEntry> mapEntriesCollection = [

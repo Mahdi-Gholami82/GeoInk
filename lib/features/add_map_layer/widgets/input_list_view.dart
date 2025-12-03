@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mapify/core/utils/coordinates_reformatter.dart';
-import 'package:mapify/data/models/coordinates_sheet_data_models.dart';
+import 'package:mapify/data/models/coordinates_sheet_data.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:provider/provider.dart';
 

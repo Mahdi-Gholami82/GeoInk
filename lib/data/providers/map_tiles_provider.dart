@@ -3,33 +3,49 @@ import 'package:mapify/data/models/coordinates_sheet_data_models.dart';
 import 'package:mapify/data/models/map_entry_data_models.dart';
 
 class TileEntriesProvider with ChangeNotifier {
-  List<MapEntries> mapEntriesCollection = [
-    MapEntries(type: EntryType.circle),
-    MapEntries(type: EntryType.polygon),
-    MapEntries(type: EntryType.polyline),
-    MapEntries(type: EntryType.marker),
+  List<MapLayerEntry> mapEntriesCollection = [
+    MapLayerEntry.circle(name: "main-circle", isMain: true),
+    MapLayerEntry.polygon(name: "main-polygon", isMain: true),
+    MapLayerEntry.polyline(name: "main-polyline", isMain: true),
+    MapLayerEntry.marker(name: "main-marker", isMain: true),
   ];
 
-  MapEntries _getEntryType(EntryType type) {
-    return mapEntriesCollection.firstWhere((element) => element.type == type);
+  MapLayerEntry _getDefaultLayerEntry(EntryType type) {
+    return mapEntriesCollection.firstWhere((element) => element.isMain);
+  }
+
+  void addMapLayerEntry({
+    required EntryType type,
+    required String name,
+    FlutterMapEntry? firstEntry,
+  }) {
+    assert(
+      mapEntriesCollection.any((entry) => entry.name == name),
+      "Names of MapLayerEntry must be unique",
+    );
+    mapEntriesCollection.add(
+      MapLayerEntry(
+        type: type,
+        name: name,
+        items: [if (firstEntry != null) firstEntry],
+      ),
+    );
   }
 
   void addMarker(InputCoordinatesSheetResult result) {
-    MapEntries entries = _getEntryType(EntryType.marker);
+    MapLayerEntry entries = _getDefaultLayerEntry(EntryType.marker);
     int count = entries.items.length;
-    entries.items.addAll(
-      result.coordinates.map((coordinate) {
-        return MarkerEntry(
-          coordinate: coordinate,
-          name: result.name ?? "marker-${count++}",
-        );
-      }).toList(),
+    entries.items.add(
+      MarkerEntry(
+        coordinate: result.coordinates.first,
+        name: result.name ?? "marker-${count++}",
+      ),
     );
     notifyListeners();
   }
 
   void addPolyLine(InputCoordinatesSheetResult result) {
-    MapEntries entries = _getEntryType(EntryType.polyline);
+    MapLayerEntry entries = _getDefaultLayerEntry(EntryType.polyline);
     int count = entries.items.length;
     entries.items.add(
       PolylineEntry(
@@ -41,7 +57,7 @@ class TileEntriesProvider with ChangeNotifier {
   }
 
   void addPolygon(InputCoordinatesSheetResult result) {
-    MapEntries entries = _getEntryType(EntryType.polygon);
+    MapLayerEntry entries = _getDefaultLayerEntry(EntryType.polygon);
     int count = entries.items.length;
     entries.items.add(
       PolygonEntry(
@@ -55,7 +71,7 @@ class TileEntriesProvider with ChangeNotifier {
   }
 
   void addCircle(InputCoordinatesSheetResult result) {
-    MapEntries entries = _getEntryType(EntryType.circle);
+    MapLayerEntry entries = _getDefaultLayerEntry(EntryType.circle);
     int count = entries.items.length;
     entries.items.add(
       CircleEntry(

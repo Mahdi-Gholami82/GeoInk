@@ -5,18 +5,23 @@ import 'package:latlong2/latlong.dart';
 /// Data models to keep track of map features or layers.
 
 /// Base class for all Entries which are used to generate map features.
-abstract class MapEntry {
+abstract class FlutterMapEntry extends ChangeNotifier {
   final String name;
   bool visible;
 
   /// will be overridden in each entry subclass.
   get feature;
 
-  MapEntry({required this.name, this.visible = true});
+  void toggleVisiblity() {
+    visible = !visible;
+    notifyListeners();
+  }
+
+  FlutterMapEntry({required this.name, this.visible = true});
 }
 
 /// Keeps track of a [Marker] feature that will be added to map layers later.
-class MarkerEntry extends MapEntry {
+class MarkerEntry extends FlutterMapEntry {
   LatLng coordinate;
   Color color;
 
@@ -38,7 +43,7 @@ class MarkerEntry extends MapEntry {
 }
 
 /// Keeps track of a [Polygon] feature that will be added to map layers later.
-class PolygonEntry extends MapEntry {
+class PolygonEntry extends FlutterMapEntry {
   final List<LatLng> points;
   final Color fillColor;
   final Color borderColor;
@@ -62,7 +67,7 @@ class PolygonEntry extends MapEntry {
 }
 
 /// Keeps track of a [Polyline] feature that will be added to map layers later.
-class PolylineEntry extends MapEntry {
+class PolylineEntry extends FlutterMapEntry {
   List<LatLng> points;
   Color color;
   double strokeWidth;
@@ -82,7 +87,7 @@ class PolylineEntry extends MapEntry {
 }
 
 /// Keeps track of a [CircleMarker] feature that will be added to map layers later.
-class CircleEntry extends MapEntry {
+class CircleEntry extends FlutterMapEntry {
   final LatLng center;
   final double radius;
   final Color borderColor;
@@ -110,20 +115,57 @@ class CircleEntry extends MapEntry {
   );
 }
 
-/// Differant types of [MapEntries]
+/// Differant types of [MapLayerEntry]
 enum EntryType { marker, polygon, polyline, circle }
 
-/// Collection of [MapEntry] sub classes, which have the same type.
-class MapEntries {
+Map entryTypeClasses = {
+  EntryType.circle: CircleEntry,
+  EntryType.marker: MarkerEntry,
+  EntryType.polygon: PolygonEntry,
+  EntryType.polyline: PolylineEntry,
+};
+
+/// Collection of [FlutterMapEntry] sub classes, which have the same type.
+class MapLayerEntry with ChangeNotifier {
   final EntryType type;
-  final List<MapEntry> items;
+  final String name;
+  final List<FlutterMapEntry> items;
+  final bool isMain;
 
-  MapEntries({required this.type, List<MapEntry>? entries})
-    : items = entries ?? [];
+  MapLayerEntry({
+    required this.type,
+    required this.name,
+    List<FlutterMapEntry>? items,
+    this.isMain = false,
+  }) : items = items ?? [];
 
-  /// Converts all [MapEntry] sub classes in [items] to a map layer which will be added to the [FlutterMap] children.
+  MapLayerEntry.marker({
+    required String name,
+    List<FlutterMapEntry>? items,
+    bool isMain = false,
+  }) : this(type: EntryType.marker, name: name, items: items, isMain: isMain);
+
+  MapLayerEntry.polygon({
+    required String name,
+    List<FlutterMapEntry>? items,
+    bool isMain = false,
+  }) : this(type: EntryType.polygon, name: name, items: items, isMain: isMain);
+
+  MapLayerEntry.polyline({
+    required String name,
+    List<FlutterMapEntry>? items,
+    bool isMain = false,
+  }) : this(type: EntryType.polyline, name: name, items: items, isMain: isMain);
+
+  MapLayerEntry.circle({
+    required String name,
+    List<FlutterMapEntry>? items,
+    bool isMain = false,
+  }) : this(type: EntryType.circle, name: name, items: items, isMain: isMain);
+
+  /// Converts all [FlutterMapEntry] sub classes in [items] to a map layer which will be added to the [FlutterMap] children.
   dynamic toFlutterMapObject() {
-    List<MapEntry> filteredItems = items
+    List<FlutterMapEntry> filteredItems = items
         .where((element) => element.visible)
         .toList();
     switch (type) {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/draggable_coordinates_sheet.dart';
-import 'package:provider/provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 void showCoordinatesButtomSheet(
-  BuildContext context, {
+  BuildContext context,
+  WidgetRef ref, {
   required Function(dynamic) then,
 
   /// Whether to be able to input radius in [DraggableCoordinatesSheet]
@@ -28,13 +30,12 @@ void showCoordinatesButtomSheet(
         (maxNumberOfCoordinatesFields ?? double.infinity),
     "minNumberOfCoordinatesFields cant be more than maxNumberOfCoordinatesFields",
   );
-  InputListCoordinatesProvider coordinatesProvider = context
-      .read<InputListCoordinatesProvider>();
-  coordinatesProvider.needsRadiusField = needsRadiusField;
-  coordinatesProvider.minNumberOfCoordinatesFields =
-      minNumberOfCoordinatesFields;
-  coordinatesProvider.maxNumberOfCoordinatesFields =
-      maxNumberOfCoordinatesFields;
+  InputListCoordinates inputListNotifier = ref.read(
+    inputListCoordinatesProvider.notifier,
+  );
+  inputListNotifier.needsRadiusField = needsRadiusField;
+  inputListNotifier.minNumberOfCoordinatesFields = minNumberOfCoordinatesFields;
+  inputListNotifier.maxNumberOfCoordinatesFields = maxNumberOfCoordinatesFields;
   showModalBottomSheet(
     isDismissible: false,
     isScrollControlled: true,

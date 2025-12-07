@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/core/theme/theme.dart' as theme;
-import 'package:mapify/data/providers/theme_provider.dart' as theme;
-import 'package:provider/provider.dart';
+import 'package:mapify/data/providers/theme_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
   static const route = "/settings";
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,17 +33,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 value: Text('English'),
               ),
               SettingsTile.switchTile(
-                initialValue:
-                    Provider.of<theme.ThemeProvider>(
-                      context,
-                      listen: false,
-                    ).themeData ==
-                    theme.darkMode,
+                initialValue: ref.read(themeProvider) == theme.darkMode,
                 onToggle: (value) {
-                  Provider.of<theme.ThemeProvider>(
-                    context,
-                    listen: false,
-                  ).toggleMode();
+                  ref.read(themeProvider.notifier).toggleMode();
                 },
                 leading: Icon(Icons.format_paint),
                 title: Text('Light/Dark Theme'),

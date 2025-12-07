@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mapify/core/services/tile_providers.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/speed_dial_fab.dart';
 import 'package:mapify/features/home/widgets/drawer.dart';
 import 'package:mapify/features/home/widgets/floating_appbar.dart';
-import 'package:provider/provider.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   static const String route = "/";
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   List<List> entriesBack = [];
   List<List> entries = [];
 
@@ -53,9 +53,9 @@ class _HomePageState extends State<HomePage> {
         ),
         children: [
           openStreetMapTileLayer,
-          ...context.watch<TileEntriesProvider>().mapEntriesCollection.map(
-            (entries) => entries.toFlutterMapObject(),
-          ),
+          ...ref
+              .watch(tileEntriesProvider)
+              .map((entries) => entries.toFlutterMapObject()),
         ],
       ),
     );

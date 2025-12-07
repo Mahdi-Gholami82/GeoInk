@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/core/utils/coordinates_reformatter.dart';
 import 'package:mapify/data/models/coordinates_sheet_data.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
-import 'package:provider/provider.dart';
 
-class InputListView extends StatefulWidget {
+class InputListView extends ConsumerStatefulWidget {
   const InputListView({super.key, required this.formGlobalKey});
   final GlobalKey formGlobalKey;
 
   @override
-  State<InputListView> createState() => _InputListViewState();
+  ConsumerState<InputListView> createState() => _InputListViewState();
 }
 
-class _InputListViewState extends State<InputListView> {
-  List<SheetListInput> get inputs =>
-      context.read<InputListCoordinatesProvider>().inputs;
-
-  set inputs(value) {
-    context.read<InputListCoordinatesProvider>().inputs = value;
-  }
+class _InputListViewState extends ConsumerState<InputListView> {
+  late InputListCoordinates inputListNotifier;
 
   late final bool needsRadiusField;
   final CoordinatesParser parser = CoordinatesParser();
@@ -26,11 +21,9 @@ class _InputListViewState extends State<InputListView> {
   @override
   void initState() {
     super.initState();
-    context.read<InputListCoordinatesProvider>().initCoordinatesProvider();
-    needsRadiusField = context
-        .read<InputListCoordinatesProvider>()
-        .needsRadiusField;
-    context.read<InputListCoordinatesProvider>().initSheetListInput();
+    inputListNotifier = ref.read(inputListCoordinatesProvider.notifier);
+    needsRadiusField = inputListNotifier.needsRadiusField;
+    inputListNotifier.initSheetListInput();
   }
 
   String? Function(String?) getFieldValidator(SheetInputFieldType type) {
@@ -68,7 +61,7 @@ class _InputListViewState extends State<InputListView> {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<InputListCoordinatesProvider>();
+    List<SheetListInput> inputs = ref.watch(inputListCoordinatesProvider);
     void onSubmit(SheetListInput currentInput) {}
 
     return Form(

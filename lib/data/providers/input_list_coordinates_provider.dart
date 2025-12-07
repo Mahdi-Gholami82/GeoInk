@@ -1,54 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:mapify/data/models/coordinates_sheet_data.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class InputListCoordinatesProvider with ChangeNotifier {
-  String get name => inputs
+part 'input_list_coordinates_provider.g.dart';
+
+@riverpod
+class InputListCoordinates extends _$InputListCoordinates {
+  Color color = Colors.red;
+  bool needsRadiusField = false;
+  int minNumberOfCoordinatesFields = 1;
+  int? maxNumberOfCoordinatesFields = 1;
+
+  @override
+  List<SheetListInput> build() {
+    return [];
+  }
+
+  String get name => state
       .firstWhere(
         (input) => input.type == SheetInputFieldType.name,
         orElse: () => SheetListInput.nameField(),
       )
       .value;
 
-  List<String> get coordinates => inputs
+  List<String> get coordinates => state
       .where((input) => input.type == SheetInputFieldType.coordinate)
       .map((input) => input.value)
       .toList();
 
-  String? get radius => inputs
+  String? get radius => state
       .firstWhere(
         (input) => input.type == SheetInputFieldType.radius,
         orElse: () => SheetListInput.radiusField(),
       )
       .value;
 
-  late Color color;
-  bool needsRadiusField = false;
-  late List<SheetListInput> inputs;
-  late int minNumberOfCoordinatesFields;
-  late int? maxNumberOfCoordinatesFields;
-
-  void initCoordinatesProvider() {
-    color = Colors.red;
-    inputs = [];
-  }
-
   void initSheetListInput() {
-    initCoordinatesProvider();
-    inputs.add(SheetListInput.nameField());
-    inputs.addAll(
+    state.add(SheetListInput.nameField());
+    state.addAll(
       List.generate(
         minNumberOfCoordinatesFields,
         (index) => SheetListInput.coordinateField(),
       ),
     );
     if (needsRadiusField) {
-      inputs.add(SheetListInput.radiusField(input: radius ?? ""));
+      state.add(SheetListInput.radiusField(input: radius ?? ""));
     }
   }
 
   void addCoordinatesField() {
-    inputs.add(SheetListInput.coordinateField());
-    notifyListeners();
+    state.add(SheetListInput.coordinateField());
   }
 
   InputCoordinatesSheetResult takeFinalResult() {
@@ -57,8 +58,6 @@ class InputListCoordinatesProvider with ChangeNotifier {
       color: color,
       radius: radius,
     );
-    initCoordinatesProvider();
-    notifyListeners();
     return result;
   }
 }

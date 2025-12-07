@@ -1,51 +1,65 @@
-import 'package:flutter/material.dart';
 import 'package:mapify/data/models/coordinates_sheet_data.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:collection/collection.dart';
 
-class TileEntriesProvider with ChangeNotifier {
-  List<MapLayerEntry> mapEntriesCollection = [
-    MapLayerEntry.circle(name: "main-circle", isMain: true),
-    MapLayerEntry.polygon(name: "main-polygon", isMain: true),
-    MapLayerEntry.polyline(name: "main-polyline", isMain: true),
-    MapLayerEntry.marker(name: "main-marker", isMain: true),
-  ];
+part 'map_tiles_provider.g.dart';
 
-  MapLayerEntry _getDefaultLayerEntry(EntryType type) {
-    return mapEntriesCollection.firstWhere((element) => element.isMain);
+@riverpod
+class TileEntriesNotifier extends _$TileEntriesNotifier {
+  @override
+  List<MapLayerEntry> build() {
+    return [];
   }
 
-  void addMapLayerEntry({
+  void _forceRebuild() {
+    state = [...state];
+  }
+
+  MapLayerEntry? _getDefaultLayerEntry(EntryType type) {
+    return state.firstWhereOrNull((element) => element.isMain);
+  }
+
+  MapLayerEntry addMapLayerEntry({
     required EntryType type,
     required String name,
     FlutterMapEntry? firstEntry,
   }) {
     assert(
-      mapEntriesCollection.any((entry) => entry.name == name),
+      !state.any((entry) => entry.name == name),
       "Names of MapLayerEntry must be unique",
     );
-    mapEntriesCollection.add(
-      MapLayerEntry(
-        type: type,
-        name: name,
-        items: [if (firstEntry != null) firstEntry],
-      ),
+    MapLayerEntry newEntry = MapLayerEntry(
+      type: type,
+      name: name,
+      items: [if (firstEntry != null) firstEntry],
     );
+    state.add(newEntry);
+    return newEntry;
   }
 
   void addMarker(InputCoordinatesSheetResult result) {
-    MapLayerEntry entries = _getDefaultLayerEntry(EntryType.marker);
-    int count = entries.items.length;
-    entries.items.add(
+    MapLayerEntry? entryLayer = _getDefaultLayerEntry(EntryType.marker);
+    entryLayer ??= addMapLayerEntry(
+      type: EntryType.marker,
+      name: "main-marker",
+    );
+    int count = entryLayer.items.length;
+    entryLayer.items.add(
       MarkerEntry(
         coordinate: result.coordinates.first,
         name: result.name ?? "marker-${count++}",
       ),
     );
-    notifyListeners();
+    _forceRebuild();
   }
 
   void addPolyLine(InputCoordinatesSheetResult result) {
-    MapLayerEntry entries = _getDefaultLayerEntry(EntryType.polyline);
+    MapLayerEntry? entries = _getDefaultLayerEntry(EntryType.polyline);
+    entries ??= addMapLayerEntry(
+      type: EntryType.polyline,
+      name: "main-polyline",
+    );
     int count = entries.items.length;
     entries.items.add(
       PolylineEntry(
@@ -53,11 +67,12 @@ class TileEntriesProvider with ChangeNotifier {
         points: result.coordinates.toList(),
       ),
     );
-    notifyListeners();
+    _forceRebuild();
   }
 
   void addPolygon(InputCoordinatesSheetResult result) {
-    MapLayerEntry entries = _getDefaultLayerEntry(EntryType.polygon);
+    MapLayerEntry? entries = _getDefaultLayerEntry(EntryType.polygon);
+    entries ??= addMapLayerEntry(type: EntryType.polygon, name: "main-polygon");
     int count = entries.items.length;
     entries.items.add(
       PolygonEntry(
@@ -67,11 +82,12 @@ class TileEntriesProvider with ChangeNotifier {
         fillColor: result.color.withAlpha(128),
       ),
     );
-    notifyListeners();
+    _forceRebuild();
   }
 
   void addCircle(InputCoordinatesSheetResult result) {
-    MapLayerEntry entries = _getDefaultLayerEntry(EntryType.circle);
+    MapLayerEntry? entries = _getDefaultLayerEntry(EntryType.circle);
+    entries ??= addMapLayerEntry(type: EntryType.circle, name: "main-circle");
     int count = entries.items.length;
     entries.items.add(
       CircleEntry(
@@ -82,6 +98,6 @@ class TileEntriesProvider with ChangeNotifier {
         borderColor: result.color.withAlpha(128),
       ),
     );
-    notifyListeners();
+    _forceRebuild();
   }
 }

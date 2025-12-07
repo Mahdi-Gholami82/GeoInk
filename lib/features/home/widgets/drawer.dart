@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/core/utils/map_icons.dart' as map_icons;
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
-import 'package:provider/provider.dart';
 
-class MapDrawer extends StatefulWidget {
+class MapDrawer extends ConsumerStatefulWidget {
   const MapDrawer({super.key});
 
   @override
-  State<MapDrawer> createState() => _MapDrawerState();
+  ConsumerState<MapDrawer> createState() => _MapDrawerState();
 }
 
-class _MapDrawerState extends State<MapDrawer> {
+class _MapDrawerState extends ConsumerState<MapDrawer> {
   Icon _getLayerIcon(EntryType type) {
     switch (type) {
       case EntryType.circle:
@@ -27,9 +27,7 @@ class _MapDrawerState extends State<MapDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    List<MapLayerEntry> collection = context
-        .watch<TileEntriesProvider>()
-        .mapEntriesCollection;
+    List<MapLayerEntry> collection = ref.watch(tileEntriesProvider);
     return Drawer(
       child: Column(
         children: [

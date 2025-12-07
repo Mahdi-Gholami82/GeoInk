@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/custom_color_picker.dart';
 import 'package:mapify/features/add_map_layer/widgets/input_list_view.dart';
-import 'package:provider/provider.dart';
 
-class CoordinatesSheet extends StatefulWidget {
+class CoordinatesSheet extends ConsumerStatefulWidget {
   const CoordinatesSheet({
     super.key,
     required this.scrollController,
@@ -14,18 +14,18 @@ class CoordinatesSheet extends StatefulWidget {
   final String title;
 
   @override
-  State<CoordinatesSheet> createState() => _CoordinatesSheetState();
+  ConsumerState<CoordinatesSheet> createState() => _CoordinatesSheetState();
 }
 
-class _CoordinatesSheetState extends State<CoordinatesSheet> {
+class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
   Color chosenColor = Colors.red;
   final formGlobalKey = GlobalKey<FormState>();
-  late InputListCoordinatesProvider coordinatesProvider;
+  late InputListCoordinates inputListNotifier;
 
   @override
   void initState() {
     super.initState();
-    coordinatesProvider = context.read<InputListCoordinatesProvider>();
+    inputListNotifier = ref.read(inputListCoordinatesProvider.notifier);
   }
 
   @override
@@ -87,9 +87,8 @@ class _CoordinatesSheetState extends State<CoordinatesSheet> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       spacing: 20,
                       children: [
-                        if (!coordinatesProvider.needsRadiusField &&
-                            coordinatesProvider.maxNumberOfCoordinatesFields !=
-                                1)
+                        if (!inputListNotifier.needsRadiusField &&
+                            inputListNotifier.maxNumberOfCoordinatesFields != 1)
                           TextButton(
                             style: TextButton.styleFrom(
                               backgroundColor: Theme.of(
@@ -107,9 +106,7 @@ class _CoordinatesSheetState extends State<CoordinatesSheet> {
                               shape: const StadiumBorder(),
                             ),
                             onPressed: () {
-                              context
-                                  .read<InputListCoordinatesProvider>()
-                                  .addCoordinatesField();
+                              inputListNotifier.addCoordinatesField();
                             },
                             child: Text(
                               "Add Coordinates",
@@ -132,15 +129,10 @@ class _CoordinatesSheetState extends State<CoordinatesSheet> {
                           ),
                           onPressed: () {
                             if (formGlobalKey.currentState!.validate()) {
-                              context
-                                      .read<InputListCoordinatesProvider>()
-                                      .color =
-                                  chosenColor;
-                              Navigator.of(context).pop(
-                                context
-                                    .read<InputListCoordinatesProvider>()
-                                    .takeFinalResult(),
-                              );
+                              inputListNotifier.color = chosenColor;
+                              Navigator.of(
+                                context,
+                              ).pop(inputListNotifier.takeFinalResult());
                             }
                           },
                           child: Text(

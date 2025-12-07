@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mapify/core/theme/theme.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class ThemeProvider with ChangeNotifier {
-  ThemeData _themeData = lightMode;
+part 'theme_provider.g.dart';
 
-  ThemeData get themeData => _themeData;
-
-  set themeData(ThemeData themeData) {
-    _themeData = themeData;
-    notifyListeners();
+@riverpod
+class ThemeNotifier extends _$ThemeNotifier {
+  @override
+  ThemeData build() {
+    return lightMode;
   }
 
   void toggleMode() {
-    themeData = themeData == lightMode ? darkMode : lightMode;
+    state = state == lightMode ? darkMode : lightMode;
   }
 }

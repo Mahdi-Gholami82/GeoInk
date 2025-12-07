@@ -39,11 +39,13 @@ dependencies:
   http: ^1.6.0
   flutter_speed_dial: ^7.0.0
   settings_ui: ^2.0.2
-  provider: ^6.1.5+1
   flutter_colorpicker: ^1.1.0
   wtf_sliding_sheet: ^1.1.5
   bottom_sheet: ^4.0.4
   window_manager: ^0.5.1
+  flutter_riverpod: ^3.0.3
+  riverpod_annotation: ^3.0.3
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +57,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  riverpod_generator: ^3.0.3
+  build_runner: ^2.10.4
+  custom_lint: ^0.8.1
+  riverpod_lint: ^3.0.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

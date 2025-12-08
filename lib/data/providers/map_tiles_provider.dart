@@ -20,6 +20,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     return state.firstWhereOrNull((element) => element.isMain);
   }
 
+  void setConsumersState(void Function() fn) {
+    fn();
+    _forceRebuild();
+  }
+
   MapLayerEntry addMapLayerEntry({
     required EntryType type,
     required String name,

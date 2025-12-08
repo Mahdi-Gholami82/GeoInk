@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/core/utils/map_icons.dart' as map_icons;
 import 'package:mapify/data/models/flutter_map_entry.dart';
+import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
 
 class MapDrawer extends ConsumerStatefulWidget {
@@ -59,7 +60,9 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                       title: Text(item.name),
                       trailing: IconButton(
                         onPressed: () {
-                          item.toggleVisiblity();
+                          ref
+                              .read(tileEntriesProvider.notifier)
+                              .setConsumersState(item.toggleVisiblity);
                         },
                         icon: Icon(
                           item.visible

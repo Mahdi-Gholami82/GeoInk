@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/coordinates_sheet.dart';
 
-class DraggableCoordinatesSheet extends StatefulWidget {
+class DraggableCoordinatesSheet extends ConsumerStatefulWidget {
   const DraggableCoordinatesSheet(
     this.title, {
     super.key,
@@ -18,11 +20,12 @@ class DraggableCoordinatesSheet extends StatefulWidget {
   final double pullDownOffset;
 
   @override
-  State<DraggableCoordinatesSheet> createState() =>
+  ConsumerState<DraggableCoordinatesSheet> createState() =>
       _DraggableCoordinatesSheetState();
 }
 
-class _DraggableCoordinatesSheetState extends State<DraggableCoordinatesSheet> {
+class _DraggableCoordinatesSheetState
+    extends ConsumerState<DraggableCoordinatesSheet> {
   final double _dragSensitivity = 1;
   late double pixelsMoved;
   late double initDragPosition;
@@ -41,6 +44,11 @@ class _DraggableCoordinatesSheetState extends State<DraggableCoordinatesSheet> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void _animateSheetTo(double size) {
     controller.animateTo(
       size,
@@ -51,6 +59,7 @@ class _DraggableCoordinatesSheetState extends State<DraggableCoordinatesSheet> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(inputListCoordinatesProvider);
     return DraggableScrollableSheet(
       controller: controller,
       shouldCloseOnMinExtent: false,

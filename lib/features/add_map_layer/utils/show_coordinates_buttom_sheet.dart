@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/draggable_coordinates_sheet.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 void showCoordinatesButtomSheet(
   BuildContext context,
@@ -33,6 +32,7 @@ void showCoordinatesButtomSheet(
   InputListCoordinates inputListNotifier = ref.read(
     inputListCoordinatesProvider.notifier,
   );
+  ref.watch(inputListCoordinatesProvider);
   inputListNotifier.needsRadiusField = needsRadiusField;
   inputListNotifier.minNumberOfCoordinatesFields = minNumberOfCoordinatesFields;
   inputListNotifier.maxNumberOfCoordinatesFields = maxNumberOfCoordinatesFields;
@@ -43,5 +43,8 @@ void showCoordinatesButtomSheet(
     context: context,
     builder: (context) =>
         DraggableCoordinatesSheet(title, initialChildSize: 0.6),
-  ).then(then);
+  ).then((value) {
+    ref.invalidate(inputListCoordinatesProvider);
+    then(value);
+  });
 }

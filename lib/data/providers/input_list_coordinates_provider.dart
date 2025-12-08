@@ -35,6 +35,10 @@ class InputListCoordinates extends _$InputListCoordinates {
       )
       .value;
 
+  void _forceRebuild() {
+    state = [...state];
+  }
+
   void initSheetListInput() {
     state.add(SheetListInput.nameField());
     state.addAll(
@@ -50,6 +54,7 @@ class InputListCoordinates extends _$InputListCoordinates {
 
   void addCoordinatesField() {
     state.add(SheetListInput.coordinateField());
+    _forceRebuild();
   }
 
   InputCoordinatesSheetResult takeFinalResult() {

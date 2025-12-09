@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mapify/data/models/coordinates_sheet_data.dart';
+import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'input_list_coordinates_provider.g.dart';
 
 @riverpod
-class InputListCoordinates extends _$InputListCoordinates {
+class InputListCoordinatesNotifier extends _$InputListCoordinates {
   Color color = Colors.red;
-  bool needsRadiusField = false;
-  int minNumberOfCoordinatesFields = 1;
-  int? maxNumberOfCoordinatesFields = 1;
+  MapLayerEntry? layer;
+  late EntryType type;
 
   @override
   List<SheetListInput> build() {
@@ -39,11 +39,28 @@ class InputListCoordinates extends _$InputListCoordinates {
     state = [...state];
   }
 
-  void initSheetListInput() {
+  void initSheetListInput({required EntryType initType}) {
+    type = initType;
+    int numberOfCoordinatesFields;
+    bool needsRadiusField = false;
     state.add(SheetListInput.nameField());
+    switch (type) {
+      case EntryType.circle:
+        numberOfCoordinatesFields = 1;
+        needsRadiusField = true;
+
+      case EntryType.marker:
+        numberOfCoordinatesFields = 1;
+
+      case EntryType.polygon:
+        numberOfCoordinatesFields = 3;
+
+      case EntryType.polyline:
+        numberOfCoordinatesFields = 2;
+    }
     state.addAll(
       List.generate(
-        minNumberOfCoordinatesFields,
+        numberOfCoordinatesFields,
         (index) => SheetListInput.coordinateField(),
       ),
     );
@@ -62,6 +79,7 @@ class InputListCoordinates extends _$InputListCoordinates {
       coordinates: coordinates,
       color: color,
       radius: radius,
+      layer: layer,
     );
     return result;
   }

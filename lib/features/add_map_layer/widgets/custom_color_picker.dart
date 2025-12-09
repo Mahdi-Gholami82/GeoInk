@@ -17,29 +17,35 @@ class CustomColorPicker extends StatefulWidget {
 class _CustomColorPickerState extends State<CustomColorPicker> {
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton.small(
-      backgroundColor: widget.initialColor,
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Select a color'),
-              content: SingleChildScrollView(
-                child: BlockPicker(
-                  pickerColor: widget.initialColor,
-                  onColorChanged: (Color value) {
-                    widget.onColorChanged(value);
-                  },
-                ),
-              ),
+    return Row(
+      spacing: 15,
+      children: [
+        FloatingActionButton.small(
+          backgroundColor: widget.initialColor,
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Select a color'),
+                  content: SingleChildScrollView(
+                    child: BlockPicker(
+                      pickerColor: widget.initialColor,
+                      onColorChanged: (Color value) {
+                        widget.onColorChanged(value);
+                      },
+                    ),
+                  ),
+                );
+              },
             );
           },
-        );
-      },
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Icon(Icons.colorize, color: Colors.white, size: 18),
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: Icon(Icons.colorize, color: Colors.white, size: 18),
+        ),
+        Text("Change color", style: TextStyle(fontWeight: FontWeight.w500)),
+      ],
     );
   }
 }

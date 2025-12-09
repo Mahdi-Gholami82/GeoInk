@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:mapify/data/models/flutter_map_entry.dart';
 
 LatLng _textToCoordinates(String text) {
   List<String> splitted = text.split(",");
@@ -14,6 +15,7 @@ class InputCoordinatesSheetResult {
   InputCoordinatesSheetResult({
     required List<String> coordinates,
     required this.color,
+    this.layer,
     String? radius,
     this.name,
   }) : coordinates = _stringToCoordinates(coordinates),
@@ -22,6 +24,7 @@ class InputCoordinatesSheetResult {
   double? radius;
   Color color;
   String? name;
+  MapLayerEntry? layer;
 }
 
 enum SheetInputFieldType { name, coordinate, radius }

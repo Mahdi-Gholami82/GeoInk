@@ -44,11 +44,6 @@ class _DraggableCoordinatesSheetState
     super.initState();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   void _animateSheetTo(double size) {
     controller.animateTo(
       size,

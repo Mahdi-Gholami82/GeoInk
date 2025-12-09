@@ -130,38 +130,58 @@ class MapLayerEntry with ChangeNotifier {
   final EntryType type;
   final String name;
   final List<FlutterMapEntry> items;
-  final bool isMain;
+  final bool isDefault;
 
   MapLayerEntry({
     required this.type,
     required this.name,
     List<FlutterMapEntry>? items,
-    this.isMain = false,
+    this.isDefault = false,
   }) : items = items ?? [];
 
   MapLayerEntry.marker({
     required String name,
     List<FlutterMapEntry>? items,
     bool isMain = false,
-  }) : this(type: EntryType.marker, name: name, items: items, isMain: isMain);
+  }) : this(
+         type: EntryType.marker,
+         name: name,
+         items: items,
+         isDefault: isMain,
+       );
 
   MapLayerEntry.polygon({
     required String name,
     List<FlutterMapEntry>? items,
     bool isMain = false,
-  }) : this(type: EntryType.polygon, name: name, items: items, isMain: isMain);
+  }) : this(
+         type: EntryType.polygon,
+         name: name,
+         items: items,
+         isDefault: isMain,
+       );
 
   MapLayerEntry.polyline({
     required String name,
     List<FlutterMapEntry>? items,
     bool isMain = false,
-  }) : this(type: EntryType.polyline, name: name, items: items, isMain: isMain);
+  }) : this(
+         type: EntryType.polyline,
+         name: name,
+         items: items,
+         isDefault: isMain,
+       );
 
   MapLayerEntry.circle({
     required String name,
     List<FlutterMapEntry>? items,
     bool isMain = false,
-  }) : this(type: EntryType.circle, name: name, items: items, isMain: isMain);
+  }) : this(
+         type: EntryType.circle,
+         name: name,
+         items: items,
+         isDefault: isMain,
+       );
 
   /// Converts all [FlutterMapEntry] sub classes in [items] to a map layer which will be added to the [FlutterMap] children.
   dynamic toFlutterMapObject() {

@@ -20,7 +20,7 @@ final class TileEntriesNotifierProvider
         argument: null,
         retry: null,
         name: r'tileEntriesProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -42,7 +42,7 @@ final class TileEntriesNotifierProvider
 }
 
 String _$tileEntriesNotifierHash() =>
-    r'b558ce4540b8931abd9642b7e804eb1c2920811a';
+    r'9219a939e9e11262a71fd5612e84305e06d97a4e';
 
 abstract class _$TileEntriesNotifier extends $Notifier<List<MapLayerEntry>> {
   List<MapLayerEntry> build();

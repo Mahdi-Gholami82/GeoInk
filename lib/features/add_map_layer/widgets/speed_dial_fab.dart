@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:mapify/features/add_map_layer/utils/show_coordinates_buttom_sheet.dart';
 
@@ -26,8 +27,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Marker",
-              minNumberOfCoordinatesFields: 1,
-              maxNumberOfCoordinatesFields: 1,
+              type: EntryType.marker,
               then: (value) {
                 if (value != null) {
                   tileEntriesNotifier.addMarker(value);
@@ -44,7 +44,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Polyline",
-              minNumberOfCoordinatesFields: 2,
+              type: EntryType.polyline,
               then: (value) {
                 if (value != null) {
                   tileEntriesNotifier.addPolyLine(value);
@@ -60,14 +60,13 @@ class AddMapElementFab extends ConsumerWidget {
             showCoordinatesButtomSheet(
               context,
               ref,
-              maxNumberOfCoordinatesFields: 1,
               title: "Add Circle",
+              type: EntryType.circle,
               then: (value) {
                 if (value != null) {
                   tileEntriesNotifier.addCircle(value);
                 }
               },
-              needsRadiusField: true,
             );
           },
         ),
@@ -79,7 +78,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Polygon",
-              minNumberOfCoordinatesFields: 3,
+              type: EntryType.polygon,
               then: (value) {
                 if (value != null) {
                   tileEntriesNotifier.addPolygon(value);

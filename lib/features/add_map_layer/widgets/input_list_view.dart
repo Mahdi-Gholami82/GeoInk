@@ -13,7 +13,7 @@ class InputListView extends ConsumerStatefulWidget {
 }
 
 class _InputListViewState extends ConsumerState<InputListView> {
-  late InputListCoordinates inputListNotifier;
+  late InputListCoordinatesNotifier inputListNotifier;
 
   late final bool needsRadiusField;
   final CoordinatesParser parser = CoordinatesParser();
@@ -22,8 +22,6 @@ class _InputListViewState extends ConsumerState<InputListView> {
   void initState() {
     super.initState();
     inputListNotifier = ref.read(inputListCoordinatesProvider.notifier);
-    needsRadiusField = inputListNotifier.needsRadiusField;
-    inputListNotifier.initSheetListInput();
   }
 
   String? Function(String?) getFieldValidator(SheetInputFieldType type) {

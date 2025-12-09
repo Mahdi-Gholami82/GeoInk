@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/custom_color_picker.dart';
 import 'package:mapify/features/add_map_layer/widgets/input_list_view.dart';
+import 'package:mapify/features/add_map_layer/widgets/map_layer_picker.dart';
 
 class CoordinatesSheet extends ConsumerStatefulWidget {
   const CoordinatesSheet({
@@ -20,7 +22,7 @@ class CoordinatesSheet extends ConsumerStatefulWidget {
 class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
   Color chosenColor = Colors.red;
   final formGlobalKey = GlobalKey<FormState>();
-  late InputListCoordinates inputListNotifier;
+  late InputListCoordinatesNotifier inputListNotifier;
 
   @override
   void initState() {
@@ -59,7 +61,8 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: Row(
-                        spacing: 15,
+                        spacing: 30,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CustomColorPicker(
                             onColorChanged: (Color value) {
@@ -69,10 +72,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                             },
                             initialColor: chosenColor,
                           ),
-                          Text(
-                            "Change layer color",
-                            style: TextStyle(fontWeight: FontWeight.w500),
-                          ),
+                          MapLayerPicker(type: inputListNotifier.type),
                         ],
                       ),
                     ),
@@ -87,22 +87,14 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       spacing: 20,
                       children: [
-                        if (!inputListNotifier.needsRadiusField &&
-                            inputListNotifier.maxNumberOfCoordinatesFields != 1)
-                          TextButton(
+                        if (inputListNotifier.type == EntryType.polygon ||
+                            inputListNotifier.type == EntryType.polyline)
+                          OutlinedButton(
                             style: TextButton.styleFrom(
                               backgroundColor: Theme.of(
                                 context,
                               ).colorScheme.surface,
-                              foregroundColor: Theme.of(
-                                context,
-                              ).colorScheme.onSurface,
                               minimumSize: const Size(110, 50),
-                              side: BorderSide(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.outlineVariant,
-                              ),
                               shape: const StadiumBorder(),
                             ),
                             onPressed: () {

@@ -9,11 +9,12 @@ part of 'input_list_coordinates_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(InputListCoordinates)
+@ProviderFor(InputListCoordinatesNotifier)
 const inputListCoordinatesProvider = InputListCoordinatesProvider._();
 
 final class InputListCoordinatesProvider
-    extends $NotifierProvider<InputListCoordinates, List<SheetListInput>> {
+    extends
+        $NotifierProvider<InputListCoordinatesNotifier, List<SheetListInput>> {
   const InputListCoordinatesProvider._()
     : super(
         from: null,
@@ -30,7 +31,7 @@ final class InputListCoordinatesProvider
 
   @$internal
   @override
-  InputListCoordinates create() => InputListCoordinates();
+  InputListCoordinatesNotifier create() => InputListCoordinatesNotifier();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(List<SheetListInput> value) {

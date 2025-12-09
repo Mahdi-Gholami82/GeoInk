@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 
 part 'map_tiles_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class TileEntriesNotifier extends _$TileEntriesNotifier {
   @override
   List<MapLayerEntry> build() {
@@ -16,8 +16,20 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     state = [...state];
   }
 
-  MapLayerEntry? _getDefaultLayerEntry(EntryType type) {
-    return state.firstWhereOrNull((element) => element.isMain);
+  MapLayerEntry _getDefaultLayerEntry(EntryType type) {
+    MapLayerEntry layerEntry = state.firstWhere(
+      (element) => element.isDefault,
+      orElse: () {
+        MapLayerEntry newlayerEntry = MapLayerEntry(
+          name: "${type.name} main layer",
+          type: type,
+          isDefault: true,
+        );
+        addMapLayerEntry(layerEntry: newlayerEntry);
+        return newlayerEntry;
+      },
+    );
+    return layerEntry;
   }
 
   void setConsumersState(void Function() fn) {
@@ -25,48 +37,42 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     _forceRebuild();
   }
 
-  MapLayerEntry addMapLayerEntry({
-    required EntryType type,
-    required String name,
-    FlutterMapEntry? firstEntry,
+  void addMapLayerEntry({
+    required MapLayerEntry layerEntry,
+    bool ignoreIfExists = false,
   }) {
-    assert(
-      !state.any((entry) => entry.name == name),
-      "Names of MapLayerEntry must be unique",
-    );
-    MapLayerEntry newEntry = MapLayerEntry(
-      type: type,
-      name: name,
-      items: [if (firstEntry != null) firstEntry],
-    );
-    state.add(newEntry);
-    return newEntry;
+    try {
+      assert(
+        !state.any((entry) => entry.name == layerEntry.name),
+        "Names of MapLayerEntry must be unique",
+      );
+    } on AssertionError {
+      if (ignoreIfExists) {
+        return;
+      }
+      rethrow;
+    }
+    state.add(layerEntry);
   }
 
   void addMarker(InputCoordinatesSheetResult result) {
-    MapLayerEntry? entryLayer = _getDefaultLayerEntry(EntryType.marker);
-    entryLayer ??= addMapLayerEntry(
-      type: EntryType.marker,
-      name: "main-marker",
-    );
+    MapLayerEntry entryLayer =
+        result.layer ?? _getDefaultLayerEntry(EntryType.marker);
     int count = entryLayer.items.length;
     entryLayer.items.add(
       MarkerEntry(
         coordinate: result.coordinates.first,
-        name: result.name ?? "marker-${count++}",
+        name: result.name ?? "marker-layer-${count++}",
       ),
     );
     _forceRebuild();
   }
 
-  void addPolyLine(InputCoordinatesSheetResult result) {
-    MapLayerEntry? entries = _getDefaultLayerEntry(EntryType.polyline);
-    entries ??= addMapLayerEntry(
-      type: EntryType.polyline,
-      name: "main-polyline",
-    );
-    int count = entries.items.length;
-    entries.items.add(
+  void addPolyLine(InputCoordinatesSheetResult result, {MapLayerEntry? layer}) {
+    MapLayerEntry entryLayer =
+        layer ?? _getDefaultLayerEntry(EntryType.polyline);
+    int count = entryLayer.items.length;
+    entryLayer.items.add(
       PolylineEntry(
         name: result.name ?? "polyline-${count++}",
         points: result.coordinates.toList(),
@@ -75,11 +81,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     _forceRebuild();
   }
 
-  void addPolygon(InputCoordinatesSheetResult result) {
-    MapLayerEntry? entries = _getDefaultLayerEntry(EntryType.polygon);
-    entries ??= addMapLayerEntry(type: EntryType.polygon, name: "main-polygon");
-    int count = entries.items.length;
-    entries.items.add(
+  void addPolygon(InputCoordinatesSheetResult result, {MapLayerEntry? layer}) {
+    MapLayerEntry entryLayer =
+        layer ?? _getDefaultLayerEntry(EntryType.polygon);
+    int count = entryLayer.items.length;
+    entryLayer.items.add(
       PolygonEntry(
         name: result.name ?? "polygon-${count++}",
         points: result.coordinates.toList(),
@@ -90,11 +96,10 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     _forceRebuild();
   }
 
-  void addCircle(InputCoordinatesSheetResult result) {
-    MapLayerEntry? entries = _getDefaultLayerEntry(EntryType.circle);
-    entries ??= addMapLayerEntry(type: EntryType.circle, name: "main-circle");
-    int count = entries.items.length;
-    entries.items.add(
+  void addCircle(InputCoordinatesSheetResult result, {MapLayerEntry? layer}) {
+    MapLayerEntry entryLayer = layer ?? _getDefaultLayerEntry(EntryType.circle);
+    int count = entryLayer.items.length;
+    entryLayer.items.add(
       CircleEntry(
         name: result.name ?? "circle-${count++}",
         center: result.coordinates[0],

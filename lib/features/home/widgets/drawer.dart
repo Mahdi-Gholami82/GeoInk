@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:expansion_tile_list/expansion_tile_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/core/utils/map_icons.dart' as map_icons;
@@ -25,6 +27,41 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
     }
   }
 
+  ExpansionTile _buildLayerExpansionTile(MapLayerEntry layer) {
+    return ExpansionTile(
+      key: ValueKey(layer.name),
+      title: Text(layer.name),
+      children: [
+        ReorderableListView(
+          key: PageStorageKey('inner-${layer.name}'),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          onReorder: (int oldIndex, int newIndex) {},
+          children: layer.items.mapIndexed((index, item) {
+            return Padding(
+              key: ValueKey('${item.name}-padding'),
+              padding: const EdgeInsets.only(right: 16.0),
+              child: ListTile(
+                title: Text(item.name),
+                key: ValueKey(item.name),
+                trailing: IconButton(
+                  onPressed: () {
+                    ref
+                        .read(tileEntriesProvider.notifier)
+                        .setConsumersState(item.toggleVisiblity);
+                  },
+                  icon: Icon(
+                    item.visible ? Icons.visibility : Icons.visibility_off,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<MapLayerEntry> collection = ref.watch(tileEntriesProvider);
@@ -47,32 +84,12 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: collection.length,
-              itemBuilder: (BuildContext context, int index) {
-                MapLayerEntry layer = collection[index];
-                return ExpansionTile(
-                  leading: _getLayerIcon(layer.type),
-                  title: Text(layer.name),
-                  children: layer.items.map((item) {
-                    return ListTile(
-                      title: Text(item.name),
-                      trailing: IconButton(
-                        onPressed: () {
-                          ref
-                              .read(tileEntriesProvider.notifier)
-                              .setConsumersState(item.toggleVisiblity);
-                        },
-                        icon: Icon(
-                          item.visible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                );
-              },
+            child: ExpansionTileList.reorderable(
+              expansionMode: ExpansionMode.atMostOne,
+              onReorder: (int oldIndex, int newIndex) {},
+              children: collection
+                  .map((layer) => _buildLayerExpansionTile(layer))
+                  .toList(),
             ),
           ),
         ],

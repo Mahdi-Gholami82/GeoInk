@@ -46,7 +46,7 @@ final class InputListCoordinatesNotifierProvider
 }
 
 String _$inputListCoordinatesNotifierHash() =>
-    r'689a4fc3a0b42295f72bb084bd7bd5a8a0636a6e';
+    r'5bfd7230061d6f3a3a745f9d160f7d70e44f1b8f';
 
 abstract class _$InputListCoordinatesNotifier
     extends $Notifier<InputListCoordinatesState> {

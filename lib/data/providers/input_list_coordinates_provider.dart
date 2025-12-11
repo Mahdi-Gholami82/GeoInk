@@ -65,6 +65,10 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     return InputListCoordinatesState.empty();
   }
 
+  void _forceRebuild() {
+    state = state.copyWith();
+  }
+
   void initSheetListInput({required EntryType initType}) {
     int numberOfCoordinatesFields;
     bool needsRadiusField = false;
@@ -111,9 +115,8 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
   }
 
   void addCoordinatesField() {
-    state = state.copyWith(
-      fields: [...state.fields, SheetListInput.coordinateField()],
-    );
+    state.fields.add(SheetListInput.coordinateField());
+    _forceRebuild();
   }
 
   InputCoordinatesSheetResult takeFinalResult() {

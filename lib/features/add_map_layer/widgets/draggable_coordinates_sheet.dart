@@ -39,9 +39,9 @@ class _DraggableCoordinatesSheetState
 
   @override
   void initState() {
+    super.initState();
     initDragPosition = widget.initialChildSize;
     pixelsMoved = 0;
-    super.initState();
   }
 
   void _animateSheetTo(double size) {
@@ -54,7 +54,6 @@ class _DraggableCoordinatesSheetState
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(inputListCoordinatesProvider);
     return DraggableScrollableSheet(
       controller: controller,
       shouldCloseOnMinExtent: false,

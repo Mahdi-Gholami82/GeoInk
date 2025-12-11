@@ -10,12 +10,15 @@ part of 'input_list_coordinates_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(InputListCoordinatesNotifier)
-const inputListCoordinatesProvider = InputListCoordinatesProvider._();
+const inputListCoordinatesProvider = InputListCoordinatesNotifierProvider._();
 
-final class InputListCoordinatesProvider
+final class InputListCoordinatesNotifierProvider
     extends
-        $NotifierProvider<InputListCoordinatesNotifier, List<SheetListInput>> {
-  const InputListCoordinatesProvider._()
+        $NotifierProvider<
+          InputListCoordinatesNotifier,
+          InputListCoordinatesState
+        > {
+  const InputListCoordinatesNotifierProvider._()
     : super(
         from: null,
         argument: null,
@@ -27,36 +30,38 @@ final class InputListCoordinatesProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$inputListCoordinatesHash();
+  String debugGetCreateSourceHash() => _$inputListCoordinatesNotifierHash();
 
   @$internal
   @override
   InputListCoordinatesNotifier create() => InputListCoordinatesNotifier();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<SheetListInput> value) {
+  Override overrideWithValue(InputListCoordinatesState value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<List<SheetListInput>>(value),
+      providerOverride: $SyncValueProvider<InputListCoordinatesState>(value),
     );
   }
 }
 
-String _$inputListCoordinatesHash() =>
-    r'e3a50062a92d443d5c47af67a655a172c7dfec3f';
+String _$inputListCoordinatesNotifierHash() =>
+    r'689a4fc3a0b42295f72bb084bd7bd5a8a0636a6e';
 
-abstract class _$InputListCoordinates extends $Notifier<List<SheetListInput>> {
-  List<SheetListInput> build();
+abstract class _$InputListCoordinatesNotifier
+    extends $Notifier<InputListCoordinatesState> {
+  InputListCoordinatesState build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<List<SheetListInput>, List<SheetListInput>>;
+    final ref =
+        this.ref as $Ref<InputListCoordinatesState, InputListCoordinatesState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<SheetListInput>, List<SheetListInput>>,
-              List<SheetListInput>,
+              AnyNotifier<InputListCoordinatesState, InputListCoordinatesState>,
+              InputListCoordinatesState,
               Object?,
               Object?
             >;

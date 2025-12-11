@@ -24,7 +24,6 @@ void showCoordinatesButtomSheet(
     builder: (context) =>
         DraggableCoordinatesSheet(title, initialChildSize: 0.6),
   ).then((value) {
-    ref.invalidate(inputListCoordinatesProvider);
     then(value);
   });
 }

@@ -1,7 +1,6 @@
 import 'package:mapify/data/models/coordinates_sheet_data.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:collection/collection.dart';
 
 part 'map_tiles_provider.g.dart';
 
@@ -16,7 +15,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     state = [...state];
   }
 
-  MapLayerEntry _getDefaultLayerEntry(EntryType type) {
+  MapLayerEntry getDefaultLayerEntry(EntryType type) {
     MapLayerEntry layerEntry = state.firstWhere(
       (element) => element.isDefault,
       orElse: () {
@@ -25,11 +24,16 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
           type: type,
           isDefault: true,
         );
-        addMapLayerEntry(layerEntry: newlayerEntry);
         return newlayerEntry;
       },
     );
     return layerEntry;
+  }
+
+  MapLayerEntry _getLayerEntry(MapLayerEntry? layer, EntryType type) {
+    MapLayerEntry entryLayer = layer ?? getDefaultLayerEntry(type);
+    addMapLayerEntry(layerEntry: entryLayer, ignoreIfExists: true);
+    return entryLayer;
   }
 
   void setConsumersState(void Function() fn) {
@@ -56,8 +60,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
   }
 
   void addMarker(InputCoordinatesSheetResult result) {
-    MapLayerEntry entryLayer =
-        result.layer ?? _getDefaultLayerEntry(EntryType.marker);
+    MapLayerEntry entryLayer = _getLayerEntry(result.layer, EntryType.marker);
     int count = entryLayer.items.length;
     entryLayer.items.add(
       MarkerEntry(
@@ -68,9 +71,8 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     _forceRebuild();
   }
 
-  void addPolyLine(InputCoordinatesSheetResult result, {MapLayerEntry? layer}) {
-    MapLayerEntry entryLayer =
-        layer ?? _getDefaultLayerEntry(EntryType.polyline);
+  void addPolyLine(InputCoordinatesSheetResult result) {
+    MapLayerEntry entryLayer = _getLayerEntry(result.layer, EntryType.polyline);
     int count = entryLayer.items.length;
     entryLayer.items.add(
       PolylineEntry(
@@ -81,9 +83,8 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     _forceRebuild();
   }
 
-  void addPolygon(InputCoordinatesSheetResult result, {MapLayerEntry? layer}) {
-    MapLayerEntry entryLayer =
-        layer ?? _getDefaultLayerEntry(EntryType.polygon);
+  void addPolygon(InputCoordinatesSheetResult result) {
+    MapLayerEntry entryLayer = _getLayerEntry(result.layer, EntryType.polygon);
     int count = entryLayer.items.length;
     entryLayer.items.add(
       PolygonEntry(
@@ -96,8 +97,8 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     _forceRebuild();
   }
 
-  void addCircle(InputCoordinatesSheetResult result, {MapLayerEntry? layer}) {
-    MapLayerEntry entryLayer = layer ?? _getDefaultLayerEntry(EntryType.circle);
+  void addCircle(InputCoordinatesSheetResult result) {
+    MapLayerEntry entryLayer = _getLayerEntry(result.layer, EntryType.circle);
     int count = entryLayer.items.length;
     entryLayer.items.add(
       CircleEntry(

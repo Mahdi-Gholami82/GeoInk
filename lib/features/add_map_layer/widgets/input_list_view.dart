@@ -59,7 +59,7 @@ class _InputListViewState extends ConsumerState<InputListView> {
 
   @override
   Widget build(BuildContext context) {
-    List<SheetListInput> inputs = ref.watch(inputListCoordinatesProvider);
+    List<SheetListInput> inputs = ref.read(inputListCoordinatesProvider).fields;
     void onSubmit(SheetListInput currentInput) {}
 
     return Form(

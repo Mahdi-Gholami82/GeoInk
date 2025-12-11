@@ -7,7 +7,6 @@ import 'package:mapify/data/providers/map_tiles_provider.dart';
 class MapLayerPicker extends ConsumerStatefulWidget {
   const MapLayerPicker({super.key, required this.type});
   final EntryType type;
-
   @override
   ConsumerState<MapLayerPicker> createState() => _MapLayerPickerState();
 }
@@ -16,6 +15,9 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
   late TextEditingController controller;
   late TileEntriesNotifier tileEntriesNotifier;
   late InputListCoordinatesNotifier inputListCoordinatesNotifier;
+  late InputListCoordinatesState inputListState;
+  late MapLayerEntry mainLayer;
+  MapLayerEntry? newLayer;
 
   void _handleTextChange() {
     setState(() {});
@@ -30,6 +32,9 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
     );
     controller = TextEditingController();
     controller.addListener(_handleTextChange);
+    mainLayer = tileEntriesNotifier.getDefaultLayerEntry(widget.type);
+    inputListState = ref.read(inputListCoordinatesProvider);
+    inputListState.layer = mainLayer;
   }
 
   @override
@@ -50,39 +55,32 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
         DropdownMenu(
           hintText: "main",
           onSelected: (value) {
-            if (value != null) {
-              setState(() {
-                tileEntriesNotifier.addMapLayerEntry(
-                  layerEntry: value,
-                  ignoreIfExists: true,
+            if (value == newLayer) {
+              if ("main" != controller.text.trim()) {
+                newLayer = MapLayerEntry(
+                  name: controller.text,
+                  type: widget.type,
                 );
-                inputListCoordinatesNotifier.layer = value;
-              });
+                inputListState.layer = newLayer!;
+              }
+            } else {
+              inputListState.layer = value ?? mainLayer;
             }
           },
           controller: controller,
           enableFilter: true,
-          dropdownMenuEntries:
-              collection
-                  .map(
-                    (e) => DropdownMenuEntry(
-                      value: e,
-                      label: e.name,
-                      labelWidget: Text(e.name),
-                    ),
-                  )
-                  .toList() +
-              [
-                if (controller.text.isNotEmpty)
-                  DropdownMenuEntry(
-                    value: MapLayerEntry(
-                      name: controller.text,
-                      type: widget.type,
-                    ),
-                    label: controller.text,
-                    labelWidget: Text("+ Add : ${controller.text}"),
-                  ),
-              ],
+          dropdownMenuEntries: [
+            DropdownMenuEntry(value: mainLayer, label: "main"),
+            ...collection
+                .where((e) => e.isDefault == false && e.type == widget.type)
+                .map((e) => DropdownMenuEntry(value: e, label: e.name)),
+            if (controller.text.isNotEmpty)
+              DropdownMenuEntry(
+                value: newLayer,
+                label: controller.text,
+                labelWidget: Text("+ Add : ${controller.text}"),
+              ),
+          ],
         ),
         Text("Select Layer", style: TextStyle(fontWeight: FontWeight.w500)),
       ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
+import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/custom_color_picker.dart';
 import 'package:mapify/features/add_map_layer/widgets/input_list_view.dart';
 import 'package:mapify/features/add_map_layer/widgets/map_layer_picker.dart';
@@ -22,12 +23,16 @@ class CoordinatesSheet extends ConsumerStatefulWidget {
 class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
   Color chosenColor = Colors.red;
   final formGlobalKey = GlobalKey<FormState>();
+  late InputListCoordinatesState inputListState;
   late InputListCoordinatesNotifier inputListNotifier;
+  late TileEntriesNotifier tileEntriesNotifier;
 
   @override
   void initState() {
     super.initState();
     inputListNotifier = ref.read(inputListCoordinatesProvider.notifier);
+    tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
+    inputListState = ref.read(inputListCoordinatesProvider);
   }
 
   @override
@@ -72,7 +77,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                             },
                             initialColor: chosenColor,
                           ),
-                          MapLayerPicker(type: inputListNotifier.type),
+                          MapLayerPicker(type: inputListState.type),
                         ],
                       ),
                     ),
@@ -87,8 +92,8 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       spacing: 20,
                       children: [
-                        if (inputListNotifier.type == EntryType.polygon ||
-                            inputListNotifier.type == EntryType.polyline)
+                        if (inputListState.type == EntryType.polygon ||
+                            inputListState.type == EntryType.polyline)
                           OutlinedButton(
                             style: TextButton.styleFrom(
                               backgroundColor: Theme.of(
@@ -121,7 +126,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                           ),
                           onPressed: () {
                             if (formGlobalKey.currentState!.validate()) {
-                              inputListNotifier.color = chosenColor;
+                              inputListState.color = chosenColor;
                               Navigator.of(
                                 context,
                               ).pop(inputListNotifier.takeFinalResult());

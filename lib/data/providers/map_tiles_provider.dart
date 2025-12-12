@@ -17,7 +17,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
 
   MapLayerEntry getDefaultLayerEntry(EntryType type) {
     MapLayerEntry layerEntry = state.firstWhere(
-      (element) => element.isDefault,
+      (element) => element.isDefault && element.type == type,
       orElse: () {
         MapLayerEntry newlayerEntry = MapLayerEntry(
           name: "${type.name} main layer",
@@ -66,6 +66,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
       MarkerEntry(
         coordinate: result.coordinates.first,
         name: result.name ?? "marker-layer-${count++}",
+        color: result.color,
       ),
     );
     _forceRebuild();
@@ -78,6 +79,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
       PolylineEntry(
         name: result.name ?? "polyline-${count++}",
         points: result.coordinates.toList(),
+        color: result.color,
       ),
     );
     _forceRebuild();

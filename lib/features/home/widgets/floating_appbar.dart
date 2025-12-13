@@ -41,87 +41,80 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
           top: 15,
           left: 15,
           child: SafeArea(
-            child: Row(
-              spacing: widget.height / 8,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 13),
-                  height: widget.height,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color:
-                        widget.backgroundColor ??
-                        Theme.of(context).colorScheme.surface,
-                    boxShadow: [
-                      BoxShadow(
-                        color: DefaultSelectionStyle.defaultColor,
-                        spreadRadius: 2,
-                        blurRadius: 3,
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.menu),
-                    onPressed: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 13),
-                  height: widget.height,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                    color:
-                        widget.backgroundColor ??
-                        Theme.of(context).colorScheme.surface,
-                    boxShadow: [
-                      BoxShadow(
-                        color: DefaultSelectionStyle.defaultColor,
-                        spreadRadius: 2,
-                        blurRadius: 3,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    spacing: 3,
-                    children: [
-                      SizedBox(
-                        width: 300,
-                        child: Row(
-                          spacing: 4,
-                          children: [
-                            Text(
-                              "Free Style",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            Transform.scale(
-                              scale: 0.85,
-                              alignment: Alignment.centerLeft,
-                              child: Switch(
-                                value: freeStyleEnabled,
-                                onChanged: (bool value) {
-                                  setState(() {});
-                                  {
-                                    freeStyleEnabled = value;
-                                  }
-                                },
-                              ),
-                            ),
-                            VerticalDivider(thickness: 1),
-                          ],
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Row(
+                spacing: widget.height / 8,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: DefaultSelectionStyle.defaultColor,
+                          spreadRadius: 3,
+                          blurRadius: 3,
                         ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.menu),
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                      style: IconButton.styleFrom(
+                        minimumSize: Size(widget.height, widget.height),
+                        shape: CircleBorder(),
+                        backgroundColor:
+                            widget.backgroundColor ??
+                            Theme.of(context).colorScheme.surface,
                       ),
-                      IconButton(
-                        onPressed: () {
-                          widget.onTapSettings();
-                        },
-                        icon: Icon(Icons.settings),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 13),
+                    height: widget.height,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(widget.borderRadius),
+                      color:
+                          widget.backgroundColor ??
+                          Theme.of(context).colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: DefaultSelectionStyle.defaultColor,
+                          spreadRadius: 2,
+                          blurRadius: 3,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      spacing: 3,
+                      children: [
+                        SizedBox(
+                          width: 300,
+                          child: Row(
+                            spacing: 4,
+                            children: [
+                              Text(
+                                "Free Style",
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                              VerticalDivider(thickness: 1),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            widget.onTapSettings();
+                          },
+                          icon: Icon(Icons.settings),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

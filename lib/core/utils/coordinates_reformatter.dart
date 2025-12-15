@@ -71,8 +71,8 @@ class CoordinatesParser {
       formatType: CoordinatesFormatTypes.decimalDegreesHemisphere,
     ),
     CoordinatesFormatTypes.degreesDecimalMinutesSymbolic: CoordinatesMatcher(
-      latPattern: r"[NS]?\s*\d{1,3}°?\s*\d{1,2}\.\d+'?\s*[NS]?",
-      longPattern: r"[EW]?\s*\d{1,3}°?\s*\d{1,2}\.\d+'?\s*[EW]?",
+      latPattern: r"(?:[NS]\s*)?\d{1,3}[°∘]?\s*\d{1,2}\.\d+[′']?\s*[NS]?",
+      longPattern: r"(?:[EW]\s*)?\d{1,3}[°∘]?\s*\d{1,2}\.\d+[′']?\s*[EW]?",
       formatType: CoordinatesFormatTypes.degreesDecimalMinutesSymbolic,
     ),
     CoordinatesFormatTypes.degreesDecimalMinutesCompact: CoordinatesMatcher(
@@ -82,9 +82,9 @@ class CoordinatesParser {
     ),
     CoordinatesFormatTypes.degreesMinutesSeconds: CoordinatesMatcher(
       latPattern:
-          r"""[NS]?\s*\d{1,3}[°\s]\d{1,2}['\s]\d{1,2}(\.\d+)?"?\s*[NS]?""",
+          r"""(?:[NS]?\s*)\d{1,3}[°∘\s]\d{1,2}[′'\s]\d{1,2}(\.\d+)?"?\s*[NS]?""",
       longPattern:
-          r"""[EW]?\s*\d{1,3}[°\s]\d{1,2}['\s]\d{1,2}(\.\d+)?"?\s*[EW]?""",
+          r"""(?:[EW]?\s*)\d{1,3}[°∘\s]\d{1,2}[′'\s]\d{1,2}(\.\d+)?"?\s*[EW]?""",
       formatType: CoordinatesFormatTypes.degreesMinutesSeconds,
     ),
     CoordinatesFormatTypes.degreesMinutesSecondsCompact: CoordinatesMatcher(

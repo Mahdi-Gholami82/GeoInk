@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# parser_test related
+parser_test_text_sample.txt
+parser_test_code_try.dart

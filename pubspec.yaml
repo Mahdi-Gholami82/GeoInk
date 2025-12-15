@@ -48,6 +48,7 @@ dependencies:
   collection: ^1.19.1
   expansion_tile_list: ^2.0.0
   reorderables: ^0.6.0
+  custom_pop_up_menu: ^1.2.4
 
 dev_dependencies:
   flutter_test:

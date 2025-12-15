@@ -66,6 +66,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
   Widget build(BuildContext context) {
     List<MapLayerEntry> collection = ref.watch(tileEntriesProvider);
     return Drawer(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Column(
         children: [
           SizedBox(

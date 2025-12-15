@@ -1,4 +1,6 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:mapify/features/home/widgets/ink_well_text_button.dart';
 
 class FloatingAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget drawer;
@@ -88,29 +90,23 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
                         ),
                       ],
                     ),
-                    child: Row(
-                      spacing: 3,
-                      children: [
-                        SizedBox(
-                          width: 300,
-                          child: Row(
-                            spacing: 4,
-                            children: [
-                              Text(
-                                "Free Style",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                              VerticalDivider(thickness: 1),
-                            ],
+                    child: Material(
+                      child: Row(
+                        spacing: 3,
+                        children: [
+                          InkWellTextButton(title: "Map Tools", onTap: () {}),
+                          InkWellTextButton(title: "Free Style", onTap: () {}),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: IconButton(
+                              onPressed: () {
+                                widget.onTapSettings();
+                              },
+                              icon: Icon(Icons.settings),
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            widget.onTapSettings();
-                          },
-                          icon: Icon(Icons.settings),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],

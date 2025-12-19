@@ -6,6 +6,7 @@ import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/custom_color_picker.dart';
 import 'package:mapify/features/add_map_layer/widgets/input_list_view.dart';
 import 'package:mapify/features/add_map_layer/widgets/map_layer_picker.dart';
+import 'package:mapify/features/add_map_layer/widgets/sheet_options_menu.dart';
 
 class CoordinatesSheet extends ConsumerStatefulWidget {
   const CoordinatesSheet({
@@ -26,6 +27,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
   late InputListCoordinatesState inputListState;
   late InputListCoordinatesNotifier inputListNotifier;
   late TileEntriesNotifier tileEntriesNotifier;
+  MenuController menuController = MenuController();
 
   @override
   void initState() {
@@ -126,7 +128,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                           ),
                           onPressed: () {
                             if (formGlobalKey.currentState!.validate()) {
-                              inputListState.color = chosenColor;
+                              inputListNotifier.setColor(chosenColor);
                               Navigator.of(
                                 context,
                               ).pop(inputListNotifier.takeFinalResult());
@@ -148,11 +150,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
             ),
           ],
         ),
-        Positioned(
-          top: 10,
-          right: 10,
-          child: IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
-        ),
+        Positioned(top: 10, right: 10, child: SheetOptionsMenu()),
         Positioned(
           top: 10,
           left: 10,

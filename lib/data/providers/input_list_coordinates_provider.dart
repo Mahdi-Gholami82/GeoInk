@@ -10,6 +10,12 @@ class InputListCoordinatesState {
   MapLayerEntry? layer;
   EntryType type;
   List<SheetListInput> fields;
+  static const Map<EntryType, int> minNumberOfCoordinatesFields = {
+    EntryType.circle: 1,
+    EntryType.marker: 1,
+    EntryType.polyline: 2,
+    EntryType.polygon: 3,
+  };
 
   InputListCoordinatesState({
     required this.color,
@@ -71,31 +77,17 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
 
   void initSheetListInput({required EntryType initType}) {
     int numberOfCoordinatesFields;
-    bool needsRadiusField = false;
     final fields = <SheetListInput>[];
     fields.add(SheetListInput.nameField());
-    switch (initType) {
-      case EntryType.circle:
-        numberOfCoordinatesFields = 1;
-        needsRadiusField = true;
-        break;
-      case EntryType.marker:
-        numberOfCoordinatesFields = 1;
-        break;
-      case EntryType.polygon:
-        numberOfCoordinatesFields = 3;
-        break;
-      case EntryType.polyline:
-        numberOfCoordinatesFields = 2;
-        break;
-    }
+    numberOfCoordinatesFields =
+        InputListCoordinatesState.minNumberOfCoordinatesFields[initType]!;
     fields.addAll(
       List.generate(
         numberOfCoordinatesFields,
         (index) => SheetListInput.coordinateField(),
       ),
     );
-    if (needsRadiusField) {
+    if (initType == EntryType.circle) {
       fields.add(SheetListInput.radiusField());
     }
     state = state.copyWith(
@@ -114,9 +106,30 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     state = state.copyWith(layer: layer);
   }
 
-  void addCoordinatesField() {
-    state.fields.add(SheetListInput.coordinateField());
+  void addCoordinatesField({String input = ""}) {
+    state.fields.add(SheetListInput.coordinateField(input: input));
     _forceRebuild();
+  }
+
+  void clearEmptyFields() {
+    var fields = state.fields;
+    for (int index = fields.length - 1; index > 0; index--) {
+      var coordinateField = fields[index];
+      if (fields.where((e) => e.type == SheetInputFieldType.coordinate).length >
+              InputListCoordinatesState.minNumberOfCoordinatesFields[state
+                  .type]! &&
+          coordinateField.value.isEmpty) {
+        fields.remove(coordinateField);
+      }
+    }
+    _forceRebuild();
+  }
+
+  void addMultipleCoordinates(Iterable<String> results) {
+    state.fields.addAll(
+      results.map((e) => SheetListInput.coordinateField(input: e)),
+    );
+    clearEmptyFields();
   }
 
   InputCoordinatesSheetResult takeFinalResult() {

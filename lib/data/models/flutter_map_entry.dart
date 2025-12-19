@@ -75,7 +75,7 @@ class PolylineEntry extends FlutterMapEntry {
   PolylineEntry({
     required super.name,
     required this.points,
-    this.color = Colors.red,
+    required this.color,
     this.strokeWidth = 3.0,
     super.visible,
   });

@@ -14,7 +14,6 @@ class InputListView extends ConsumerStatefulWidget {
 
 class _InputListViewState extends ConsumerState<InputListView> {
   late final bool needsRadiusField;
-  final CoordinatesParser parser = CoordinatesParser();
 
   @override
   void initState() {
@@ -28,7 +27,10 @@ class _InputListViewState extends ConsumerState<InputListView> {
           if (value == null || value.isEmpty) {
             return "The coordinate field cannot be empty.";
           }
-          return parser.hasMatchField(value)
+          if (tryParseSingle(value) == null) {
+            return "Unable to parse data.";
+          }
+          return hasMatchField(value)
               ? null
               : "The input does not match any supported coordinate formats.";
         };

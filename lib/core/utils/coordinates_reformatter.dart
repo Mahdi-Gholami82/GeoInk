@@ -104,28 +104,23 @@ String _normalizeCoordinateString(String input) {
 
 /// Predefined matchers for various coordinate formats.
 Map<CoordinatesFormatTypes, CoordinatesMatcher> matchers = {
-  CoordinatesFormatTypes.decimalDegrees: CoordinatesMatcher(
-    latPattern: r"(?<number>[+\-−]?\d{1,3}(?:\.\d+)?)",
-    longPattern: r"(?<number>[+\-−]?\d{1,3}(?:\.\d+)?)",
-    formatType: CoordinatesFormatTypes.decimalDegrees,
-  ),
-  CoordinatesFormatTypes.decimalDegreesHemisphere: CoordinatesMatcher(
-    latPattern: r"(?<number>\d{1,3}(?:\.\d+)?)\s*",
-    longPattern: r"(?<number>\d{1,3}(?:\.\d+)?)\s*",
+  CoordinatesFormatTypes.notamCompactDDMMSS: CoordinatesMatcher(
+    latPattern: r"(?<degrees>\d{2})(?<minutes>\d{2})(?<seconds>\d{2})",
+    longPattern: r"(?<degrees>\d{3})(?<minutes>\d{2})(?<seconds>\d{2})",
     isDirectional: true,
-    formatType: CoordinatesFormatTypes.decimalDegreesHemisphere,
+    formatType: CoordinatesFormatTypes.notamCompactDDMMSS,
   ),
-  CoordinatesFormatTypes.degreesDecimalMinutesSymbolic: CoordinatesMatcher(
-    latPattern: r"(?<degrees>\d{1,3})[°∘]\s*(?<minutes>\d{1,2}\.\d+)[′']",
-    longPattern: r"(?<degrees>\d{1,3})[°∘]\s*(?<minutes>\d{1,2}\.\d+)[′']",
+  CoordinatesFormatTypes.notamCompactDDMM: CoordinatesMatcher(
+    latPattern: r"(?<degrees>\d{2})(?<minutes>\d{2})",
+    longPattern: r"(?<degrees>\d{3})(?<minutes>\d{2})",
     isDirectional: true,
-    formatType: CoordinatesFormatTypes.degreesDecimalMinutesSymbolic,
+    formatType: CoordinatesFormatTypes.notamCompactDDMM,
   ),
-  CoordinatesFormatTypes.degreesDecimalMinutesCompact: CoordinatesMatcher(
-    latPattern: r"(?<degrees>\d{2})(?<minutes>\d{2}\.\d+)",
-    longPattern: r"(?<degrees>\d{3})(?<minutes>\d{2}\.\d+)",
+  CoordinatesFormatTypes.degreesMinutesSecondsCompact: CoordinatesMatcher(
+    latPattern: r"(?<degrees>\d{2})(?<minutes>\d{2})(?<seconds>\d{2})",
+    longPattern: r"(?<degrees>\d{3})(?<minutes>\d{2})(?<seconds>\d{2})",
     isDirectional: true,
-    formatType: CoordinatesFormatTypes.degreesDecimalMinutesCompact,
+    formatType: CoordinatesFormatTypes.degreesMinutesSecondsCompact,
   ),
   CoordinatesFormatTypes.degreesMinutesSeconds: CoordinatesMatcher(
     latPattern:
@@ -135,23 +130,28 @@ Map<CoordinatesFormatTypes, CoordinatesMatcher> matchers = {
     isDirectional: true,
     formatType: CoordinatesFormatTypes.degreesMinutesSeconds,
   ),
-  CoordinatesFormatTypes.degreesMinutesSecondsCompact: CoordinatesMatcher(
-    latPattern: r"(?<degrees>\d{2})(?<minutes>\d{2})(?<seconds>\d{2})",
-    longPattern: r"(?<degrees>\d{3})(?<minutes>\d{2})(?<seconds>\d{2})",
+  CoordinatesFormatTypes.degreesDecimalMinutesCompact: CoordinatesMatcher(
+    latPattern: r"(?<degrees>\d{2})(?<minutes>\d{2}\.\d+)",
+    longPattern: r"(?<degrees>\d{3})(?<minutes>\d{2}\.\d+)",
     isDirectional: true,
-    formatType: CoordinatesFormatTypes.degreesMinutesSecondsCompact,
+    formatType: CoordinatesFormatTypes.degreesDecimalMinutesCompact,
   ),
-  CoordinatesFormatTypes.notamCompactDDMM: CoordinatesMatcher(
-    latPattern: r"(?<degrees>\d{2})(?<minutes>\d{2})",
-    longPattern: r"(?<degrees>\d{3})(?<minutes>\d{2})",
+  CoordinatesFormatTypes.degreesDecimalMinutesSymbolic: CoordinatesMatcher(
+    latPattern: r"(?<degrees>\d{1,3})[°∘]\s*(?<minutes>\d{1,2}\.\d+)[′']",
+    longPattern: r"(?<degrees>\d{1,3})[°∘]\s*(?<minutes>\d{1,2}\.\d+)[′']",
     isDirectional: true,
-    formatType: CoordinatesFormatTypes.notamCompactDDMM,
+    formatType: CoordinatesFormatTypes.degreesDecimalMinutesSymbolic,
   ),
-  CoordinatesFormatTypes.notamCompactDDMMSS: CoordinatesMatcher(
-    latPattern: r"(?<degrees>\d{2})(?<minutes>\d{2})(?<seconds>\d{2})",
-    longPattern: r"(?<degrees>\d{3})(?<minutes>\d{2})(?<seconds>\d{2})",
+  CoordinatesFormatTypes.decimalDegreesHemisphere: CoordinatesMatcher(
+    latPattern: r"(?<number>\d{1,3}(?:\.\d+)?)\s*",
+    longPattern: r"(?<number>\d{1,3}(?:\.\d+)?)\s*",
     isDirectional: true,
-    formatType: CoordinatesFormatTypes.notamCompactDDMMSS,
+    formatType: CoordinatesFormatTypes.decimalDegreesHemisphere,
+  ),
+  CoordinatesFormatTypes.decimalDegrees: CoordinatesMatcher(
+    latPattern: r"(?<number>[+\-−]?\d{1,3}(?:\.\d+)?)",
+    longPattern: r"(?<number>[+\-−]?\d{1,3}(?:\.\d+)?)",
+    formatType: CoordinatesFormatTypes.decimalDegrees,
   ),
 };
 
@@ -281,80 +281,77 @@ Map _processMatchToMap(RegExpMatch match) {
   return result;
 }
 
-/// Parses and reformats coordinate strings into structured data.
-class CoordinatesParser {
-  late final String defaultFullPattern = fullPatternWithSeperator(
-    r"(?:[,\s]|(?<=\D))",
+/// Pattern with default seperator used for parsing coordinates. matches ( "," or spaces or no space)
+final String defaultFullPattern = fullPatternWithSeperator(
+  r"(?:(?:\s{0,3},\s{0,3}|\s)|(?<=\D))",
+);
+
+String fullPatternWithSeperator(String seperator) {
+  List patterns = [];
+  for (var matcher in matchers.values) {
+    patterns.add("(?:${matcher.withSeperatorPattern(seperator)})");
+  }
+  return patterns.join("|");
+}
+
+Map? tryParseSingle(String text, {String? seperator}) {
+  String fullPattern = seperator == null
+      ? defaultFullPattern
+      : fullPatternWithSeperator(seperator);
+  RegExpMatch? match = RegExp(
+    "^$fullPattern\$",
+    multiLine: true,
+  ).firstMatch(_normalizeCoordinateString(text));
+  if (match == null) {
+    return null;
+  }
+  return _processMatchToMap(match);
+}
+
+Iterable<Map> parseAll(String text, {String? seperator}) {
+  String fullPattern = seperator == null
+      ? defaultFullPattern
+      : fullPatternWithSeperator(seperator);
+  Iterable<RegExpMatch> matches = RegExp(
+    fullPattern,
+  ).allMatches(_normalizeCoordinateString(text));
+  return matches.map(_processMatchToMap);
+}
+
+bool hasMatchField(String text, {String? seperator}) {
+  String fullPattern = seperator == null
+      ? defaultFullPattern
+      : fullPatternWithSeperator(seperator);
+  return RegExp(
+    "^$fullPattern\$",
+    multiLine: true,
+  ).hasMatch(_normalizeCoordinateString(text));
+}
+
+LatLng? parseSingleToLatLng(String text, {String? seperator}) {
+  Map? coordinate = tryParseSingle(text, seperator: seperator);
+  if (coordinate == null) return null;
+  LatLng? latLng = _genericCoordinatesToLatLngParser(
+    coordinate[LatOrLong.lat]!,
+    coordinate[LatOrLong.long]!,
+    coordinate["type"],
   );
+  return latLng;
+}
 
-  String fullPatternWithSeperator(String seperator) {
-    List patterns = [];
-    for (var matcher in matchers.values) {
-      patterns.add("(?:${matcher.withSeperatorPattern(seperator)})");
-    }
-    return patterns.join("|");
-  }
-
-  Map? parseSingle(String text, {String? seperator}) {
-    String fullPattern = seperator == null
-        ? defaultFullPattern
-        : fullPatternWithSeperator(seperator);
-    RegExpMatch? match = RegExp(
-      "^$fullPattern\$",
-      multiLine: true,
-    ).firstMatch(_normalizeCoordinateString(text));
-    if (match == null) {
-      return null;
-    }
-    return _processMatchToMap(match);
-  }
-
-  Iterable<Map> parseAll(String text, {String? seperator}) {
-    String fullPattern = seperator == null
-        ? defaultFullPattern
-        : fullPatternWithSeperator(seperator);
-    Iterable<RegExpMatch> matches = RegExp(
-      fullPattern,
-    ).allMatches(_normalizeCoordinateString(text));
-    return matches.map(_processMatchToMap);
-  }
-
-  bool hasMatchField(String text, {String? seperator}) {
-    String fullPattern = seperator == null
-        ? defaultFullPattern
-        : fullPatternWithSeperator(seperator);
-    return RegExp(
-      "^$fullPattern\$",
-      multiLine: true,
-    ).hasMatch(_normalizeCoordinateString(text));
-  }
-
-  LatLng? parseSingleToLatLng(String text, {String? seperator}) {
-    Map? coordinate = parseSingle(text, seperator: seperator);
-    if (coordinate == null) return null;
+List<LatLng> parseAllToLatLng(String text, {String? seperator}) {
+  Iterable<Map> coordinates = parseAll(text, seperator: seperator);
+  List<LatLng> latLngs = [];
+  for (var coordinate in coordinates) {
     LatLng? latLng = _genericCoordinatesToLatLngParser(
       coordinate[LatOrLong.lat]!,
       coordinate[LatOrLong.long]!,
       coordinate["type"],
     );
-    return latLng;
-  }
-
-  List<LatLng> parseAllToLatLng(String text, {String? seperator}) {
-    Iterable<Map> coordinates = parseAll(text, seperator: seperator);
-    print(coordinates.length);
-    List<LatLng> latLngs = [];
-    for (var coordinate in coordinates) {
-      LatLng? latLng = _genericCoordinatesToLatLngParser(
-        coordinate[LatOrLong.lat]!,
-        coordinate[LatOrLong.long]!,
-        coordinate["type"],
-      );
-      if (latLng == null) {
-        continue;
-      }
-      latLngs.add(latLng);
+    if (latLng == null) {
+      continue;
     }
-    return latLngs;
+    latLngs.add(latLng);
   }
+  return latLngs;
 }

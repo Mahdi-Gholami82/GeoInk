@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/features/home/widgets/floating_appbar.dart';
 
 class InkWellTextButton extends StatelessWidget {
   const InkWellTextButton({

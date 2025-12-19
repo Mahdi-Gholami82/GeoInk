@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
-
-LatLng _textToCoordinates(String text) {
-  List<String> splitted = text.split(",");
-  return LatLng(double.parse(splitted[0]), double.parse(splitted[1]));
-}
+import 'package:mapify/core/utils/coordinates_reformatter.dart';
 
 List<LatLng> _stringToCoordinates(List<String> coordinates) {
-  return coordinates.map(_textToCoordinates).toList();
+  return coordinates.map((e) => parseSingleToLatLng(e)!).toList();
 }
 
 class InputCoordinatesSheetResult {

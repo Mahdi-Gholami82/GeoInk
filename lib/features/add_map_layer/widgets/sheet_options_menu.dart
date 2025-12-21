@@ -15,8 +15,8 @@ class _SheetOptionsMenuState extends ConsumerState<SheetOptionsMenu> {
   late InputListCoordinatesNotifier inputListNotifier;
   late InputListCoordinatesState inputListState;
 
-  String parseResultToText(Map result) {
-    return "${result[LatOrLong.lat]}, ${result[LatOrLong.long]}";
+  String parseResultToText(CoordinatesParseResult result) {
+    return "${result.latValue}, ${result.longValue}";
   }
 
   @override
@@ -52,12 +52,14 @@ class _SheetOptionsMenuState extends ConsumerState<SheetOptionsMenu> {
               if (InputListCoordinatesState
                       .minNumberOfCoordinatesFields[inputListState.type]! >
                   1) {
-                Iterable<Map> results = parseAll(clipboardText);
+                Iterable<CoordinatesParseResult> results = parseAll(
+                  clipboardText,
+                );
                 inputListNotifier.addMultipleCoordinates(
                   results.map((e) => parseResultToText(e)),
                 );
               } else {
-                Map? result = tryParseSingle(clipboardText);
+                CoordinatesParseResult? result = tryParseSingle(clipboardText);
                 if (result != null) {
                   inputListNotifier.addCoordinatesField(
                     input: parseResultToText(result),

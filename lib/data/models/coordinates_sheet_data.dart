@@ -4,7 +4,7 @@ import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/core/utils/coordinates_reformatter.dart';
 
 List<LatLng> _stringToCoordinates(List<String> coordinates) {
-  return coordinates.map((e) => parseSingleToLatLng(e)!).toList();
+  return coordinates.map((e) => tryParseSingle(e)!.toLatLng()!).toList();
 }
 
 class InputCoordinatesSheetResult {

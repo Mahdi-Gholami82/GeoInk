@@ -6,7 +6,7 @@ import 'package:mapify/core/services/tile_providers.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/speed_dial_fab.dart';
 import 'package:mapify/features/home/widgets/drawer.dart';
-import 'package:mapify/features/home/widgets/floating_appbar.dart';
+import 'package:mapify/features/appbar/floating_appbar.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   static const String route = "/";

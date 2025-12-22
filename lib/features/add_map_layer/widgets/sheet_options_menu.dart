@@ -5,8 +5,7 @@ import 'package:mapify/core/utils/coordinates_reformatter.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 
 class SheetOptionsMenu extends ConsumerStatefulWidget {
-  SheetOptionsMenu({super.key});
-  final MenuController menuController = MenuController();
+  const SheetOptionsMenu({super.key});
   @override
   ConsumerState<SheetOptionsMenu> createState() => _SheetOptionsMenuState();
 }
@@ -26,14 +25,6 @@ class _SheetOptionsMenuState extends ConsumerState<SheetOptionsMenu> {
     super.initState();
   }
 
-  void toggleMenu() {
-    if (widget.menuController.isOpen) {
-      widget.menuController.close();
-    } else {
-      widget.menuController.open();
-    }
-  }
-
   Future<String?> getTextFromClipboard() async {
     ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
 
@@ -43,7 +34,18 @@ class _SheetOptionsMenuState extends ConsumerState<SheetOptionsMenu> {
   @override
   Widget build(BuildContext context) {
     return MenuAnchor(
-      controller: widget.menuController,
+      builder: (context, controller, child) {
+        return IconButton(
+          onPressed: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+          icon: Icon(Icons.more_vert),
+        );
+      },
       menuChildren: [
         MenuItemButton(
           onPressed: () async {
@@ -82,12 +84,6 @@ class _SheetOptionsMenuState extends ConsumerState<SheetOptionsMenu> {
           child: const Text('Clear Empty'),
         ),
       ],
-      child: IconButton(
-        onPressed: () {
-          toggleMenu();
-        },
-        icon: Icon(Icons.more_vert),
-      ),
     );
   }
 }

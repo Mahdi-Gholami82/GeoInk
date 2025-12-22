@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mapify/features/appbar/widgets/free_style_dropdown_menu.dart';
 import 'package:mapify/features/home/widgets/ink_well_text_button.dart';
+import 'package:mapify/features/appbar/widgets/map_dropdown_menu.dart';
 
 class FloatingAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget drawer;
@@ -93,8 +95,8 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
                       child: Row(
                         spacing: 3,
                         children: [
-                          InkWellTextButton(title: "Map Tools", onTap: () {}),
-                          InkWellTextButton(title: "Free Style", onTap: () {}),
+                          MapDropdownMenu(),
+                          FreeStyleDropdownMenu(),
                           Padding(
                             padding: const EdgeInsets.only(left: 10),
                             child: IconButton(

@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:expansion_tile_list/expansion_tile_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/core/utils/map_icons.dart' as map_icons;
+import 'package:mapify/core/ui/map_features_icons.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
 
@@ -14,16 +14,16 @@ class MapDrawer extends ConsumerStatefulWidget {
 }
 
 class _MapDrawerState extends ConsumerState<MapDrawer> {
-  Icon _getLayerIcon(EntryType type) {
+  IconData _getLayerIcon(EntryType type) {
     switch (type) {
       case EntryType.circle:
-        return map_icons.circleIcon;
+        return MapIcons.circle;
       case EntryType.marker:
-        return map_icons.markerIcon;
+        return MapIcons.marker;
       case EntryType.polygon:
-        return map_icons.polygonIcon;
+        return MapIcons.polygon;
       case EntryType.polyline:
-        return map_icons.polylineIcon;
+        return MapIcons.polyline;
     }
   }
 

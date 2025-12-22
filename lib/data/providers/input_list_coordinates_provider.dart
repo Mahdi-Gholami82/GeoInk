@@ -111,16 +111,46 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     _forceRebuild();
   }
 
-  void clearEmptyFields() {
+  void _removeFieldUnlessEmpty(
+    SheetListInput input, {
+    Function? onNotEmpty,
+    Function? onLenghtLimit,
+  }) {
     var fields = state.fields;
+    if (!(fields.where((e) => e.type == SheetInputFieldType.coordinate).length >
+        InputListCoordinatesState.minNumberOfCoordinatesFields[state.type]!)) {
+      if (onLenghtLimit != null) onLenghtLimit;
+      return;
+    } else if (input.value.isNotEmpty) {
+      if (onNotEmpty != null) onNotEmpty();
+      return;
+    }
+    fields.remove(input);
+  }
+
+  void removeField(
+    SheetListInput input, {
+    Function? onNotEmpty,
+    Function? onLenghtLimit,
+  }) {
+    _removeFieldUnlessEmpty(
+      input,
+      onNotEmpty: onNotEmpty,
+      onLenghtLimit: onLenghtLimit,
+    );
+    _forceRebuild();
+  }
+
+  void clearEmptyFields({Function? onNotEmpty, Function? onLenghtLimit}) {
+    var fields = state.fields;
+
     for (int index = fields.length - 1; index > 0; index--) {
       var coordinateField = fields[index];
-      if (fields.where((e) => e.type == SheetInputFieldType.coordinate).length >
-              InputListCoordinatesState.minNumberOfCoordinatesFields[state
-                  .type]! &&
-          coordinateField.value.isEmpty) {
-        fields.remove(coordinateField);
-      }
+      _removeFieldUnlessEmpty(
+        coordinateField,
+        onNotEmpty: onNotEmpty,
+        onLenghtLimit: onLenghtLimit,
+      );
     }
     _forceRebuild();
   }

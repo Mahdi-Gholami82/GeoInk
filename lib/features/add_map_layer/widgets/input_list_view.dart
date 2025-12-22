@@ -14,10 +14,12 @@ class InputListView extends ConsumerStatefulWidget {
 
 class _InputListViewState extends ConsumerState<InputListView> {
   late final bool needsRadiusField;
+  late InputListCoordinatesNotifier inputListNotifier;
 
   @override
   void initState() {
     super.initState();
+    inputListNotifier = ref.read(inputListCoordinatesProvider.notifier);
   }
 
   String? Function(String?) getFieldValidator(SheetInputFieldType type) {
@@ -85,6 +87,14 @@ class _InputListViewState extends ConsumerState<InputListView> {
               decoration: InputDecoration(
                 labelText: input.type.name,
                 border: OutlineInputBorder(),
+                suffixIcon: input.type == SheetInputFieldType.coordinate
+                    ? IconButton(
+                        onPressed: () {
+                          inputListNotifier.removeField(input);
+                        },
+                        icon: Icon(Icons.delete_outline),
+                      )
+                    : null,
               ),
             ),
           );

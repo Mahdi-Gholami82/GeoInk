@@ -198,7 +198,7 @@ class CoordinatesParseResult {
       "Lat or long missing.",
     );
     assert(
-      matcher.isDirectional &&
+      !matcher.isDirectional ||
           leadingOrTrailingCoordinates.every((e) => e != null),
       "Every coordinate must have a direction when Directional == true.",
     );

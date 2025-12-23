@@ -33,6 +33,11 @@ class _MapDropdownMenuState extends State<MapDropdownMenu> {
                 child: const Text('Export'),
               ),
               MenuItemButton(
+                leadingIcon: Icon(Icons.image_outlined),
+                onPressed: () {},
+                child: const Text('To Image'),
+              ),
+              MenuItemButton(
                 leadingIcon: Icon(Icons.code),
                 onPressed: () {},
                 child: const Text('Parser'),

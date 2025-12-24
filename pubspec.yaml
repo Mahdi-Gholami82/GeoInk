@@ -50,6 +50,8 @@ dependencies:
   reorderables: ^0.6.0
   custom_pop_up_menu: ^1.2.4
   geojson_vi: ^2.2.5
+  uuid: ^4.5.2
+  file_picker: ^10.3.8
 
 dev_dependencies:
   flutter_test:

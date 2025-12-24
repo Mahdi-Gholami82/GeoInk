@@ -1,3 +1,4 @@
+import 'package:geojson_vi/geojson_vi.dart';
 import 'package:mapify/data/models/coordinates_sheet_data.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,6 +14,13 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
 
   void _forceRebuild() {
     state = [...state];
+  }
+
+  GeoJSONFeatureCollection toGeoJsonFeatureCollection() {
+    final allFeatures = state
+        .expand((entry) => entry.toGeoJsonFeatureCollection().features)
+        .toList();
+    return GeoJSONFeatureCollection(allFeatures.nonNulls.toList());
   }
 
   MapLayerEntry getDefaultLayerEntry(EntryType type) {
@@ -78,7 +86,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     entryLayer.items.add(
       PolylineEntry(
         name: result.name ?? "polyline-${count++}",
-        points: result.coordinates.toList(),
+        coordinates: result.coordinates.toList(),
         color: result.color,
       ),
     );
@@ -91,7 +99,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     entryLayer.items.add(
       PolygonEntry(
         name: result.name ?? "polygon-${count++}",
-        points: result.coordinates.toList(),
+        coordinates: result.coordinates.toList(),
         borderColor: result.color,
         fillColor: result.color.withAlpha(128),
       ),

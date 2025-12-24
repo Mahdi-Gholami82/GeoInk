@@ -1,14 +1,27 @@
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:mapify/features/home/widgets/ink_well_text_button.dart';
 
-class MapDropdownMenu extends StatefulWidget {
+class MapDropdownMenu extends ConsumerStatefulWidget {
   const MapDropdownMenu({super.key});
 
   @override
-  State<MapDropdownMenu> createState() => _MapDropdownMenuState();
+  ConsumerState<MapDropdownMenu> createState() => _MapDropdownMenuState();
 }
 
-class _MapDropdownMenuState extends State<MapDropdownMenu> {
+class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
+  late TileEntriesNotifier tileEntriesNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MenuAnchor(
@@ -29,7 +42,13 @@ class _MapDropdownMenuState extends State<MapDropdownMenu> {
               ),
               MenuItemButton(
                 leadingIcon: Icon(Icons.file_upload),
-                onPressed: () {},
+                onPressed: () async {
+                  await FilePicker.platform.saveFile(
+                    bytes: utf8.encode(
+                      tileEntriesNotifier.toGeoJsonFeatureCollection().toJSON(),
+                    ),
+                  );
+                },
                 child: const Text('Export'),
               ),
               MenuItemButton(

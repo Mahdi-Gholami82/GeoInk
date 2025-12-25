@@ -1,56 +1,12 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
+import 'package:mapify/core/utils/coordinates_tools.dart';
 
 const uuid = Uuid();
-
-double _calculateCenterLat(List<LatLng> points) =>
-    points.map((p) => p.latitude).reduce((a, b) => a + b) / points.length;
-double _calculateCenterLong(List<LatLng> points) =>
-    points.map((p) => p.longitude).reduce((a, b) => a + b) / points.length;
-
-List<LatLng> _sortClockwiseLatLng(List<LatLng> coordinates) {
-  final centerLat = _calculateCenterLat(coordinates);
-  final centerLng = _calculateCenterLong(coordinates);
-  List<LatLng> coordinatesCopy = [...coordinates];
-
-  coordinatesCopy.sort((a, b) {
-    final angleA = atan2(a.latitude - centerLat, a.longitude - centerLng);
-    final angleB = atan2(b.latitude - centerLat, b.longitude - centerLng);
-    return angleB.compareTo(angleA);
-  });
-
-  return coordinatesCopy;
-}
-
-List<LatLng> _sortCounterClockwiseLatLng(List<LatLng> coordinates) {
-  final centerLat = _calculateCenterLat(coordinates);
-  final centerLng = _calculateCenterLong(coordinates);
-  List<LatLng> coordinatesCopy = [...coordinates];
-
-  coordinatesCopy.sort((a, b) {
-    final angleA = atan2(a.latitude - centerLat, a.longitude - centerLng);
-    final angleB = atan2(b.latitude - centerLat, b.longitude - centerLng);
-    return angleA.compareTo(angleB);
-  });
-
-  return coordinatesCopy;
-}
-
-bool _isCounterClockwise(List<Point<double>> coordinates) {
-  double area = 0;
-  for (int i = 0; i < coordinates.length; i++) {
-    final p1 = coordinates[i];
-    final p2 = coordinates[(i + 1) % coordinates.length];
-    area += (p2.x - p1.x) * (p2.y + p1.y);
-  }
-  return area < 0;
-}
 
 /// Data models to keep track of map features or layers.
 
@@ -136,10 +92,8 @@ class PolygonEntry extends FlutterMapEntry {
 
   @override
   GeoJSONPolygon get geoJasonObject {
-    List<LatLng> sorted = _sortCounterClockwiseLatLng(coordinates);
-    sorted.add(sorted.first);
     return GeoJSONPolygon([
-      sorted.map((p) => [p.longitude, p.latitude]).toList(),
+      coordinates.map((p) => [p.longitude, p.latitude]).toList(),
     ]);
   }
 

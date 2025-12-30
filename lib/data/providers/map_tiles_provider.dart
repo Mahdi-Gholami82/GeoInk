@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:collection/collection.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mapify/core/utils/coordinates_tools.dart';
@@ -9,63 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'map_tiles_provider.g.dart';
 
-bool _isCounterClockwise(List<LatLng> coordinates) {
-  double sum = 0;
-
-  for (int i = 0; i < coordinates.length; i++) {
-    final p1 = coordinates[i];
-    final p2 = coordinates[(i + 1) % coordinates.length];
-
-    sum += (p2.longitude - p1.longitude) * (p2.latitude + p1.latitude);
-  }
-  return sum < 0;
-}
-
-double _calculateCenterLat(List<LatLng> points) =>
-    points.map((p) => p.latitude).reduce((a, b) => a + b) / points.length;
-double _calculateCenterLong(List<LatLng> points) =>
-    points.map((p) => p.longitude).reduce((a, b) => a + b) / points.length;
-
-List<LatLng> _sortClockwiseLatLng(List<LatLng> coordinates) {
-  List<LatLng> coordinatesCopy = [...coordinates];
-  if (!_isCounterClockwise(coordinatesCopy)) return coordinatesCopy;
-  final centerLat = _calculateCenterLat(coordinates);
-  final centerLng = _calculateCenterLong(coordinates);
-
-  coordinatesCopy.sort((a, b) {
-    final angleA = atan2(a.latitude - centerLat, a.longitude - centerLng);
-    final angleB = atan2(b.latitude - centerLat, b.longitude - centerLng);
-    return angleB.compareTo(angleA);
-  });
-
-  return coordinatesCopy;
-}
-
-List<LatLng> _sortCounterClockwiseLatLng(List<LatLng> coordinates) {
-  List<LatLng> coordinatesCopy = [...coordinates];
-  if (_isCounterClockwise(coordinatesCopy)) return coordinatesCopy;
-  final centerLat = _calculateCenterLat(coordinates);
-  final centerLng = _calculateCenterLong(coordinates);
-
-  coordinatesCopy.sort((a, b) {
-    final angleA = atan2(a.latitude - centerLat, a.longitude - centerLng);
-    final angleB = atan2(b.latitude - centerLat, b.longitude - centerLng);
-    return angleA.compareTo(angleB);
-  });
-
-  return coordinatesCopy;
-}
-
-List<LatLng> processPolygonLatlngs(List<LatLng> coordinates) {
-  List<LatLng> sorted = _sortCounterClockwiseLatLng(
-    latLngsEqual(coordinates.first, coordinates.last)
-        ? coordinates.sublist(0, coordinates.length - 1)
-        : coordinates,
-  );
-  if (!latLngsEqual(sorted.first, sorted.last)) sorted.add(sorted.first);
-  return sorted;
-}
-
 @Riverpod(keepAlive: true)
 class TileEntriesNotifier extends _$TileEntriesNotifier {
   @override
@@ -73,7 +15,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     return [];
   }
 
-  void _forceRebuild() {
+  void forceRebuild() {
     state = [...state];
   }
 
@@ -105,9 +47,14 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     return entryLayer;
   }
 
+  MapLayerEntry getLayerByIdOrMain(String id, EntryType type) {
+    return state.firstWhereOrNull((e) => e.id == id) ??
+        getDefaultLayerEntry(type);
+  }
+
   void setConsumersState(void Function() fn) {
     fn();
-    _forceRebuild();
+    forceRebuild();
   }
 
   void addMapLayerEntry({
@@ -134,11 +81,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     entryLayer.items.add(
       MarkerEntry(
         coordinate: result.coordinates.first,
-        name: result.name ?? "marker-layer-${count++}",
+        name: result.name ?? "marker-${count++}",
         color: result.color,
       ),
     );
-    _forceRebuild();
+    forceRebuild();
   }
 
   void addPolyLine(InputCoordinatesSheetResult result) {
@@ -151,7 +98,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         color: result.color,
       ),
     );
-    _forceRebuild();
+    forceRebuild();
   }
 
   void addPolygon(InputCoordinatesSheetResult result) {
@@ -166,7 +113,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         fillColor: result.color.withAlpha(128),
       ),
     );
-    _forceRebuild();
+    forceRebuild();
   }
 
   void addCircle(InputCoordinatesSheetResult result) {
@@ -181,6 +128,143 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         borderColor: result.color.withAlpha(128),
       ),
     );
-    _forceRebuild();
+    forceRebuild();
+  }
+
+  void addFromGeoJsonObject(
+    GeoJSONGeometry geoJson,
+    MapLayerEntry layer,
+    Map<String, dynamic> properties,
+  ) {
+    LatLng toLatLng(List c) => LatLng(c[1], c[0]);
+    List<LatLng> toListLatLng(List<List<double>> coordinates) =>
+        coordinates.map((e) => toLatLng(e)).toList();
+
+    switch (geoJson.type) {
+      case GeoJSONType.point:
+        assert(layer.type == EntryType.marker);
+        var geoJsonPoint = geoJson as GeoJSONPoint;
+        if (properties["radius"] != null) {
+          MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.marker);
+          int count = entryLayer.items.length;
+          layer.items.add(
+            MarkerEntry.withDefaults(
+              name: properties["name"] ?? "marker-${count++}",
+              coordinate: toLatLng(geoJsonPoint.coordinates),
+              color: properties["color"],
+              visible: properties["visible"],
+              description: properties["description"],
+            ),
+          );
+        } else {
+          MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.circle);
+          int count = entryLayer.items.length;
+          layer.items.add(
+            CircleEntry.withDefaults(
+              name: properties["name"] ?? "marker-${count++}",
+              center: toLatLng(geoJsonPoint.coordinates),
+              radius: properties["radius"],
+              fillColor: properties["color"],
+              visible: properties["visible"],
+              description: properties["description"],
+            ),
+          );
+        }
+        break;
+      case GeoJSONType.multiPoint:
+        assert(layer.type == EntryType.marker);
+        var geoJsonMultiPoint = geoJson as GeoJSONMultiPoint;
+        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.marker);
+        int count = entryLayer.items.length;
+        layer.items.addAll(
+          geoJsonMultiPoint.coordinates.map(
+            (e) => MarkerEntry.withDefaults(
+              name: "marker-${count++}",
+              coordinate: toLatLng(e),
+              color: properties["color"],
+              visible: properties["visible"],
+              description: properties["description"],
+            ),
+          ),
+        );
+        break;
+      case GeoJSONType.lineString:
+        assert(layer.type == EntryType.polyline);
+        var geoJsonLineString = geoJson as GeoJSONLineString;
+        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.polyline);
+        int count = entryLayer.items.length;
+        layer.items.add(
+          PolylineEntry.withDefaults(
+            name: properties["name"] ?? "polyline-${count++}",
+            coordinates: toListLatLng(geoJsonLineString.coordinates),
+            color: properties["color"],
+            visible: properties["visible"],
+            strokeWidth: properties["stroke_width"],
+            description: properties["description"],
+          ),
+        );
+        break;
+      case GeoJSONType.multiLineString:
+        var geoJsonMultiLineString = geoJson as GeoJSONMultiLineString;
+        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.polyline);
+        int count = entryLayer.items.length;
+        layer.items.addAll(
+          geoJsonMultiLineString.coordinates.map(
+            (e) => PolylineEntry.withDefaults(
+              name: properties["name"] ?? "polyline-${count++}",
+              coordinates: toListLatLng(e),
+              color: properties["color"],
+              visible: properties["visible"],
+              strokeWidth: properties["stroke_width"],
+              description: properties["description"],
+            ),
+          ),
+        );
+        break;
+      case GeoJSONType.polygon:
+        var geoJsonPolygon = geoJson as GeoJSONPolygon;
+        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.polygon);
+        int count = entryLayer.items.length;
+        List<LatLng>? coordinates = geoJsonPolygon.coordinates
+            .map((e) => toListLatLng(e))
+            .firstWhereOrNull((e) => isCounterClockwise(e));
+        if (coordinates == null) break;
+        layer.items.add(
+          PolygonEntry.withDefaults(
+            name: properties["name"] ?? "polygon-${count++}",
+            coordinates: coordinates,
+            fillColor: properties["fill_color"],
+            visible: properties["visible"],
+            borderColor: properties["border_color"],
+            description: properties["description"],
+            borderWidth: properties["border_width"],
+          ),
+        );
+        break;
+      case GeoJSONType.multiPolygon:
+        var geoJsonMultiPolygon = geoJson as GeoJSONMultiPolygon;
+        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.polygon);
+        int count = entryLayer.items.length;
+        for (var polygonCoordinate in geoJsonMultiPolygon.coordinates) {
+          List<LatLng>? coordinates = polygonCoordinate
+              .map((e) => toListLatLng(e))
+              .firstWhereOrNull((e) => isCounterClockwise(e));
+          if (coordinates == null) continue;
+          layer.items.add(
+            PolygonEntry.withDefaults(
+              name: properties["name"] ?? "polygon-${count++}",
+              coordinates: coordinates,
+              fillColor: properties["fill_color"],
+              visible: properties["visible"],
+              borderColor: properties["border_color"],
+              description: properties["description"],
+              borderWidth: properties["border_width"],
+            ),
+          );
+        }
+        break;
+      default:
+        throw AssertionError("Geomatry not in supported types.");
+    }
   }
 }

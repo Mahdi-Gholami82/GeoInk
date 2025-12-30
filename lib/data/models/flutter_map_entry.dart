@@ -11,8 +11,9 @@ const uuid = Uuid();
 /// Data models to keep track of map features or layers.
 
 /// Base class for all Entries which are used to generate map features.
-abstract class FlutterMapEntry extends ChangeNotifier {
+abstract class FlutterMapEntry {
   String name;
+  String description;
   bool visible;
 
   /// will be overridden in each entry subclass.
@@ -22,10 +23,13 @@ abstract class FlutterMapEntry extends ChangeNotifier {
 
   void toggleVisiblity() {
     visible = !visible;
-    notifyListeners();
   }
 
-  FlutterMapEntry({required this.name, this.visible = true});
+  FlutterMapEntry({
+    required this.name,
+    this.visible = true,
+    this.description = "",
+  });
 }
 
 /// Keeps track of a [Marker] feature that will be added to map layers later.
@@ -38,7 +42,17 @@ class MarkerEntry extends FlutterMapEntry {
     required this.coordinate,
     this.color = Colors.black,
     super.visible,
+    super.description,
   });
+
+  MarkerEntry.withDefaults({
+    required super.name,
+    required this.coordinate,
+    Color? color,
+    bool? visible,
+    String? description,
+  }) : color = color ?? Colors.black,
+       super(visible: visible ?? true, description: description ?? "");
 
   /// Generates a [Marker] from a [MarkerEntry] to be used in a [MarkerLayer].
   @override
@@ -61,8 +75,9 @@ class MarkerEntry extends FlutterMapEntry {
           "name": name,
           "color": color.toHexString(),
           "visible": visible,
-          "layerId": layerId,
-          "layerName": layerName,
+          "layer_id": layerId,
+          "layer_name": layerName,
+          "description": description,
         },
       );
 }
@@ -76,10 +91,25 @@ class PolygonEntry extends FlutterMapEntry {
   PolygonEntry({
     required super.name,
     required this.coordinates,
-    required this.fillColor,
-    required this.borderColor,
+    this.fillColor = Colors.red,
+    Color? borderColor,
     this.borderWidth = 2.0,
-  });
+    super.description,
+    super.visible,
+  }) : borderColor = borderColor ?? Colors.red.withAlpha(128);
+
+  PolygonEntry.withDefaults({
+    required super.name,
+    required this.coordinates,
+    Color? fillColor,
+    Color? borderColor,
+    double? borderWidth,
+    bool? visible,
+    String? description,
+  }) : fillColor = fillColor ?? Colors.red,
+       borderColor = borderColor ?? Colors.red.withAlpha(128),
+       borderWidth = borderWidth ?? 2.0,
+       super(visible: visible ?? true, description: description ?? "");
 
   /// Generates a [Polygon] from a [PolygonEntry] to be used in a [PolygonLayer].
   @override
@@ -103,12 +133,13 @@ class PolygonEntry extends FlutterMapEntry {
         geoJasonObject,
         properties: {
           'name': name,
-          'fillColor': fillColor.toHexString(),
-          'borderColor': borderColor.toHexString(),
-          'borderWidth': borderWidth,
+          'fill_color': fillColor.toHexString(),
+          'border_color': borderColor.toHexString(),
+          'border_width': borderWidth,
           'visible': visible,
-          "layerId": layerId,
-          "layerName": layerName,
+          "layer_id": layerId,
+          "layer_name": layerName,
+          "description": description,
         },
       );
 }
@@ -122,10 +153,23 @@ class PolylineEntry extends FlutterMapEntry {
   PolylineEntry({
     required super.name,
     required this.coordinates,
-    required this.color,
+    this.color = Colors.red,
     this.strokeWidth = 3.0,
     super.visible,
+    super.description,
   });
+
+  PolylineEntry.withDefaults({
+    required super.name,
+    required this.coordinates,
+    Color? color,
+    Color? borderColor,
+    double? strokeWidth,
+    bool? visible,
+    String? description,
+  }) : color = color ?? Colors.red,
+       strokeWidth = strokeWidth ?? 2.0,
+       super(visible: visible ?? true, description: description ?? "");
 
   /// Generates a [Polyline] from a [PolylineEntry] to be used in a [PolylineLayer].
   @override
@@ -144,10 +188,11 @@ class PolylineEntry extends FlutterMapEntry {
         properties: {
           'name': name,
           'color': color.toHexString(),
-          'strokeWidth': strokeWidth,
+          'stroke_width': strokeWidth,
           'visible': visible,
-          "layerId": layerId,
-          "layerName": layerName,
+          "layer_id": layerId,
+          "layer_name": layerName,
+          "description": description,
         },
       );
 }
@@ -168,6 +213,20 @@ class CircleEntry extends FlutterMapEntry {
     this.borderWidth = 2.0,
     required this.fillColor,
   });
+
+  CircleEntry.withDefaults({
+    required super.name,
+    required this.center,
+    required this.radius,
+    Color? fillColor,
+    Color? borderColor,
+    double? borderWidth,
+    bool? visible,
+    String? description,
+  }) : fillColor = fillColor ?? Colors.red,
+       borderColor = borderColor ?? Colors.red.withAlpha(128),
+       borderWidth = borderWidth ?? 2.0,
+       super(visible: visible ?? true, description: description ?? "");
 
   /// Generates a [CircleMarker] from a [CircleEntry] to be used in a [CircleLayer].
   @override
@@ -191,13 +250,14 @@ class CircleEntry extends FlutterMapEntry {
         properties: {
           'name': name,
           'radius': radius,
-          'borderColor': borderColor.toHexString(),
-          'borderWidth': borderWidth,
-          'fillColor': fillColor.toHexString(),
+          'border_color': borderColor.toHexString(),
+          'border_width': borderWidth,
+          'fill_color': fillColor.toHexString(),
           'visible': visible,
-          "subType": "Circle",
-          "layerId": layerId,
-          "layerName": layerName,
+          "layer_id": layerId,
+          "layer_name": layerName,
+          "description": description,
+          "subtype": "circle",
         },
       );
 }
@@ -279,24 +339,28 @@ class MapLayerEntry {
         .toList();
     switch (type) {
       case EntryType.marker:
+        assert(filteredItems.every((e) => e is MarkerEntry));
         final markers = filteredItems.cast<MarkerEntry>();
         return MarkerLayer(
           markers: markers.map((marker) => marker.flutterMapFeature).toList(),
         );
 
       case EntryType.polyline:
+        assert(filteredItems.every((e) => e is PolylineEntry));
         final lines = filteredItems.cast<PolylineEntry>();
         return PolylineLayer(
           polylines: lines.map((line) => line.flutterMapFeature).toList(),
         );
 
       case EntryType.polygon:
+        assert(filteredItems.every((e) => e is PolygonEntry));
         final polys = filteredItems.cast<PolygonEntry>();
         return PolygonLayer(
           polygons: polys.map((poly) => poly.flutterMapFeature).toList(),
         );
 
       case EntryType.circle:
+        assert(filteredItems.every((e) => e is CircleEntry));
         final circles = filteredItems.cast<CircleEntry>();
         return CircleLayer(
           circles: circles.map((circle) => circle.flutterMapFeature).toList(),

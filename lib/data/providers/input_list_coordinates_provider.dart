@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mapify/data/models/coordinates_sheet_data.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
+import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'input_list_coordinates_provider.g.dart';
@@ -167,7 +168,11 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
       coordinates: state.coordinates,
       color: state.color,
       radius: state.radius,
-      layer: state.layer,
+      layer:
+          state.layer ??
+          ref
+              .read(tileEntriesProvider.notifier)
+              .getDefaultLayerEntry(state.type),
     );
   }
 }

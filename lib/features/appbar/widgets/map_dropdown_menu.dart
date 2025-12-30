@@ -56,6 +56,8 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                 leadingIcon: Icon(Icons.file_download),
                 onPressed: () async {
                   var result = await FilePicker.platform.pickFiles();
+                  final stopwatch = Stopwatch();
+                  stopwatch.start();
                   if (result != null) {
                     var file = File(result.files.single.path!);
                     try {
@@ -69,14 +71,6 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                         GeoJSONGeometry geometry = feature.geometry!;
                         Map<String, dynamic> properties =
                             feature.properties ?? {};
-                        MapLayerEntry layer = tileEntriesNotifier
-                            .getLayerByIdOrMain(
-                              properties["id"] ?? "",
-                              entryTypeFromGeomatryType(
-                                geometry.type,
-                                properties["radius"] != null,
-                              )!,
-                            );
                         List<GeoJSONGeometry> geomatries = [geometry];
                         while (geomatries.any(
                           (e) => e.type == GeoJSONType.geometryCollection,
@@ -94,21 +88,23 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                         for (var noneCollectionGeomatry in geomatries) {
                           tileEntriesNotifier.addFromGeoJsonObject(
                             noneCollectionGeomatry,
-                            layer,
-                            properties,
+                            properties: properties,
                           );
                         }
                       }
-                      ref.read(tileEntriesProvider).forEach((e) {
-                        e.items.forEach((e) {
-                          print(e.visible);
-                        });
-                      });
                     } on AssertionError {
                       // TODO: message to user
                     }
                     tileEntriesNotifier.forceRebuild();
                   }
+                  stopwatch.stop();
+                  print('Execution time: ${stopwatch.elapsed}');
+                  print(
+                    'Elapsed milliseconds: ${stopwatch.elapsedMilliseconds}ms',
+                  );
+                  print(
+                    'Elapsed microseconds: ${stopwatch.elapsedMicroseconds}us',
+                  );
                 },
                 child: const Text('Import'),
               ),

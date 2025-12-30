@@ -35,21 +35,15 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
           type: type,
           isDefault: true,
         );
+        state.add(newlayerEntry);
         return newlayerEntry;
       },
     );
     return layerEntry;
   }
 
-  MapLayerEntry _getLayerEntry(MapLayerEntry? layer, EntryType type) {
-    MapLayerEntry entryLayer = layer ?? getDefaultLayerEntry(type);
-    addMapLayerEntry(layerEntry: entryLayer, ignoreIfExists: true);
-    return entryLayer;
-  }
-
-  MapLayerEntry getLayerByIdOrMain(String id, EntryType type) {
-    return state.firstWhereOrNull((e) => e.id == id) ??
-        getDefaultLayerEntry(type);
+  MapLayerEntry? getLayerById(String id) {
+    return state.firstWhereOrNull((e) => e.id == id);
   }
 
   void setConsumersState(void Function() fn) {
@@ -76,9 +70,8 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
   }
 
   void addMarker(InputCoordinatesSheetResult result) {
-    MapLayerEntry entryLayer = _getLayerEntry(result.layer, EntryType.marker);
-    int count = entryLayer.items.length;
-    entryLayer.items.add(
+    int count = result.layer.items.length;
+    result.layer.items.add(
       MarkerEntry(
         coordinate: result.coordinates.first,
         name: result.name ?? "marker-${count++}",
@@ -89,9 +82,8 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
   }
 
   void addPolyLine(InputCoordinatesSheetResult result) {
-    MapLayerEntry entryLayer = _getLayerEntry(result.layer, EntryType.polyline);
-    int count = entryLayer.items.length;
-    entryLayer.items.add(
+    int count = result.layer.items.length;
+    result.layer.items.add(
       PolylineEntry(
         name: result.name ?? "polyline-${count++}",
         coordinates: result.coordinates,
@@ -102,10 +94,9 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
   }
 
   void addPolygon(InputCoordinatesSheetResult result) {
-    MapLayerEntry entryLayer = _getLayerEntry(result.layer, EntryType.polygon);
-    int count = entryLayer.items.length;
+    int count = result.layer.items.length;
     var coordinates = result.coordinates;
-    entryLayer.items.add(
+    result.layer.items.add(
       PolygonEntry(
         name: result.name ?? "polygon-${count++}",
         coordinates: processPolygonLatlngs(coordinates),
@@ -117,9 +108,8 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
   }
 
   void addCircle(InputCoordinatesSheetResult result) {
-    MapLayerEntry entryLayer = _getLayerEntry(result.layer, EntryType.circle);
-    int count = entryLayer.items.length;
-    entryLayer.items.add(
+    int count = result.layer.items.length;
+    result.layer.items.add(
       CircleEntry(
         name: result.name ?? "circle-${count++}",
         center: result.coordinates[0],
@@ -132,22 +122,27 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
   }
 
   void addFromGeoJsonObject(
-    GeoJSONGeometry geoJson,
-    MapLayerEntry layer,
-    Map<String, dynamic> properties,
-  ) {
+    GeoJSONGeometry geoJson, {
+    required Map<String, dynamic> properties,
+    MapLayerEntry? layer,
+  }) {
     LatLng toLatLng(List c) => LatLng(c[1], c[0]);
     List<LatLng> toListLatLng(List<List<double>> coordinates) =>
         coordinates.map((e) => toLatLng(e)).toList();
+    if (layer != null) {
+      addMapLayerEntry(layerEntry: layer, ignoreIfExists: true);
+    } else {
+      layer = getLayerById(properties["id"]);
+    }
 
     switch (geoJson.type) {
       case GeoJSONType.point:
-        assert(layer.type == EntryType.marker);
         var geoJsonPoint = geoJson as GeoJSONPoint;
         if (properties["radius"] != null) {
-          MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.marker);
+          MapLayerEntry entryLayer =
+              layer ?? getDefaultLayerEntry(EntryType.marker);
           int count = entryLayer.items.length;
-          layer.items.add(
+          entryLayer.items.add(
             MarkerEntry.withDefaults(
               name: properties["name"] ?? "marker-${count++}",
               coordinate: toLatLng(geoJsonPoint.coordinates),
@@ -157,9 +152,9 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
             ),
           );
         } else {
-          MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.circle);
+          MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.circle);
           int count = entryLayer.items.length;
-          layer.items.add(
+          entryLayer.items.add(
             CircleEntry.withDefaults(
               name: properties["name"] ?? "marker-${count++}",
               center: toLatLng(geoJsonPoint.coordinates),
@@ -172,11 +167,10 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         }
         break;
       case GeoJSONType.multiPoint:
-        assert(layer.type == EntryType.marker);
         var geoJsonMultiPoint = geoJson as GeoJSONMultiPoint;
-        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.marker);
+        MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.marker);
         int count = entryLayer.items.length;
-        layer.items.addAll(
+        entryLayer.items.addAll(
           geoJsonMultiPoint.coordinates.map(
             (e) => MarkerEntry.withDefaults(
               name: "marker-${count++}",
@@ -189,11 +183,10 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         );
         break;
       case GeoJSONType.lineString:
-        assert(layer.type == EntryType.polyline);
         var geoJsonLineString = geoJson as GeoJSONLineString;
-        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.polyline);
+        MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.polyline);
         int count = entryLayer.items.length;
-        layer.items.add(
+        entryLayer.items.add(
           PolylineEntry.withDefaults(
             name: properties["name"] ?? "polyline-${count++}",
             coordinates: toListLatLng(geoJsonLineString.coordinates),
@@ -206,9 +199,9 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         break;
       case GeoJSONType.multiLineString:
         var geoJsonMultiLineString = geoJson as GeoJSONMultiLineString;
-        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.polyline);
+        MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.polyline);
         int count = entryLayer.items.length;
-        layer.items.addAll(
+        entryLayer.items.addAll(
           geoJsonMultiLineString.coordinates.map(
             (e) => PolylineEntry.withDefaults(
               name: properties["name"] ?? "polyline-${count++}",
@@ -223,13 +216,13 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         break;
       case GeoJSONType.polygon:
         var geoJsonPolygon = geoJson as GeoJSONPolygon;
-        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.polygon);
+        MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.polygon);
         int count = entryLayer.items.length;
         List<LatLng>? coordinates = geoJsonPolygon.coordinates
             .map((e) => toListLatLng(e))
             .firstWhereOrNull((e) => isCounterClockwise(e));
         if (coordinates == null) break;
-        layer.items.add(
+        entryLayer.items.add(
           PolygonEntry.withDefaults(
             name: properties["name"] ?? "polygon-${count++}",
             coordinates: coordinates,
@@ -243,14 +236,14 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         break;
       case GeoJSONType.multiPolygon:
         var geoJsonMultiPolygon = geoJson as GeoJSONMultiPolygon;
-        MapLayerEntry entryLayer = _getLayerEntry(layer, EntryType.polygon);
+        MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.polygon);
         int count = entryLayer.items.length;
         for (var polygonCoordinate in geoJsonMultiPolygon.coordinates) {
           List<LatLng>? coordinates = polygonCoordinate
               .map((e) => toListLatLng(e))
               .firstWhereOrNull((e) => isCounterClockwise(e));
           if (coordinates == null) continue;
-          layer.items.add(
+          entryLayer.items.add(
             PolygonEntry.withDefaults(
               name: properties["name"] ?? "polygon-${count++}",
               coordinates: coordinates,
@@ -263,6 +256,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
           );
         }
         break;
+      case GeoJSONType.geometryCollection:
+        var geoJsonGeomatryCollection = geoJson as GeoJSONGeometryCollection;
+        for (var geomatry in geoJsonGeomatryCollection.geometries) {
+          addFromGeoJsonObject(geomatry, properties: properties, layer: layer);
+        }
       default:
         throw AssertionError("Geomatry not in supported types.");
     }

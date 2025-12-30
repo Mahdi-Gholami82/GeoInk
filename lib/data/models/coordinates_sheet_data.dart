@@ -11,7 +11,7 @@ class InputCoordinatesSheetResult {
   InputCoordinatesSheetResult({
     required List<String> coordinates,
     required this.color,
-    this.layer,
+    required this.layer,
     String? radius,
     this.name,
   }) : coordinates = _stringToCoordinates(coordinates),
@@ -20,7 +20,7 @@ class InputCoordinatesSheetResult {
   double? radius;
   Color color;
   String? name;
-  MapLayerEntry? layer;
+  MapLayerEntry layer;
 }
 
 enum SheetInputFieldType { name, coordinate, radius }

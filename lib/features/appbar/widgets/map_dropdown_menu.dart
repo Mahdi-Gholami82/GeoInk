@@ -56,8 +56,6 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                 leadingIcon: Icon(Icons.file_download),
                 onPressed: () async {
                   var result = await FilePicker.platform.pickFiles();
-                  final stopwatch = Stopwatch();
-                  stopwatch.start();
                   if (result != null) {
                     var file = File(result.files.single.path!);
                     try {
@@ -72,24 +70,27 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                         Map<String, dynamic> properties =
                             feature.properties ?? {};
                         List<GeoJSONGeometry> geomatries = [geometry];
-                        while (geomatries.any(
-                          (e) => e.type == GeoJSONType.geometryCollection,
-                        )) {
-                          geomatries.expand((geomatry) {
-                            if (geomatry.type ==
-                                GeoJSONType.geometryCollection) {
-                              var geomatryCollection =
-                                  geometry as GeoJSONGeometryCollection;
-                              return geomatryCollection.geometries;
+                        while (geomatries.isNotEmpty) {
+                          List<GeoJSONGeometry> filteredGeomatries = geomatries
+                              .where(
+                                (e) => e.type != GeoJSONType.geometryCollection,
+                              )
+                              .toList();
+
+                          for (var geomatryObject in filteredGeomatries) {
+                            {
+                              tileEntriesNotifier.addFromGeoJsonObject(
+                                geomatryObject,
+                                properties: properties,
+                              );
                             }
-                            return [geomatry];
-                          });
-                        }
-                        for (var noneCollectionGeomatry in geomatries) {
-                          tileEntriesNotifier.addFromGeoJsonObject(
-                            noneCollectionGeomatry,
-                            properties: properties,
+                          }
+                          geomatries.removeWhere(
+                            (e) => filteredGeomatries.contains(e),
                           );
+                          geomatries = geomatries.expand((e) {
+                            return (e as GeoJSONGeometryCollection).geometries;
+                          }).toList();
                         }
                       }
                     } on AssertionError {
@@ -97,14 +98,6 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                     }
                     tileEntriesNotifier.forceRebuild();
                   }
-                  stopwatch.stop();
-                  print('Execution time: ${stopwatch.elapsed}');
-                  print(
-                    'Elapsed milliseconds: ${stopwatch.elapsedMilliseconds}ms',
-                  );
-                  print(
-                    'Elapsed microseconds: ${stopwatch.elapsedMicroseconds}us',
-                  );
                 },
                 child: const Text('Import'),
               ),

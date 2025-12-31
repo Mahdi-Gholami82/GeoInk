@@ -107,7 +107,10 @@ class PolygonEntry extends FlutterMapEntry {
     bool? visible,
     String? description,
   }) : fillColor = fillColor ?? Colors.red,
-       borderColor = borderColor ?? Colors.red.withAlpha(128),
+       borderColor =
+           borderColor ??
+           fillColor?.withAlpha(128) ??
+           Colors.red.withAlpha(128),
        borderWidth = borderWidth ?? 2.0,
        super(visible: visible ?? true, description: description ?? "");
 
@@ -163,7 +166,6 @@ class PolylineEntry extends FlutterMapEntry {
     required super.name,
     required this.coordinates,
     Color? color,
-    Color? borderColor,
     double? strokeWidth,
     bool? visible,
     String? description,
@@ -224,7 +226,10 @@ class CircleEntry extends FlutterMapEntry {
     bool? visible,
     String? description,
   }) : fillColor = fillColor ?? Colors.red,
-       borderColor = borderColor ?? Colors.red.withAlpha(128),
+       borderColor =
+           borderColor ??
+           fillColor?.withAlpha(128) ??
+           Colors.red.withAlpha(128),
        borderWidth = borderWidth ?? 2.0,
        super(visible: visible ?? true, description: description ?? "");
 
@@ -337,6 +342,12 @@ class MapLayerEntry {
     List<FlutterMapEntry> filteredItems = items
         .where((element) => element.visible)
         .toList();
+    List<String> namesList = items.map((e) => e.name).toList();
+    print(namesList);
+    assert(
+      namesList.toSet().length == namesList.length,
+      "There shouldnt be duplicate names inside a layer.",
+    );
     switch (type) {
       case EntryType.marker:
         assert(filteredItems.every((e) => e is MarkerEntry));

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mapify/core/utils/coordinates_tools.dart';
@@ -27,6 +28,11 @@ String _getUniqueName(String name, MapLayerEntry layer) {
     return "$name (${maxNum + 1})";
   }
   return name;
+}
+
+Color? _hexStringToColor(String? text) {
+  if (text == null) return null;
+  return Color(int.parse("0x$text"));
 }
 
 @Riverpod(keepAlive: true)
@@ -63,7 +69,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     return layerEntry;
   }
 
-  MapLayerEntry? getLayerById(String id) {
+  MapLayerEntry? getLayerById(String? id) {
     return state.firstWhereOrNull((e) => e.id == id);
   }
 
@@ -149,9 +155,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     if (layer != null) {
       addMapLayerEntry(layerEntry: layer, ignoreIfExists: true);
     } else {
-      layer = getLayerById(properties["id"]);
+      layer = getLayerById(properties["layer-id"]);
     }
     String? name = properties["name"];
+    final bool visible = properties["visible"] ?? true;
+    final String? description = properties["description"];
     switch (geoJson.type) {
       case GeoJSONType.point:
         var geoJsonPoint = geoJson as GeoJSONPoint;
@@ -162,9 +170,9 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
             MarkerEntry.withDefaults(
               name: _getUniqueName(name ?? "marker", entryLayer),
               coordinate: toLatLng(geoJsonPoint.coordinates),
-              color: properties["color"],
-              visible: properties["visible"],
-              description: properties["description"],
+              color: _hexStringToColor(properties["color"]),
+              visible: visible,
+              description: description,
             ),
           );
         } else {
@@ -174,9 +182,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
               name: _getUniqueName(name ?? "circle", entryLayer),
               center: toLatLng(geoJsonPoint.coordinates),
               radius: properties["radius"],
-              fillColor: properties["color"],
-              visible: properties["visible"],
-              description: properties["description"],
+              fillColor: _hexStringToColor(properties["fill"]),
+              borderColor: _hexStringToColor(properties["stroke"]),
+              borderWidth: properties["stroke-width"],
+              visible: visible,
+              description: description,
             ),
           );
         }
@@ -185,14 +195,15 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         var geoJsonMultiPoint = geoJson as GeoJSONMultiPoint;
         MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.marker);
         name ??= "marker";
+        final Color? color = _hexStringToColor(properties["color"]);
         for (var polygonCoordinates in geoJsonMultiPoint.coordinates) {
           entryLayer.items.add(
             MarkerEntry.withDefaults(
               name: _getUniqueName(name, entryLayer),
               coordinate: toLatLng(polygonCoordinates),
-              color: properties["color"],
-              visible: properties["visible"],
-              description: properties["description"],
+              color: color,
+              visible: visible,
+              description: description,
             ),
           );
         }
@@ -204,10 +215,10 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
           PolylineEntry.withDefaults(
             name: _getUniqueName(name ?? "polyline", entryLayer),
             coordinates: toListLatLng(geoJsonLineString.coordinates),
-            color: properties["color"],
-            visible: properties["visible"],
-            strokeWidth: properties["stroke_width"],
-            description: properties["description"],
+            color: _hexStringToColor(properties["stroke"]),
+            strokeWidth: properties["stroke-width"],
+            visible: visible,
+            description: description,
           ),
         );
         break;
@@ -215,15 +226,16 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         var geoJsonMultiLineString = geoJson as GeoJSONMultiLineString;
         MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.polyline);
         name ??= "polyline";
+        final Color? stroke = _hexStringToColor(properties["stroke"]);
         for (var polylineCoordinates in geoJsonMultiLineString.coordinates) {
           entryLayer.items.add(
             PolylineEntry.withDefaults(
               name: _getUniqueName(name, entryLayer),
               coordinates: toListLatLng(polylineCoordinates),
-              color: properties["color"],
-              visible: properties["visible"],
-              strokeWidth: properties["stroke_width"],
-              description: properties["description"],
+              color: stroke,
+              strokeWidth: properties["stroke-width"],
+              visible: visible,
+              description: description,
             ),
           );
         }
@@ -239,11 +251,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
           PolygonEntry.withDefaults(
             name: _getUniqueName(name ?? "polygon", entryLayer),
             coordinates: coordinates,
-            fillColor: properties["fill_color"],
-            visible: properties["visible"],
-            borderColor: properties["border_color"],
-            description: properties["description"],
-            borderWidth: properties["border_width"],
+            fillColor: _hexStringToColor(properties["fill"]),
+            borderColor: _hexStringToColor(properties["stroke"]),
+            borderWidth: properties["stroke-width"],
+            visible: visible,
+            description: description,
           ),
         );
         break;
@@ -251,6 +263,8 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         var geoJsonMultiPolygon = geoJson as GeoJSONMultiPolygon;
         MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.polygon);
         name ??= "polygon";
+        final Color? stroke = _hexStringToColor(properties["stroke"]);
+        final Color? fill = _hexStringToColor(properties["fill"]);
         for (var polygonCoordinates in geoJsonMultiPolygon.coordinates) {
           List<LatLng>? coordinates = polygonCoordinates
               .map((e) => toListLatLng(e))
@@ -260,11 +274,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
             PolygonEntry.withDefaults(
               name: _getUniqueName(name, entryLayer),
               coordinates: coordinates,
-              fillColor: properties["fill_color"],
-              visible: properties["visible"],
-              borderColor: properties["border_color"],
-              description: properties["description"],
-              borderWidth: properties["border_width"],
+              fillColor: fill,
+              borderColor: stroke,
+              borderWidth: properties["stroke-width"],
+              visible: visible,
+              description: description,
             ),
           );
         }

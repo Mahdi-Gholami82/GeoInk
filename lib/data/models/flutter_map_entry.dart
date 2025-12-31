@@ -75,8 +75,8 @@ class MarkerEntry extends FlutterMapEntry {
           "name": name,
           "color": color.toHexString(),
           "visible": visible,
-          "layer_id": layerId,
-          "layer_name": layerName,
+          "layer-id": layerId,
+          "layer-name": layerName,
           "description": description,
         },
       );
@@ -135,13 +135,13 @@ class PolygonEntry extends FlutterMapEntry {
       GeoJSONFeature(
         geoJasonObject,
         properties: {
-          'name': name,
-          'fill_color': fillColor.toHexString(),
-          'border_color': borderColor.toHexString(),
-          'border_width': borderWidth,
-          'visible': visible,
-          "layer_id": layerId,
-          "layer_name": layerName,
+          "name": name,
+          "fill": fillColor.toHexString(),
+          "stroke": borderColor.toHexString(),
+          "stroke-width": borderWidth,
+          "visible": visible,
+          "layer-id": layerId,
+          "layer-name": layerName,
           "description": description,
         },
       );
@@ -188,12 +188,12 @@ class PolylineEntry extends FlutterMapEntry {
       GeoJSONFeature(
         geoJasonObject,
         properties: {
-          'name': name,
-          'color': color.toHexString(),
-          'stroke_width': strokeWidth,
-          'visible': visible,
-          "layer_id": layerId,
-          "layer_name": layerName,
+          "name": name,
+          "stroke": color.toHexString(),
+          "stroke-width": strokeWidth,
+          "visible": visible,
+          "layer-id": layerId,
+          "layer-name": layerName,
           "description": description,
         },
       );
@@ -253,14 +253,14 @@ class CircleEntry extends FlutterMapEntry {
       GeoJSONFeature(
         geoJasonObject,
         properties: {
-          'name': name,
-          'radius': radius,
-          'border_color': borderColor.toHexString(),
-          'border_width': borderWidth,
-          'fill_color': fillColor.toHexString(),
-          'visible': visible,
-          "layer_id": layerId,
-          "layer_name": layerName,
+          "name": name,
+          "radius": radius,
+          "fill": fillColor.toHexString(),
+          "stroke": borderColor.toHexString(),
+          "stroke-width": borderWidth,
+          "visible": visible,
+          "layer-id": layerId,
+          "layer-name": layerName,
           "description": description,
           "subtype": "circle",
         },
@@ -343,7 +343,6 @@ class MapLayerEntry {
         .where((element) => element.visible)
         .toList();
     List<String> namesList = items.map((e) => e.name).toList();
-    print(namesList);
     assert(
       namesList.toSet().length == namesList.length,
       "There shouldnt be duplicate names inside a layer.",

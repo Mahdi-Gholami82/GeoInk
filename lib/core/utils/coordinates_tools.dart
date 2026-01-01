@@ -35,7 +35,7 @@ double _calculateCenterLat(List<LatLng> points) =>
 double _calculateCenterLong(List<LatLng> points) =>
     points.map((p) => p.longitude).reduce((a, b) => a + b) / points.length;
 
-List<LatLng> _sortClockwiseLatLng(List<LatLng> coordinates) {
+List<LatLng> sortClockwiseLatLng(List<LatLng> coordinates) {
   List<LatLng> coordinatesCopy = [...coordinates];
   if (!isCounterClockwise(coordinatesCopy)) return coordinatesCopy;
   final centerLat = _calculateCenterLat(coordinates);
@@ -50,7 +50,7 @@ List<LatLng> _sortClockwiseLatLng(List<LatLng> coordinates) {
   return coordinatesCopy;
 }
 
-List<LatLng> _sortCounterClockwiseLatLng(List<LatLng> coordinates) {
+List<LatLng> sortCounterClockwiseLatLng(List<LatLng> coordinates) {
   List<LatLng> coordinatesCopy = [...coordinates];
   if (isCounterClockwise(coordinatesCopy)) return coordinatesCopy;
   final centerLat = _calculateCenterLat(coordinates);
@@ -66,7 +66,7 @@ List<LatLng> _sortCounterClockwiseLatLng(List<LatLng> coordinates) {
 }
 
 List<LatLng> processPolygonLatlngs(List<LatLng> coordinates) {
-  List<LatLng> sorted = _sortCounterClockwiseLatLng(
+  List<LatLng> sorted = sortCounterClockwiseLatLng(
     latLngsEqual(coordinates.first, coordinates.last)
         ? coordinates.sublist(0, coordinates.length - 1)
         : coordinates,

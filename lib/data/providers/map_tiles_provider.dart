@@ -243,14 +243,18 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
       case GeoJSONType.polygon:
         var geoJsonPolygon = geoJson as GeoJSONPolygon;
         MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.polygon);
-        List<LatLng>? coordinates = geoJsonPolygon.coordinates
+        List<List<LatLng>>? coordinates = geoJsonPolygon.coordinates
             .map((e) => toListLatLng(e))
-            .firstWhereOrNull((e) => isCounterClockwise(e));
-        if (coordinates == null) break;
+            .toList();
+        List<LatLng>? polygonMainCoordinates = coordinates.length == 1
+            ? coordinates.first
+            : coordinates.firstWhereOrNull((e) => isCounterClockwise(e));
+
+        if (polygonMainCoordinates == null) break;
         entryLayer.items.add(
           PolygonEntry.withDefaults(
             name: _getUniqueName(name ?? "polygon", entryLayer),
-            coordinates: coordinates,
+            coordinates: polygonMainCoordinates,
             fillColor: _hexStringToColor(properties["fill"]),
             borderColor: _hexStringToColor(properties["stroke"]),
             borderWidth: properties["stroke-width"],
@@ -266,14 +270,17 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         final Color? stroke = _hexStringToColor(properties["stroke"]);
         final Color? fill = _hexStringToColor(properties["fill"]);
         for (var polygonCoordinates in geoJsonMultiPolygon.coordinates) {
-          List<LatLng>? coordinates = polygonCoordinates
+          List<List<LatLng>>? coordinates = polygonCoordinates
               .map((e) => toListLatLng(e))
-              .firstWhereOrNull((e) => isCounterClockwise(e));
-          if (coordinates == null) continue;
+              .toList();
+          List<LatLng>? polygonMainCoordinates = coordinates.length == 1
+              ? coordinates.first
+              : coordinates.firstWhereOrNull((e) => isCounterClockwise(e));
+          if (polygonMainCoordinates == null) continue;
           entryLayer.items.add(
             PolygonEntry.withDefaults(
               name: _getUniqueName(name, entryLayer),
-              coordinates: coordinates,
+              coordinates: polygonMainCoordinates,
               fillColor: fill,
               borderColor: stroke,
               borderWidth: properties["stroke-width"],

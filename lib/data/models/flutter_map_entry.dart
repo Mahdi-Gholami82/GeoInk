@@ -3,6 +3,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:mapify/core/utils/map_colors.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mapify/core/utils/coordinates_tools.dart';
 
@@ -40,7 +41,7 @@ class MarkerEntry extends FlutterMapEntry {
   MarkerEntry({
     required super.name,
     required this.coordinate,
-    this.color = Colors.black,
+    this.color = MapDefaultColors.marker,
     super.visible,
     super.description,
   });
@@ -51,7 +52,7 @@ class MarkerEntry extends FlutterMapEntry {
     Color? color,
     bool? visible,
     String? description,
-  }) : color = color ?? Colors.black,
+  }) : color = color ?? MapDefaultColors.marker,
        super(visible: visible ?? true, description: description ?? "");
 
   /// Generates a [Marker] from a [MarkerEntry] to be used in a [MarkerLayer].
@@ -91,12 +92,12 @@ class PolygonEntry extends FlutterMapEntry {
   PolygonEntry({
     required super.name,
     required this.coordinates,
-    this.fillColor = Colors.red,
+    this.fillColor = MapDefaultColors.polygon,
     Color? borderColor,
     this.borderWidth = 2.0,
     super.description,
     super.visible,
-  }) : borderColor = borderColor ?? Colors.red.withAlpha(128);
+  }) : borderColor = borderColor ?? MapDefaultColors.polygon.withAlpha(128);
 
   PolygonEntry.withDefaults({
     required super.name,
@@ -106,11 +107,12 @@ class PolygonEntry extends FlutterMapEntry {
     double? borderWidth,
     bool? visible,
     String? description,
-  }) : fillColor = fillColor ?? Colors.red,
-       borderColor =
-           borderColor ??
-           fillColor?.withAlpha(128) ??
-           Colors.red.withAlpha(128),
+  }) : fillColor =
+           fillColor ??
+           (borderColor?.withAlpha(128) ??
+               MapDefaultColors.polygon.withAlpha(128)),
+       borderColor = borderColor ?? MapDefaultColors.polygon,
+
        borderWidth = borderWidth ?? 2.0,
        super(visible: visible ?? true, description: description ?? "");
 
@@ -156,7 +158,7 @@ class PolylineEntry extends FlutterMapEntry {
   PolylineEntry({
     required super.name,
     required this.coordinates,
-    this.color = Colors.red,
+    this.color = MapDefaultColors.polyline,
     this.strokeWidth = 3.0,
     super.visible,
     super.description,
@@ -169,7 +171,7 @@ class PolylineEntry extends FlutterMapEntry {
     double? strokeWidth,
     bool? visible,
     String? description,
-  }) : color = color ?? Colors.red,
+  }) : color = color ?? MapDefaultColors.polyline,
        strokeWidth = strokeWidth ?? 2.0,
        super(visible: visible ?? true, description: description ?? "");
 
@@ -212,8 +214,8 @@ class CircleEntry extends FlutterMapEntry {
     required this.center,
     required this.radius,
     required this.borderColor,
-    this.borderWidth = 2.0,
     required this.fillColor,
+    this.borderWidth = 2.0,
   });
 
   CircleEntry.withDefaults({
@@ -225,11 +227,11 @@ class CircleEntry extends FlutterMapEntry {
     double? borderWidth,
     bool? visible,
     String? description,
-  }) : fillColor = fillColor ?? Colors.red,
-       borderColor =
-           borderColor ??
-           fillColor?.withAlpha(128) ??
-           Colors.red.withAlpha(128),
+  }) : fillColor =
+           fillColor ??
+           (borderColor?.withAlpha(128) ??
+               MapDefaultColors.circle.withAlpha(128)),
+       borderColor = borderColor ?? MapDefaultColors.circle,
        borderWidth = borderWidth ?? 2.0,
        super(visible: visible ?? true, description: description ?? "");
 

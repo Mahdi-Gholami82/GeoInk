@@ -22,7 +22,7 @@ class CoordinatesSheet extends ConsumerStatefulWidget {
 }
 
 class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
-  Color chosenColor = Colors.red;
+  late Color chosenColor;
   final formGlobalKey = GlobalKey<FormState>();
   late InputListCoordinatesState inputListState;
   late InputListCoordinatesNotifier inputListNotifier;
@@ -35,6 +35,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
     inputListNotifier = ref.read(inputListCoordinatesProvider.notifier);
     tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
     inputListState = ref.read(inputListCoordinatesProvider);
+    chosenColor = inputListState.color;
   }
 
   @override

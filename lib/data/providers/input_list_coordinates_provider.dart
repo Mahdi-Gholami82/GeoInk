@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mapify/core/utils/map_colors.dart';
 import 'package:mapify/data/models/coordinates_sheet_data.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
@@ -94,7 +95,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     state = state.copyWith(
       type: initType,
       fields: fields,
-      color: Colors.red,
+      color: MapDefaultColors.fromType(initType),
       layer: null,
     );
   }

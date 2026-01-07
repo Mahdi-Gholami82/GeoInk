@@ -1,8 +1,5 @@
-import 'package:collection/collection.dart';
-import 'package:expansion_tile_list/expansion_tile_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/core/ui/map_features_icons.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
 
@@ -14,57 +11,31 @@ class MapDrawer extends ConsumerStatefulWidget {
 }
 
 class _MapDrawerState extends ConsumerState<MapDrawer> {
-  IconData _getLayerIcon(EntryType type) {
-    switch (type) {
-      case EntryType.circle:
-        return MapIcons.circle;
-      case EntryType.marker:
-        return MapIcons.marker;
-      case EntryType.polygon:
-        return MapIcons.polygon;
-      case EntryType.polyline:
-        return MapIcons.polyline;
-    }
-  }
+  late TileEntriesNotifier tileEntriesNotifier;
+  late List<MapLayerEntry> layers;
+  late List<ExpansibleController> controllers;
 
-  ExpansionTile _buildLayerExpansionTile(MapLayerEntry layer) {
-    return ExpansionTile(
-      key: ValueKey(layer.name),
-      title: Text(layer.name),
-      children: [
-        ReorderableListView(
-          key: PageStorageKey('inner-${layer.name}'),
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          onReorder: (int oldIndex, int newIndex) {},
-          children: layer.items.mapIndexed((index, item) {
-            return Padding(
-              key: ValueKey('${item.name}-padding'),
-              padding: const EdgeInsets.only(right: 16.0),
-              child: ListTile(
-                title: Text(item.name),
-                key: ValueKey(item.name),
-                trailing: IconButton(
-                  onPressed: () {
-                    ref
-                        .read(tileEntriesProvider.notifier)
-                        .setConsumersState(item.toggleVisiblity);
-                  },
-                  icon: Icon(
-                    item.visible ? Icons.visibility : Icons.visibility_off,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+  @override
+  void initState() {
+    tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
+    layers = ref.read(tileEntriesProvider);
+    controllers = List.generate(
+      layers.length,
+      (index) => ExpansibleController(),
     );
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<MapLayerEntry> collection = ref.watch(tileEntriesProvider);
+    void collapseAllExceptIndex(int selectedIndex) {
+      for (int index = 0; index < controllers.length; index++) {
+        if (index != selectedIndex) {
+          controllers[index].collapse();
+        }
+      }
+    }
+
     return Drawer(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Column(
@@ -85,12 +56,79 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
             ),
           ),
           Expanded(
-            child: ExpansionTileList.reorderable(
-              expansionMode: ExpansionMode.atMostOne,
-              onReorder: (int oldIndex, int newIndex) {},
-              children: collection
-                  .map((layer) => _buildLayerExpansionTile(layer))
-                  .toList(),
+            child: ReorderableListView.builder(
+              onReorder: (oldIndex, newIndex) {
+                if (oldIndex < newIndex) {
+                  newIndex -= 1;
+                }
+                layers.insert(newIndex, layers.removeAt(oldIndex));
+                controllers.insert(newIndex, controllers.removeAt(oldIndex));
+                tileEntriesNotifier.updateState(layers);
+              },
+              buildDefaultDragHandles: false,
+              itemBuilder: (BuildContext context, int layerIndex) {
+                MapLayerEntry layer = layers[layerIndex];
+                var controller = controllers[layerIndex];
+                return ReorderableDragStartListener(
+                  key: ValueKey(layer.name),
+                  index: layerIndex,
+                  child: Material(
+                    child: Listener(
+                      onPointerDown: (event) {
+                        collapseAllExceptIndex(layerIndex);
+                      },
+                      child: ExpansionTile(
+                        key: ValueKey(layer.name),
+                        title: Text(layer.name),
+                        controller: controller,
+                        children: [
+                          ReorderableListView.builder(
+                            key: PageStorageKey('inner-${layer.name}'),
+                            buildDefaultDragHandles: false,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            onReorder: (int oldIndex, int newIndex) {
+                              tileEntriesNotifier.setConsumersState(() {
+                                if (oldIndex < newIndex) {
+                                  newIndex -= 1;
+                                }
+                                final FlutterMapEntry item = layer.items
+                                    .removeAt(oldIndex);
+                                layer.items.insert(newIndex, item);
+                              });
+                            },
+                            itemCount: layer.items.length,
+                            itemBuilder: (context, itemIndex) {
+                              FlutterMapEntry item = layer.items[itemIndex];
+                              return ReorderableDragStartListener(
+                                key: ValueKey('${item.name}-padding'),
+                                index: itemIndex,
+                                child: ListTile(
+                                  title: Text(item.name),
+                                  key: ValueKey(item.name),
+                                  trailing: IconButton(
+                                    onPressed: () {
+                                      tileEntriesNotifier.setConsumersState(
+                                        item.toggleVisiblity,
+                                      );
+                                    },
+                                    icon: Icon(
+                                      item.visible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              itemCount: layers.length,
             ),
           ),
         ],

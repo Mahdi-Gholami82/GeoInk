@@ -104,7 +104,7 @@ class PolygonEntry extends FlutterMapEntry {
     required this.coordinates,
     Color? fillColor,
     Color? borderColor,
-    double? borderWidth,
+    num? borderWidth,
     bool? visible,
     String? description,
   }) : fillColor =
@@ -113,7 +113,7 @@ class PolygonEntry extends FlutterMapEntry {
                MapDefaultColors.polygon.withAlpha(128)),
        borderColor = borderColor ?? MapDefaultColors.polygon,
 
-       borderWidth = borderWidth ?? 2.0,
+       borderWidth = (borderWidth ?? 2.0).toDouble(),
        super(visible: visible ?? true, description: description ?? "");
 
   /// Generates a [Polygon] from a [PolygonEntry] to be used in a [PolygonLayer].
@@ -168,11 +168,11 @@ class PolylineEntry extends FlutterMapEntry {
     required super.name,
     required this.coordinates,
     Color? color,
-    double? strokeWidth,
+    num? strokeWidth,
     bool? visible,
     String? description,
   }) : color = color ?? MapDefaultColors.polyline,
-       strokeWidth = strokeWidth ?? 2.0,
+       strokeWidth = (strokeWidth ?? 2.0).toDouble(),
        super(visible: visible ?? true, description: description ?? "");
 
   /// Generates a [Polyline] from a [PolylineEntry] to be used in a [PolylineLayer].
@@ -224,7 +224,7 @@ class CircleEntry extends FlutterMapEntry {
     required this.radius,
     Color? fillColor,
     Color? borderColor,
-    double? borderWidth,
+    num? borderWidth,
     bool? visible,
     String? description,
   }) : fillColor =
@@ -232,7 +232,7 @@ class CircleEntry extends FlutterMapEntry {
            (borderColor?.withAlpha(128) ??
                MapDefaultColors.circle.withAlpha(128)),
        borderColor = borderColor ?? MapDefaultColors.circle,
-       borderWidth = borderWidth ?? 2.0,
+       borderWidth = (borderWidth ?? 2.0).toDouble(),
        super(visible: visible ?? true, description: description ?? "");
 
   /// Generates a [CircleMarker] from a [CircleEntry] to be used in a [CircleLayer].

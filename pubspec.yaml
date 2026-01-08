@@ -40,18 +40,13 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   settings_ui: ^2.0.2
   flutter_colorpicker: ^1.1.0
-  wtf_sliding_sheet: ^1.1.5
-  bottom_sheet: ^4.0.4
   window_manager: ^0.5.1
   flutter_riverpod: ^3.0.3
   riverpod_annotation: ^3.0.3
-  collection: ^1.19.1
-  expansion_tile_list: ^2.0.0
-  reorderables: ^0.6.0
-  custom_pop_up_menu: ^1.2.4
   geojson_vi: ^2.2.5
   uuid: ^4.5.2
   file_picker: ^10.3.8
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:

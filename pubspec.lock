@@ -57,22 +57,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  bottom_inset_observer:
-    dependency: transitive
-    description:
-      name: bottom_inset_observer
-      sha256: cbfb01e0e07cc4922052701786d5e607765a6f54e1844f41061abf8744519a7d
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
-  bottom_sheet:
-    dependency: "direct main"
-    description:
-      name: bottom_sheet
-      sha256: efd28f52357d23e1c01eaeb45466b407f1e29318305bd6d10baf814fda18bd7e
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.4"
   build:
     dependency: transitive
     description:
@@ -257,14 +241,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0+8.4.0"
-  custom_pop_up_menu:
-    dependency: "direct main"
-    description:
-      name: custom_pop_up_menu
-      sha256: eeac484c6ddffffb25e803dc2a5cc9381e700a29f074e9fcc76fe36b62fde850
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.4"
   dart_earcut:
     dependency: transitive
     description:
@@ -297,14 +273,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.11"
-  expansion_tile_list:
-    dependency: "direct main"
-    description:
-      name: expansion_tile_list
-      sha256: a07b0a2b44a84062e3d89e54bcfaa41dd2792ff9d7917013a8d8e6cebd512ad9
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -752,14 +720,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
-  reorderables:
-    dependency: "direct main"
-    description:
-      name: reorderables
-      sha256: "004a886e4878df1ee27321831c838bc1c976311f4ca6a74ce7d561e506540a77"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.0"
   riverpod:
     dependency: transitive
     description:
@@ -1101,14 +1061,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  wtf_sliding_sheet:
-    dependency: "direct main"
-    description:
-      name: wtf_sliding_sheet
-      sha256: eb2f844a03fc64b9b904dc441bbb2283ee4dcf5244fe64bd91063bfbad70e89c
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.5"
   xdg_directories:
     dependency: transitive
     description:

@@ -165,7 +165,9 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
   }
 
   InputCoordinatesSheetResult takeFinalResult() {
+    final String name = state.name.trim();
     return InputCoordinatesSheetResult(
+      name: name.isNotEmpty ? name : null,
       coordinates: state.coordinates,
       color: state.color,
       radius: state.radius,

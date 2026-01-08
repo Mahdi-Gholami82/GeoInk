@@ -38,9 +38,6 @@ class _InputListViewState extends ConsumerState<InputListView> {
         };
       case SheetInputFieldType.name:
         return (value) {
-          if (value == null || value.isEmpty) {
-            return "The name field cannot be empty.";
-          }
           return null;
         };
       case SheetInputFieldType.radius:

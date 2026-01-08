@@ -28,12 +28,11 @@ class AddMapElementFab extends ConsumerWidget {
               ref,
               title: "Add Marker",
               type: EntryType.marker,
-              then: (value) {
-                if (value != null) {
-                  tileEntriesNotifier.addMarker(value);
-                }
-              },
-            );
+            ).then((value) {
+              if (value != null) {
+                tileEntriesNotifier.addMarker(value);
+              }
+            });
           },
         ),
         SpeedDialChild(
@@ -45,12 +44,11 @@ class AddMapElementFab extends ConsumerWidget {
               ref,
               title: "Add Polyline",
               type: EntryType.polyline,
-              then: (value) {
-                if (value != null) {
-                  tileEntriesNotifier.addPolyLine(value);
-                }
-              },
-            );
+            ).then((value) {
+              if (value != null) {
+                tileEntriesNotifier.addPolyLine(value);
+              }
+            });
           },
         ),
         SpeedDialChild(
@@ -62,12 +60,11 @@ class AddMapElementFab extends ConsumerWidget {
               ref,
               title: "Add Circle",
               type: EntryType.circle,
-              then: (value) {
-                if (value != null) {
-                  tileEntriesNotifier.addCircle(value);
-                }
-              },
-            );
+            ).then((value) {
+              if (value != null) {
+                tileEntriesNotifier.addCircle(value);
+              }
+            });
           },
         ),
         SpeedDialChild(
@@ -79,12 +76,11 @@ class AddMapElementFab extends ConsumerWidget {
               ref,
               title: "Add Polygon",
               type: EntryType.polygon,
-              then: (value) {
-                if (value != null) {
-                  tileEntriesNotifier.addPolygon(value);
-                }
-              },
-            );
+            ).then((value) {
+              if (value != null) {
+                tileEntriesNotifier.addPolygon(value);
+              }
+            });
           },
         ),
         // TODO: Implement overlay image adder

@@ -5,7 +5,6 @@ import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mapify/core/utils/map_colors.dart';
 import 'package:uuid/uuid.dart';
-import 'package:mapify/core/utils/coordinates_tools.dart';
 
 const uuid = Uuid();
 

@@ -4,10 +4,9 @@ import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/features/add_map_layer/widgets/draggable_coordinates_sheet.dart';
 
-void showCoordinatesButtomSheet(
+Future showCoordinatesButtomSheet(
   BuildContext context,
   WidgetRef ref, {
-  required Function(dynamic) then,
   required String title,
   required EntryType type,
 }) {
@@ -16,14 +15,12 @@ void showCoordinatesButtomSheet(
   );
   inputListNotifier.initSheetListInput(initType: type);
   ref.watch(inputListCoordinatesProvider);
-  showModalBottomSheet(
+  return showModalBottomSheet(
     isDismissible: false,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     context: context,
     builder: (context) =>
         DraggableCoordinatesSheet(title, initialChildSize: 0.6),
-  ).then((value) {
-    then(value);
-  });
+  );
 }

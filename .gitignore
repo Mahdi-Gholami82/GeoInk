@@ -44,6 +44,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# parser_test related
-parser_test_text_sample.txt
-parser_test_code_try.dart
+# core utils test related
+lib/core/utils/parser_test_text_sample.txt
+lib/core/utils/parser_test_code_try.dart
+lib/core/utils/coordinates_tools_test.dart

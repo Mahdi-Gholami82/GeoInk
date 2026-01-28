@@ -161,9 +161,6 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     required Map<String, dynamic> properties,
     MapLayerEntry? layer,
   }) {
-    LatLng toLatLng(List c) => LatLng(c[1], c[0]);
-    List<LatLng> toListLatLng(List<List<double>> coordinates) =>
-        coordinates.map((e) => toLatLng(e)).toList();
     if (layer != null) {
       addMapLayerEntry(layerEntry: layer, ignoreIfExists: true);
     } else {
@@ -181,7 +178,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
           entryLayer.items.add(
             MarkerEntry.withDefaults(
               name: _getUniqueName(name ?? "marker", entryLayer),
-              coordinate: toLatLng(geoJsonPoint.coordinates),
+              coordinate: listToLatLng(geoJsonPoint.coordinates),
               color: _stringToColor(properties["color"]),
               visible: visible,
               description: description,
@@ -192,7 +189,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
           entryLayer.items.add(
             CircleEntry.withDefaults(
               name: _getUniqueName(name ?? "circle", entryLayer),
-              center: toLatLng(geoJsonPoint.coordinates),
+              center: listToLatLng(geoJsonPoint.coordinates),
               radius: properties["radius"],
               fillColor: _stringToColor(properties["fill"]),
               borderColor: _stringToColor(properties["stroke"]),
@@ -212,7 +209,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
           entryLayer.items.add(
             MarkerEntry.withDefaults(
               name: _getUniqueName(name, entryLayer),
-              coordinate: toLatLng(polygonCoordinates),
+              coordinate: listToLatLng(polygonCoordinates),
               color: color,
               visible: visible,
               description: description,
@@ -226,7 +223,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         entryLayer.items.add(
           PolylineEntry.withDefaults(
             name: _getUniqueName(name ?? "polyline", entryLayer),
-            coordinates: toListLatLng(geoJsonLineString.coordinates),
+            coordinates: multipleListToLatLng(geoJsonLineString.coordinates),
             color: _stringToColor(properties["stroke"]),
             strokeWidth: properties["stroke-width"],
             visible: visible,
@@ -243,7 +240,7 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
           entryLayer.items.add(
             PolylineEntry.withDefaults(
               name: _getUniqueName(name, entryLayer),
-              coordinates: toListLatLng(polylineCoordinates),
+              coordinates: multipleListToLatLng(polylineCoordinates),
               color: stroke,
               strokeWidth: properties["stroke-width"],
               visible: visible,
@@ -256,13 +253,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         var geoJsonPolygon = geoJson as GeoJSONPolygon;
         MapLayerEntry entryLayer = getDefaultLayerEntry(EntryType.polygon);
         List<List<LatLng>>? coordinates = geoJsonPolygon.coordinates
-            .map((e) => toListLatLng(e))
+            .map((e) => multipleListToLatLng(e))
             .toList();
         List<LatLng>? polygonMainCoordinates = coordinates.length == 1
             ? coordinates.first
-            : coordinates.firstWhereOrNull((e) => isCounterClockwise(e));
-
-        if (polygonMainCoordinates == null) break;
+            : findMaxCoordinatesArea(coordinates);
         entryLayer.items.add(
           PolygonEntry.withDefaults(
             name: _getUniqueName(name ?? "polygon", entryLayer),
@@ -283,12 +278,11 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
         final Color? fill = _stringToColor(properties["fill"]);
         for (var polygonCoordinates in geoJsonMultiPolygon.coordinates) {
           List<List<LatLng>>? coordinates = polygonCoordinates
-              .map((e) => toListLatLng(e))
+              .map((e) => multipleListToLatLng(e))
               .toList();
           List<LatLng>? polygonMainCoordinates = coordinates.length == 1
               ? coordinates.first
-              : coordinates.firstWhereOrNull((e) => isCounterClockwise(e));
-          if (polygonMainCoordinates == null) continue;
+              : findMaxCoordinatesArea(coordinates);
           entryLayer.items.add(
             PolygonEntry.withDefaults(
               name: _getUniqueName(name, entryLayer),

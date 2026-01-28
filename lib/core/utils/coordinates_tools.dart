@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 
 /// Checks if two [LatLng] objects hold the same coordinates.
@@ -73,4 +74,28 @@ List<LatLng> processPolygonLatlngs(List<LatLng> coordinates) {
   );
   if (!latLngsEqual(sorted.first, sorted.last)) sorted.add(sorted.first);
   return sorted;
+}
+
+LatLng listToLatLng(List c) => LatLng(c[1], c[0]);
+
+List<LatLng> multipleListToLatLng(List<List<double>> coordinatesList) =>
+    coordinatesList.map((e) => listToLatLng(e)).toList();
+
+double calculateArea(List<LatLng> points) {
+  return GeoJSONPolygon([
+    [
+      for (var point in points) [point.latitude, point.longitude],
+    ],
+  ]).area;
+}
+
+List<LatLng> findMaxCoordinatesArea(List<List<LatLng>> points) {
+  assert(points.isNotEmpty, "Given points must not be empty.");
+  var max = points.first;
+  for (var point in points) {
+    if ((calculateArea(point) > calculateArea(max))) {
+      max = point;
+    }
+  }
+  return max;
 }

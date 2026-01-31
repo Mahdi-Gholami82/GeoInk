@@ -17,11 +17,15 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  List<List> entriesBack = [];
-  List<List> entries = [];
-
   @override
   Widget build(BuildContext context) {
+    List<Widget> mapChildren = [
+      openStreetMapTileLayer,
+      ...ref
+          .watch(tileEntriesProvider)
+          .map((entries) => entries.toFlutterMapObject()),
+    ];
+
     return Scaffold(
       drawer: MapDrawer(),
       extendBodyBehindAppBar: true,
@@ -31,19 +35,6 @@ class _HomePageState extends ConsumerState<HomePage> {
         onTapSettings: () {
           Navigator.of(context).pushNamed("/settings");
         },
-        onSearch: (searchText) {
-          setState(() {
-            if (searchText.isNotEmpty) {
-              entries = List.from(
-                entries.where((element) {
-                  return element.first.contains(searchText);
-                }),
-              );
-            } else {
-              entries = entriesBack;
-            }
-          });
-        },
       ),
       floatingActionButton: AddMapElementFab(),
       body: FlutterMap(
@@ -51,12 +42,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           initialCenter: LatLng(51.5, -0.09),
           initialZoom: 5,
         ),
-        children: [
-          openStreetMapTileLayer,
-          ...ref
-              .watch(tileEntriesProvider)
-              .map((entries) => entries.toFlutterMapObject()),
-        ],
+        children: mapChildren,
       ),
     );
   }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mapify/core/ui/widgets/custom_draggable_sheet.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
-import 'package:mapify/features/add_map_layer/widgets/draggable_coordinates_sheet.dart';
+import 'package:mapify/features/add_map_layer/widgets/coordinates_sheet.dart';
 
 Future showCoordinatesButtomSheet(
   BuildContext context,
@@ -20,7 +21,14 @@ Future showCoordinatesButtomSheet(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     context: context,
-    builder: (context) =>
-        DraggableCoordinatesSheet(title, initialChildSize: 0.6),
+    builder: (context) => CustomDraggableSheet(
+      initialChildSize: 0.6,
+      builder: (context, scrollController) {
+        return CoordinatesSheet(
+          scrollController: scrollController,
+          title: title,
+        );
+      },
+    ),
   );
 }

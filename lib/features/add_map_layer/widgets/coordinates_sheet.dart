@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mapify/core/ui/widgets/custom_sheet_drag_handle.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
@@ -44,17 +45,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
       children: [
         Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Container(
-                height: 5,
-                width: 90,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(125),
-                ),
-              ),
-            ),
+            CustomSheetDragHandle(),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(20),

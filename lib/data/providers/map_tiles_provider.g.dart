@@ -42,7 +42,7 @@ final class TileEntriesNotifierProvider
 }
 
 String _$tileEntriesNotifierHash() =>
-    r'cd6611f7026ce0c294af28c3171600da1a10c4a4';
+    r'ed06b64f3e56ca8cde97eca1c89d6f1776593c8a';
 
 abstract class _$TileEntriesNotifier extends $Notifier<List<MapLayerEntry>> {
   List<MapLayerEntry> build();

@@ -1,30 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/features/add_map_layer/widgets/coordinates_sheet.dart';
 
-class DraggableCoordinatesSheet extends ConsumerStatefulWidget {
-  const DraggableCoordinatesSheet(
-    this.title, {
+class CustomDraggableSheet extends StatefulWidget {
+  const CustomDraggableSheet({
     super.key,
     this.initialChildSize = 0.5,
     this.maxChildSize = 1.0,
     this.minChildSize = 0.15,
     this.pullDownOffset = 0.15,
+    required this.builder,
   });
-  final String title;
 
   final double initialChildSize;
   final double maxChildSize;
   final double minChildSize;
   final double pullDownOffset;
+  final ScrollableWidgetBuilder builder;
 
   @override
-  ConsumerState<DraggableCoordinatesSheet> createState() =>
-      _DraggableCoordinatesSheetState();
+  State<CustomDraggableSheet> createState() => _CustomDraggableSheetState();
 }
 
-class _DraggableCoordinatesSheetState
-    extends ConsumerState<DraggableCoordinatesSheet> {
+class _CustomDraggableSheetState extends State<CustomDraggableSheet> {
   final double _dragSensitivity = 1;
   late double pixelsMoved;
   late double initDragPosition;
@@ -34,13 +30,14 @@ class _DraggableCoordinatesSheetState
   double get minMaxAverage =>
       (widget.initialChildSize + widget.maxChildSize) / 2;
 
-  DraggableScrollableController controller = DraggableScrollableController();
+  late DraggableScrollableController controller;
 
   @override
   void initState() {
     super.initState();
     initDragPosition = widget.initialChildSize;
     pixelsMoved = 0;
+    controller = DraggableScrollableController();
   }
 
   void _animateSheetTo(double size) {
@@ -88,10 +85,7 @@ class _DraggableCoordinatesSheetState
           },
           child: Material(
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            child: CoordinatesSheet(
-              scrollController: scrollController,
-              title: widget.title,
-            ),
+            child: widget.builder(context, scrollController),
           ),
         );
       },

@@ -4,7 +4,6 @@ import 'package:mapify/features/appbar/widgets/map_dropdown_menu.dart';
 
 class FloatingAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget drawer;
-  final Function(String searchText) onSearch;
   final Function onTapSettings;
   final Color? backgroundColor;
   final double borderRadius;
@@ -12,7 +11,6 @@ class FloatingAppBar extends StatefulWidget implements PreferredSizeWidget {
   const FloatingAppBar({
     super.key,
     required this.drawer,
-    required this.onSearch,
     required this.onTapSettings,
     this.backgroundColor,
     this.borderRadius = 6,

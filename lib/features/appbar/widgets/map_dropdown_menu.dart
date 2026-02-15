@@ -1,13 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geojson_vi/geojson_vi.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
+import 'package:mapify/data/providers/flutter_map_children_provider.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
 import 'package:mapify/features/home/widgets/ink_well_text_button.dart';
+import 'package:mapify/features/save_map_to_image/utils/show_buttom_sheet.dart';
+import 'package:screenshot/screenshot.dart';
 
 class MapDropdownMenu extends ConsumerStatefulWidget {
   const MapDropdownMenu({super.key});
@@ -114,7 +120,9 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               ),
               MenuItemButton(
                 leadingIcon: Icon(Icons.image_outlined),
-                onPressed: () {},
+                onPressed: () {
+                  showSaveToImageButtomSheet(context);
+                },
                 child: const Text('To Image'),
               ),
               MenuItemButton(

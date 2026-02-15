@@ -19,12 +19,9 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
-    List<Widget> mapChildren = [
-      openStreetMapTileLayer,
-      ...ref
-          .watch(tileEntriesProvider)
-          .map((entries) => entries.toFlutterMapObject()),
-    ];
+    Iterable<Widget> mapChildren = ref
+        .watch(tileEntriesProvider)
+        .map((entries) => entries.toFlutterMapObject());
 
     return Scaffold(
       drawer: MapDrawer(),
@@ -42,7 +39,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           initialCenter: LatLng(51.5, -0.09),
           initialZoom: 5,
         ),
-        children: mapChildren,
+        children: [openStreetMapTileLayer, ...mapChildren],
       ),
     );
   }

@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/core/services/tile_providers.dart';
 import 'package:mapify/core/ui/widgets/custom_sheet_drag_handle.dart';
+import 'package:mapify/core/utils/map_to_image.dart';
 import 'package:mapify/data/providers/flutter_map_children_provider.dart';
-import 'package:mapify/features/save_map_to_image/utils/map_to_image.dart';
+import 'package:mapify/core/ui/widgets/load_error.dart';
 
 class SaveToImageButtomSheet extends ConsumerStatefulWidget {
   const SaveToImageButtomSheet({super.key, required this.scrollController});
@@ -27,18 +28,18 @@ class _SaveToImageButtomSheetState
   void initState() {
     super.initState();
     mapChildren = ref.read(mapChildrenProvider);
-    imageFuture = mapToImage(
-      tileLayer: openStreetMapTileLayer,
-      mapChildren: mapChildren,
-      ratio: 2,
-    );
-    imageFuture.then((Uint8List image) {
-      mapImage = image;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    imageFuture = mapToImage(
+      tileLayer: openStreetMapTileLayerWaitLoad,
+      mapChildren: mapChildren,
+    );
+
+    imageFuture.then((Uint8List image) {
+      mapImage = image;
+    });
     return Stack(
       alignment: AlignmentGeometry.topCenter,
       children: [
@@ -75,6 +76,14 @@ class _SaveToImageButtomSheetState
                             ],
                           ),
                         ),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return loadError(
+                        message: 'Failed to load tiles.',
+                        onRetry: () {
+                          setState(() {});
+                        },
                       );
                     }
                     return Center(

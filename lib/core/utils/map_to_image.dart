@@ -6,26 +6,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/layer/tile_layer/tile_range_calculator.dart';
 import 'package:flutter_map/src/layer/tile_layer/tile_range.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:screenshot/screenshot.dart';
-
-const double _maxMercLat = 85.05112878;
-const double _maxMercLong = 180;
-final _maxMercBounds = LatLngBounds(
-  LatLng(-_maxMercLat, -_maxMercLong),
-  LatLng(_maxMercLat, _maxMercLong),
-);
-
-class _CameraExtra extends MapCamera {
-  _CameraExtra({required this.preferedSize, required MapOptions options})
-    : super.initialCamera(options);
-
-  Size preferedSize;
-
-  @override
-  Size get size {
-    return preferedSize;
-  }
-}
+import 'package:mapify/core/utils/max_merc_bounds.dart';
+import 'package:mapify/core/utils/map_to_image/camera_with_prefered_size.dart';
+import 'package:mapify/core/utils/map_to_image/map_to_image_waiter.dart';
 
 Future<ImageInfo> _getImage(ImageProvider provider) {
   final completer = Completer<ImageInfo>();
@@ -44,7 +27,6 @@ List<Future<dynamic>> _loadAllNeccessaryTiles(
   Iterable<TileCoordinates> tiles,
   TileLayer tileLayer,
 ) {
-  debugPrint("lenght : ${tiles.length}");
   List<Future> images = [];
   var resolver = TileCoordinatesResolver(true);
   for (var tile in tiles.map((e) => resolver.get(e)).toSet()) {
@@ -66,11 +48,11 @@ Future<Uint8List> mapToImage({
   double width = 1920,
   double height = 1080,
   double ratio = 1,
+  Duration timeout = const Duration(seconds: 10),
 }) async {
   var mapOptions = MapOptions(
-    initialCameraFit: CameraFit.bounds(bounds: bounds ?? _maxMercBounds),
+    initialCameraFit: CameraFit.bounds(bounds: bounds ?? MercBounds.maxBounds),
   );
-  var screenshotController = ScreenshotController();
   var mapController = MapControllerImpl(options: mapOptions);
   var tileRangeCalculator = TileRangeCalculator(
     tileDimension: tileLayer.tileDimension,
@@ -80,31 +62,30 @@ Future<Uint8List> mapToImage({
     tileLayer.minNativeZoom,
     tileLayer.maxNativeZoom,
   );
-
   DiscreteTileRange tileRange = tileRangeCalculator.calculate(
-    camera: _CameraExtra(
+    camera: CameraWithPreferedSize(
       preferedSize: Size(width, height),
       options: mapOptions,
     ),
     tileZoom: tileZoom,
   );
   Iterable<TileCoordinates> tiles = tileRange.coordinates;
-  print(tileRange.coordinates.length);
-  var loadingTiles = _loadAllNeccessaryTiles(tiles, tileLayer);
-  Future.wait(loadingTiles).then((v) {
-    print(v.length);
-  });
 
-  return screenshotController.captureFromWidget(
-    MediaQuery(
-      data: MediaQueryData(),
-      child: FlutterMap(
-        mapController: mapController,
-        options: mapOptions,
-        children: [tileLayer, ...mapChildren],
+  var imageFuture = mapToImageWaiter(
+    FlutterMap(
+      children: [tileLayer, ...mapChildren],
+      options: MapOptions(
+        initialCenter: LatLng(0, 0),
+        initialCameraFit: CameraFit.bounds(bounds: MercBounds.maxBounds),
+        initialZoom: 2,
       ),
     ),
-    targetSize: Size(width, height),
-    pixelRatio: ratio,
+    tilesLoadedGenerator: () {
+      Future<List> tileLoad = Future.wait(
+        _loadAllNeccessaryTiles(tiles, tileLayer),
+      ).timeout(timeout);
+      return tileLoad;
+    },
   );
+  return imageFuture;
 }

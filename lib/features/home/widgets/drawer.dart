@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapify/data/models/flutter_map_entry.dart';
 import 'package:mapify/data/providers/map_tiles_provider.dart';
+import 'package:mapify/features/home/widgets/flutter_map_dropdown_menu.dart';
 
 class MapDrawer extends ConsumerStatefulWidget {
   const MapDrawer({super.key});
@@ -103,19 +104,23 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                               return ReorderableDragStartListener(
                                 key: ValueKey('${item.name}-padding'),
                                 index: itemIndex,
-                                child: ListTile(
-                                  title: Text(item.name),
-                                  key: ValueKey(item.name),
-                                  trailing: IconButton(
-                                    onPressed: () {
-                                      tileEntriesNotifier.setConsumersState(
-                                        item.toggleVisiblity,
-                                      );
-                                    },
-                                    icon: Icon(
-                                      item.visible
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
+                                child: FlutterMapDropdownMenu(
+                                  entry: item,
+                                  layer: layer,
+                                  child: ListTile(
+                                    title: Text(item.name),
+                                    key: ValueKey(item.name),
+                                    trailing: IconButton(
+                                      onPressed: () {
+                                        tileEntriesNotifier.setConsumersState(
+                                          item.toggleVisiblity,
+                                        );
+                                      },
+                                      icon: Icon(
+                                        item.visible
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
                                     ),
                                   ),
                                 ),

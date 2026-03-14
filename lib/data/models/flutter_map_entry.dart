@@ -294,6 +294,8 @@ class MapLayerEntry {
   }) : items = items ?? [],
        id = uuid.v4();
 
+  bool get isEmpty => items.isEmpty;
+
   MapLayerEntry.marker({
     required String name,
     List<FlutterMapEntry>? items,

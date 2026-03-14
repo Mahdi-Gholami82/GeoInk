@@ -120,11 +120,12 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                 },
                 child: const Text('To Image'),
               ),
-              MenuItemButton(
-                leadingIcon: Icon(Icons.code),
-                onPressed: () {},
-                child: const Text('Parser'),
-              ),
+              // TODO: Implement parser tool.
+              // MenuItemButton(
+              //   leadingIcon: Icon(Icons.code),
+              //   onPressed: () {},
+              //   child: const Text('Parser'),
+              // ),
             ],
           ),
         ),

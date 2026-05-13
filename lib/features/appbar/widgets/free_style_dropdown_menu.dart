@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mapify/core/ui/map_features_icons.dart';
-import 'package:mapify/features/home/widgets/ink_well_text_button.dart';
+import 'package:mapify/features/appbar/widgets/ink_well_text_button.dart';
 
 class FreeStyleDropdownMenu extends StatefulWidget {
   const FreeStyleDropdownMenu({super.key});

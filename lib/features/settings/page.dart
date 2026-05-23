@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/core/theme/theme.dart' as theme;
-import 'package:mapify/data/providers/theme_provider.dart';
+import 'package:GeoInk/core/theme/theme.dart' as theme;
+import 'package:GeoInk/data/providers/theme_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {

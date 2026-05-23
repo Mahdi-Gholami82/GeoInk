@@ -4,9 +4,9 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:mapify/core/utils/coordinates_tools.dart';
-import 'package:mapify/data/models/coordinates_sheet_data.dart';
-import 'package:mapify/data/models/flutter_map_entry.dart';
+import 'package:GeoInk/core/utils/coordinates_tools.dart';
+import 'package:GeoInk/data/models/coordinates_sheet_data.dart';
+import 'package:GeoInk/data/models/flutter_map_entry.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'map_tiles_provider.g.dart';

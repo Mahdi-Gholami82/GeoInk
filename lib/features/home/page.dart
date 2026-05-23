@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:mapify/core/services/tile_providers.dart';
-import 'package:mapify/data/providers/map_tiles_provider.dart';
-import 'package:mapify/features/add_map_layer/widgets/speed_dial_fab.dart';
-import 'package:mapify/features/home/widgets/drawer.dart';
-import 'package:mapify/features/appbar/floating_appbar.dart';
+import 'package:GeoInk/core/services/tile_providers.dart';
+import 'package:GeoInk/data/providers/map_tiles_provider.dart';
+import 'package:GeoInk/features/add_map_layer/widgets/speed_dial_fab.dart';
+import 'package:GeoInk/features/home/widgets/drawer.dart';
+import 'package:GeoInk/features/appbar/floating_appbar.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   static const String route = "/";

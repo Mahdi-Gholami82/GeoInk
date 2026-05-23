@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/data/providers/theme_provider.dart';
-import 'package:mapify/features/home/page.dart';
+import 'package:GeoInk/data/providers/theme_provider.dart';
+import 'package:GeoInk/features/home/page.dart';
 import 'package:http/http.dart';
 import 'package:http/retry.dart';
-import 'package:mapify/features/settings/page.dart';
+import 'package:GeoInk/features/settings/page.dart';
 import 'package:window_manager/window_manager.dart';
 
 final httpClient = RetryClient(Client());

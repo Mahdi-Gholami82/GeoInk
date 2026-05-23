@@ -3,7 +3,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:mapify/core/utils/map_colors.dart';
+import 'package:GeoInk/core/utils/map_colors.dart';
 import 'package:uuid/uuid.dart';
 
 const uuid = Uuid();

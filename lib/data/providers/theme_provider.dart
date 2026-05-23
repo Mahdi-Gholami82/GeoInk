@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/core/theme/theme.dart';
+import 'package:GeoInk/core/theme/theme.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'theme_provider.g.dart';

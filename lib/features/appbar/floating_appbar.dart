@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/features/appbar/widgets/free_style_dropdown_menu.dart';
-import 'package:mapify/features/appbar/widgets/map_dropdown_menu.dart';
+import 'package:GeoInk/features/appbar/widgets/free_style_dropdown_menu.dart';
+import 'package:GeoInk/features/appbar/widgets/map_dropdown_menu.dart';
 
 class FloatingAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget drawer;

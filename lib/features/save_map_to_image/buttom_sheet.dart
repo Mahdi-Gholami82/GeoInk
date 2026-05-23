@@ -3,11 +3,11 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/core/services/tile_providers.dart';
-import 'package:mapify/core/ui/widgets/custom_sheet_drag_handle.dart';
-import 'package:mapify/core/utils/map_to_image.dart';
-import 'package:mapify/data/providers/flutter_map_children_provider.dart';
-import 'package:mapify/core/ui/widgets/load_error.dart';
+import 'package:GeoInk/core/services/tile_providers.dart';
+import 'package:GeoInk/core/ui/widgets/custom_sheet_drag_handle.dart';
+import 'package:GeoInk/core/utils/map_to_image.dart';
+import 'package:GeoInk/data/providers/flutter_map_children_provider.dart';
+import 'package:GeoInk/core/ui/widgets/load_error.dart';
 
 class SaveToImageButtomSheet extends ConsumerStatefulWidget {
   const SaveToImageButtomSheet({super.key, required this.scrollController});

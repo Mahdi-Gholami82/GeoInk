@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mapify/features/home/page.dart';
+import 'package:GeoInk/features/home/page.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

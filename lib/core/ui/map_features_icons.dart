@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mapify/data/models/flutter_map_entry.dart';
+import 'package:GeoInk/data/models/flutter_map_entry.dart';
 
 abstract final class MapIcons {
   static const IconData circle = Icons.adjust;

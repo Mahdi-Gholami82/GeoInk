@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/data/models/flutter_map_entry.dart';
-import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
-import 'package:mapify/data/providers/map_tiles_provider.dart';
+import 'package:GeoInk/data/models/flutter_map_entry.dart';
+import 'package:GeoInk/data/providers/input_list_coordinates_provider.dart';
+import 'package:GeoInk/data/providers/map_tiles_provider.dart';
 
 class MapLayerPicker extends ConsumerStatefulWidget {
   const MapLayerPicker({super.key, required this.type});

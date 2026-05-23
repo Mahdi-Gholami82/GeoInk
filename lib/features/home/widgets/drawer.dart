@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/data/models/flutter_map_entry.dart';
-import 'package:mapify/data/providers/map_tiles_provider.dart';
-import 'package:mapify/features/home/widgets/flutter_map_dropdown_menu.dart';
+import 'package:GeoInk/data/models/flutter_map_entry.dart';
+import 'package:GeoInk/data/providers/map_tiles_provider.dart';
+import 'package:GeoInk/features/home/widgets/flutter_map_dropdown_menu.dart';
 
 class MapDrawer extends ConsumerStatefulWidget {
   const MapDrawer({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/core/utils/coordinates_reformatter.dart';
-import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
+import 'package:GeoInk/core/utils/coordinates_reformatter.dart';
+import 'package:GeoInk/data/providers/input_list_coordinates_provider.dart';
 
 class SheetOptionsMenu extends ConsumerStatefulWidget {
   const SheetOptionsMenu({super.key});

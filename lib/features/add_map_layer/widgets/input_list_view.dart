@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapify/core/utils/coordinates_reformatter.dart';
-import 'package:mapify/data/models/coordinates_sheet_data.dart';
-import 'package:mapify/data/providers/input_list_coordinates_provider.dart';
+import 'package:GeoInk/core/utils/coordinates_reformatter.dart';
+import 'package:GeoInk/data/models/coordinates_sheet_data.dart';
+import 'package:GeoInk/data/providers/input_list_coordinates_provider.dart';
 
 class InputListView extends ConsumerStatefulWidget {
   const InputListView({super.key, required this.formGlobalKey});

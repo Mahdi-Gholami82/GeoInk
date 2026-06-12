@@ -16,11 +16,14 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
   late MapLayerList mapLayerList;
   late InputListCoordinatesNotifier inputListCoordinatesNotifier;
   late InputListCoordinatesState inputListState;
-  late MapLayer mainLayer;
-  MapLayer? newLayer;
 
   void _handleTextChange() {
-    setState(() {});
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -32,9 +35,7 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
     );
     controller = TextEditingController();
     controller.addListener(_handleTextChange);
-    mainLayer = mapLayerList.getDefaultLayerEntry(widget.entryType);
     inputListState = ref.read(inputListCoordinatesProvider);
-    inputListState.layer = mainLayer;
   }
 
   @override
@@ -55,27 +56,20 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
         DropdownMenu(
           hintText: "main",
           onSelected: (value) {
-            if (value == newLayer) {
-              if ("main" != controller.text.trim()) {
-                newLayer = MapLayer(
-                  name: controller.text, entryType: widget.entryType,
-                );
-                inputListState.layer = newLayer!;
-              }
-            } else {
-              inputListState.layer = value ?? mainLayer;
-            }
+                inputListState.layer = value;
           },
           controller: controller,
           enableFilter: true,
           dropdownMenuEntries: [
-            DropdownMenuEntry(value: mainLayer, label: "main"),
+            DropdownMenuEntry(value: null, label: "main"),
             ...collection
                 .where((e) => e.isDefault == false && e.entryType == widget.entryType)
                 .map((e) => DropdownMenuEntry(value: e, label: e.name)),
-            if (controller.text.isNotEmpty)
+            if (controller.text.isNotEmpty && controller.text.trim() != "main")
               DropdownMenuEntry(
-                value: newLayer,
+                value: MapLayer(
+                  name: controller.text, entryType: widget.entryType,
+                ),
                 label: controller.text,
                 labelWidget: Text("+ Add : ${controller.text}"),
               ),

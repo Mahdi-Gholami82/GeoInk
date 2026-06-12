@@ -1,10 +1,10 @@
+import 'package:GeoInk/features/add_map_layer/widgets/custom_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:GeoInk/core/ui/widgets/custom_sheet_drag_handle.dart';
 import 'package:GeoInk/data/models/flutter_map_entry.dart';
 import 'package:GeoInk/data/providers/input_list_coordinates_provider.dart';
 import 'package:GeoInk/data/providers/map_tiles_provider.dart';
-import 'package:GeoInk/features/add_map_layer/widgets/custom_color_picker.dart';
 import 'package:GeoInk/features/add_map_layer/widgets/input_list_view.dart';
 import 'package:GeoInk/features/add_map_layer/widgets/map_layer_picker.dart';
 import 'package:GeoInk/features/add_map_layer/widgets/sheet_options_menu.dart';
@@ -71,7 +71,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                             },
                             initialColor: chosenColor,
                           ),
-                          MapLayerPicker(type: inputListState.type),
+                          MapLayerPicker(entryType: inputListState.type,),
                         ],
                       ),
                     ),
@@ -86,8 +86,8 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       spacing: 20,
                       children: [
-                        if (inputListState.type == EntryType.polygon ||
-                            inputListState.type == EntryType.polyline)
+                        if (inputListState.type == EntryType.Polygon ||
+                            inputListState.type == EntryType.Polyline)
                           OutlinedButton(
                             style: TextButton.styleFrom(
                               backgroundColor: Theme.of(

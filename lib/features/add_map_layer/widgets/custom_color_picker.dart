@@ -7,7 +7,7 @@ class CustomColorPicker extends StatefulWidget {
     required this.onColorChanged,
     required this.initialColor,
   });
-  final Function(Color) onColorChanged;
+  final Function(Color value) onColorChanged;
   final Color initialColor;
 
   @override

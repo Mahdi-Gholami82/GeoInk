@@ -7,13 +7,13 @@ final networkTileProvider = NetworkTileProvider(httpClient: httpClient);
 
 TileLayer openStreetMapTileLayer = TileLayer(
   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-  userAgentPackageName: 'dev.fleaflet.flutter_map.example',
+  userAgentPackageName: "GeoInk",
   tileProvider: networkTileProvider,
 );
 
 TileLayer openStreetMapTileLayerWaitLoad = TileLayer(
   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-  userAgentPackageName: 'dev.fleaflet.flutter_map.example',
+  userAgentPackageName: "GeoInk",
   tileProvider: networkTileProvider,
   tileDisplay: TileDisplay.instantaneous(),
 );

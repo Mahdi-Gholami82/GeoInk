@@ -7,15 +7,30 @@ abstract final class MapDefaultColors {
   static const Color polygon = Colors.blue;
   static const Color polyline = Colors.red;
 
+  static Color from<T extends FlutterMapEntry>() {
+    switch (T) {
+      case CircleEntry:
+        return circle;
+      case MarkerEntry:
+        return marker;
+      case PolygonEntry:
+        return polygon;
+      case PolylineEntry:
+        return polyline;
+      default: 
+        throw AssertionError("Invalid type");
+    }
+  }
+
   static Color fromType(EntryType type) {
     switch (type) {
-      case EntryType.circle:
+      case EntryType.Circle:
         return circle;
-      case EntryType.marker:
+      case EntryType.Marker:
         return marker;
-      case EntryType.polygon:
+      case EntryType.Polygon:
         return polygon;
-      case EntryType.polyline:
+      case EntryType.Polyline:
         return polyline;
     }
   }

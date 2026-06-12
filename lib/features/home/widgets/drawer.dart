@@ -13,13 +13,13 @@ class MapDrawer extends ConsumerStatefulWidget {
 
 class _MapDrawerState extends ConsumerState<MapDrawer> {
   late TileEntriesNotifier tileEntriesNotifier;
-  late List<MapLayerEntry> layers;
+  late List<MapLayer> layers;
   late List<ExpansibleController> controllers;
 
   @override
   void initState() {
     tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
-    layers = ref.read(tileEntriesProvider);
+    layers = ref.read(tileEntriesProvider).items;
     controllers = List.generate(
       layers.length,
       (index) => ExpansibleController(),
@@ -58,7 +58,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
           ),
           Expanded(
             child: ReorderableListView.builder(
-              onReorder: (oldIndex, newIndex) {
+              onReorderItem: (oldIndex, newIndex) {
                 if (oldIndex < newIndex) {
                   newIndex -= 1;
                 }
@@ -68,7 +68,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
               },
               buildDefaultDragHandles: false,
               itemBuilder: (BuildContext context, int layerIndex) {
-                MapLayerEntry layer = layers[layerIndex];
+                MapLayer layer = layers[layerIndex];
                 var controller = controllers[layerIndex];
                 return ReorderableDragStartListener(
                   key: ValueKey(layer.name),

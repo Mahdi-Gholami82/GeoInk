@@ -13,6 +13,9 @@ class AddMapElementFab extends ConsumerWidget {
     TileEntriesNotifier tileEntriesNotifier = ref.read(
       tileEntriesProvider.notifier,
     );
+    MapLayerList tileEntries = ref.read(
+      tileEntriesProvider
+    );
 
     return SpeedDial(
       icon: Icons.add,
@@ -27,7 +30,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Marker",
-              type: EntryType.marker,
+              type: EntryType.Marker,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addMarker(value);
@@ -43,7 +46,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Polyline",
-              type: EntryType.polyline,
+              type: EntryType.Polyline,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addPolyLine(value);
@@ -59,7 +62,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Circle",
-              type: EntryType.circle,
+              type: EntryType.Circle,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addCircle(value);
@@ -75,7 +78,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Polygon",
-              type: EntryType.polygon,
+              type: EntryType.Polygon,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addPolygon(value);

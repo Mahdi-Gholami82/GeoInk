@@ -6,7 +6,7 @@ import 'package:GeoInk/data/providers/map_tiles_provider.dart';
 class FlutterMapDropdownMenu extends ConsumerWidget {
   final Widget child;
   final FlutterMapEntry entry;
-  final MapLayerEntry layer;
+  final MapLayer layer;
   final menuController = MenuController();
 
   FlutterMapDropdownMenu({
@@ -21,7 +21,7 @@ class FlutterMapDropdownMenu extends ConsumerWidget {
       tileEntriesProvider.notifier,
     );
 
-    List<MapLayerEntry> tileEntries = ref.read(tileEntriesProvider);
+    List<MapLayer> tileEntries = ref.read(tileEntriesProvider).items;
 
     List<Widget> menu = [
       MenuItemButton(
@@ -64,7 +64,7 @@ class FlutterMapDropdownMenu extends ConsumerWidget {
             if (value) {
               layer.items.remove(entry);
               if (layer.isEmpty) {
-                ref.read(tileEntriesProvider).remove(layer);
+                ref.read(tileEntriesProvider).items.remove(layer);
               }
               tileEntriesNotifier.forceRebuild();
             }

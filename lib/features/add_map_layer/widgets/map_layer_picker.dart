@@ -5,19 +5,19 @@ import 'package:GeoInk/data/providers/input_list_coordinates_provider.dart';
 import 'package:GeoInk/data/providers/map_tiles_provider.dart';
 
 class MapLayerPicker extends ConsumerStatefulWidget {
-  const MapLayerPicker({super.key, required this.type});
-  final EntryType type;
+  const MapLayerPicker({super.key,required this.entryType});
+  final EntryType entryType;
   @override
   ConsumerState<MapLayerPicker> createState() => _MapLayerPickerState();
 }
 
 class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
   late TextEditingController controller;
-  late TileEntriesNotifier tileEntriesNotifier;
+  late MapLayerList mapLayerList;
   late InputListCoordinatesNotifier inputListCoordinatesNotifier;
   late InputListCoordinatesState inputListState;
-  late MapLayerEntry mainLayer;
-  MapLayerEntry? newLayer;
+  late MapLayer mainLayer;
+  MapLayer? newLayer;
 
   void _handleTextChange() {
     setState(() {});
@@ -26,13 +26,13 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
   @override
   void initState() {
     super.initState();
-    tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
+    mapLayerList = ref.read(tileEntriesProvider);
     inputListCoordinatesNotifier = ref.read(
       inputListCoordinatesProvider.notifier,
     );
     controller = TextEditingController();
     controller.addListener(_handleTextChange);
-    mainLayer = tileEntriesNotifier.getDefaultLayerEntry(widget.type);
+    mainLayer = mapLayerList.getDefaultLayerEntry(widget.entryType);
     inputListState = ref.read(inputListCoordinatesProvider);
     inputListState.layer = mainLayer;
   }
@@ -46,7 +46,7 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
 
   @override
   Widget build(BuildContext context) {
-    List<MapLayerEntry> collection = ref.read(tileEntriesProvider);
+    List<MapLayer> collection = ref.read(tileEntriesProvider).items;
 
     return Row(
       spacing: 10,
@@ -57,9 +57,8 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
           onSelected: (value) {
             if (value == newLayer) {
               if ("main" != controller.text.trim()) {
-                newLayer = MapLayerEntry(
-                  name: controller.text,
-                  type: widget.type,
+                newLayer = MapLayer(
+                  name: controller.text, entryType: widget.entryType,
                 );
                 inputListState.layer = newLayer!;
               }
@@ -72,7 +71,7 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
           dropdownMenuEntries: [
             DropdownMenuEntry(value: mainLayer, label: "main"),
             ...collection
-                .where((e) => e.isDefault == false && e.type == widget.type)
+                .where((e) => e.isDefault == false && e.entryType == widget.entryType)
                 .map((e) => DropdownMenuEntry(value: e, label: e.name)),
             if (controller.text.isNotEmpty)
               DropdownMenuEntry(

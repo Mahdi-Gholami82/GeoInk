@@ -1,3 +1,4 @@
+import 'package:GeoInk/features/freestyle/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:GeoInk/data/providers/theme_provider.dart';
@@ -15,7 +16,7 @@ void main() async {
 
   WindowOptions windowOptions = WindowOptions(
     size: Size(1000, 700),
-    minimumSize: Size(500, 700),
+    // minimumSize: Size(500, 700),
     center: true,
     backgroundColor: Colors.transparent,
     skipTaskbar: false,
@@ -42,7 +43,10 @@ class _MapifyAppState extends ConsumerState<MapifyApp> {
     return MaterialApp(
       home: HomePage(),
       theme: ref.watch(themeProvider),
-      routes: {SettingsPage.route: (context) => SettingsPage()},
+      routes: {
+        SettingsPage.route: (context) => SettingsPage(),
+        FreeStylePage.route: (context) => FreeStylePage(),
+      },
     );
   }
 }

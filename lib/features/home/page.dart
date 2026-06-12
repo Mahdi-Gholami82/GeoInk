@@ -20,8 +20,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     Iterable<Widget> mapChildren = ref
-        .watch(tileEntriesProvider)
-        .map((entries) => entries.toFlutterMapObject());
+        .watch(tileEntriesProvider).getMapChildren();
 
     return Scaffold(
       drawer: MapDrawer(),

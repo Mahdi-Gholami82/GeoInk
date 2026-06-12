@@ -1,3 +1,5 @@
+import 'package:GeoInk/data/models/flutter_map_entry.dart';
+import 'package:GeoInk/features/freestyle/page.dart';
 import 'package:flutter/material.dart';
 import 'package:GeoInk/core/ui/map_features_icons.dart';
 import 'package:GeoInk/features/appbar/widgets/ink_well_text_button.dart';
@@ -25,23 +27,41 @@ class _FreeStyleDropdownMenuState extends State<FreeStyleDropdownMenu> {
             children: [
               MenuItemButton(
                 leadingIcon: Icon(MapIcons.marker),
-                onPressed: () {},
-                child: const Text('Marker'),
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                  ).pushNamed(FreeStylePage.route, arguments: EntryType.Marker);
+                },
+                child: Text(EntryType.Marker.name),
               ),
               MenuItemButton(
                 leadingIcon: Icon(MapIcons.circle),
-                onPressed: () {},
-                child: const Text('Circle'),
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                  ).pushNamed(FreeStylePage.route, arguments: EntryType.Circle);
+                },
+                child: Text(EntryType.Circle.name),
               ),
               MenuItemButton(
                 leadingIcon: Icon(MapIcons.polygon),
-                onPressed: () {},
-                child: const Text('Polygon'),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    FreeStylePage.route,
+                    arguments: EntryType.Polygon,
+                  );
+                },
+                child: Text(EntryType.Polygon.name),
               ),
               MenuItemButton(
                 leadingIcon: Icon(MapIcons.polyline),
-                onPressed: () {},
-                child: const Text('Polyline'),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    FreeStylePage.route,
+                    arguments: EntryType.Polyline,
+                  );
+                },
+                child: Text(EntryType.Polyline.name),
               ),
             ],
           ),

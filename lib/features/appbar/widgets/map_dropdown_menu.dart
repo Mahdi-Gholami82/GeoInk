@@ -18,23 +18,23 @@ class MapDropdownMenu extends ConsumerStatefulWidget {
 }
 
 class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
-  late TileEntriesNotifier tileEntriesNotifier;
+  late MapLayerList mapLayerList;
 
   @override
   void initState() {
     super.initState();
-    tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
+    mapLayerList = ref.read(tileEntriesProvider);
   }
 
   EntryType? entryTypeFromGeomatryType(GeoJSONType type, bool hasRadius) {
     switch (type) {
       case GeoJSONType.multiLineString || GeoJSONType.lineString:
-        return EntryType.polyline;
+        return EntryType.Polyline;
       case GeoJSONType.multiPolygon || GeoJSONType.polygon:
-        return EntryType.polygon;
+        return EntryType.Polygon;
       case GeoJSONType.point:
-        if (hasRadius) return EntryType.circle;
-        return EntryType.marker;
+        if (hasRadius) return EntryType.Circle;
+        return EntryType.Marker;
       default:
         return null;
     }
@@ -80,7 +80,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
 
                           for (var geomatryObject in filteredGeomatries) {
                             {
-                              tileEntriesNotifier.addFromGeoJsonObject(
+                              mapLayerList.addFromGeoJsonObject(
                                 geomatryObject,
                                 properties: properties,
                               );
@@ -97,7 +97,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                     } on AssertionError {
                       // TODO: message to user
                     }
-                    tileEntriesNotifier.forceRebuild();
+                    ref.read(tileEntriesProvider.notifier).forceRebuild();
                   }
                 },
                 child: const Text('Import'),
@@ -107,7 +107,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                 onPressed: () async {
                   await FilePicker.platform.saveFile(
                     bytes: utf8.encode(
-                      tileEntriesNotifier.toGeoJsonFeatureCollection().toJSON(),
+                      mapLayerList.toGeoJsonFeatureCollection().toJSON(),
                     ),
                   );
                 },

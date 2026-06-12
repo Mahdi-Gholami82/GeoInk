@@ -13,7 +13,7 @@ part of 'map_tiles_provider.dart';
 const tileEntriesProvider = TileEntriesNotifierProvider._();
 
 final class TileEntriesNotifierProvider
-    extends $NotifierProvider<TileEntriesNotifier, List<MapLayerEntry>> {
+    extends $NotifierProvider<TileEntriesNotifier, MapLayerList> {
   const TileEntriesNotifierProvider._()
     : super(
         from: null,
@@ -33,29 +33,29 @@ final class TileEntriesNotifierProvider
   TileEntriesNotifier create() => TileEntriesNotifier();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<MapLayerEntry> value) {
+  Override overrideWithValue(MapLayerList value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<List<MapLayerEntry>>(value),
+      providerOverride: $SyncValueProvider<MapLayerList>(value),
     );
   }
 }
 
 String _$tileEntriesNotifierHash() =>
-    r'ed06b64f3e56ca8cde97eca1c89d6f1776593c8a';
+    r'4efd0013c173b00a5f1f4551f48b978cc6cb0d1e';
 
-abstract class _$TileEntriesNotifier extends $Notifier<List<MapLayerEntry>> {
-  List<MapLayerEntry> build();
+abstract class _$TileEntriesNotifier extends $Notifier<MapLayerList> {
+  MapLayerList build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<List<MapLayerEntry>, List<MapLayerEntry>>;
+    final ref = this.ref as $Ref<MapLayerList, MapLayerList>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<MapLayerEntry>, List<MapLayerEntry>>,
-              List<MapLayerEntry>,
+              AnyNotifier<MapLayerList, MapLayerList>,
+              MapLayerList,
               Object?,
               Object?
             >;

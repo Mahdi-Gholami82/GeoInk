@@ -7,8 +7,8 @@ List<LatLng> _stringToCoordinates(List<String> coordinates) {
   return coordinates.map((e) => tryParseSingle(e)!.toLatLng()!).toList();
 }
 
-class InputCoordinatesSheetResult {
-  InputCoordinatesSheetResult({
+class InputCoordinatesResult {
+  InputCoordinatesResult({
     required List<String> coordinates,
     required this.color,
     required this.layer,
@@ -20,7 +20,7 @@ class InputCoordinatesSheetResult {
   double? radius;
   Color color;
   String? name;
-  MapLayerEntry layer;
+  MapLayer layer;
 }
 
 enum SheetInputFieldType { name, coordinate, radius }

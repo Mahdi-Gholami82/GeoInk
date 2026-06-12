@@ -1,3 +1,4 @@
+import 'package:GeoInk/core/ui/floating_shadow.dart';
 import 'package:flutter/material.dart';
 import 'package:GeoInk/features/appbar/widgets/free_style_dropdown_menu.dart';
 import 'package:GeoInk/features/appbar/widgets/map_dropdown_menu.dart';
@@ -48,11 +49,7 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(
-                        color: DefaultSelectionStyle.defaultColor,
-                        spreadRadius: 3,
-                        blurRadius: 3,
-                      ),
+                      FloatingShadow(),
                     ],
                   ),
                   child: IconButton(
@@ -79,11 +76,7 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
                         widget.backgroundColor ??
                         Theme.of(context).colorScheme.surface,
                     boxShadow: [
-                      BoxShadow(
-                        color: DefaultSelectionStyle.defaultColor,
-                        spreadRadius: 2,
-                        blurRadius: 3,
-                      ),
+                      FloatingShadow(),
                     ],
                   ),
                   child: Material(

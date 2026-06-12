@@ -48,6 +48,7 @@ dependencies:
   file_picker: ^10.3.8
   collection: ^1.19.1
   pool: ^1.5.2
+  flutter_map_math: ^0.2.4
 
 dev_dependencies:
   flutter_test:

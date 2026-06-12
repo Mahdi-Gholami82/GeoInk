@@ -9,14 +9,15 @@ part 'input_list_coordinates_provider.g.dart';
 
 class InputListCoordinatesState {
   Color color;
-  MapLayerEntry? layer;
-  EntryType type;
+  MapLayer? layer;
   List<SheetListInput> fields;
+  EntryType type;
+
   static const Map<EntryType, int> minNumberOfCoordinatesFields = {
-    EntryType.circle: 1,
-    EntryType.marker: 1,
-    EntryType.polyline: 2,
-    EntryType.polygon: 3,
+    EntryType.Circle: 1,
+    EntryType.Marker: 1,
+    EntryType.Polyline: 2,
+    EntryType.Polygon: 3,
   };
 
   InputListCoordinatesState({
@@ -29,12 +30,12 @@ class InputListCoordinatesState {
   InputListCoordinatesState.empty()
     : color = Colors.red,
       layer = null,
-      type = EntryType.marker,
+      type = EntryType.Marker,
       fields = [];
 
   InputListCoordinatesState copyWith({
     Color? color,
-    MapLayerEntry? layer,
+    MapLayer? layer,
     EntryType? type,
     List<SheetListInput>? fields,
   }) {
@@ -89,7 +90,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
         (index) => SheetListInput.coordinateField(),
       ),
     );
-    if (initType == EntryType.circle) {
+    if (initType == EntryType.Circle) {
       fields.add(SheetListInput.radiusField());
     }
     state = state.copyWith(
@@ -104,7 +105,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     state = state.copyWith(color: color);
   }
 
-  void setLayer(MapLayerEntry layer) {
+  void setLayer(MapLayer layer) {
     state = state.copyWith(layer: layer);
   }
 
@@ -164,18 +165,19 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     clearEmptyFields();
   }
 
-  InputCoordinatesSheetResult takeFinalResult() {
+  InputCoordinatesResult takeFinalResult() {
     final String name = state.name.trim();
-    return InputCoordinatesSheetResult(
+    MapLayer layer = state.layer ??
+          ref
+              .read(tileEntriesProvider)
+              .getDefaultLayerEntry(state.type);
+    return InputCoordinatesResult(
       name: name.isNotEmpty ? name : null,
       coordinates: state.coordinates,
       color: state.color,
       radius: state.radius,
       layer:
-          state.layer ??
-          ref
-              .read(tileEntriesProvider.notifier)
-              .getDefaultLayerEntry(state.type),
+          layer,
     );
   }
 }

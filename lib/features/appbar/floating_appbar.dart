@@ -1,7 +1,7 @@
-import 'package:GeoInk/core/ui/floating_shadow.dart';
+import 'package:geoink/core/ui/floating_shadow.dart';
 import 'package:flutter/material.dart';
-import 'package:GeoInk/features/appbar/widgets/free_style_dropdown_menu.dart';
-import 'package:GeoInk/features/appbar/widgets/map_dropdown_menu.dart';
+import 'package:geoink/features/appbar/widgets/free_style_dropdown_menu.dart';
+import 'package:geoink/features/appbar/widgets/map_dropdown_menu.dart';
 
 class FloatingAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget drawer;

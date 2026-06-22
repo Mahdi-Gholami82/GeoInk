@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:GeoInk/data/models/flutter_map_entry.dart';
+import 'package:geoink/data/models/flutter_map_entry.dart';
 
 abstract final class MapDefaultColors {
   static const Color circle = Colors.red;

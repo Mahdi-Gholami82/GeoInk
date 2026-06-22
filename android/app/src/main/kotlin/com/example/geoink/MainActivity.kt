@@ -1,4 +1,4 @@
-package com.example.mapify
+package com.example.geoink
 
 import io.flutter.embedding.android.FlutterActivity
 

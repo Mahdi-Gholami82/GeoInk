@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:GeoInk/core/ui/widgets/custom_draggable_sheet.dart';
-import 'package:GeoInk/features/save_map_to_image/buttom_sheet.dart';
+import 'package:geoink/core/ui/widgets/custom_draggable_sheet.dart';
+import 'package:geoink/features/save_map_to_image/buttom_sheet.dart';
 
 Future showSaveToImageButtomSheet(BuildContext context) {
   return showModalBottomSheet(

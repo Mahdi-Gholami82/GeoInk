@@ -1,11 +1,11 @@
-import 'package:GeoInk/features/freestyle/page.dart';
+import 'package:geoink/features/freestyle/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:GeoInk/data/providers/theme_provider.dart';
-import 'package:GeoInk/features/home/page.dart';
+import 'package:geoink/data/providers/theme_provider.dart';
+import 'package:geoink/features/home/page.dart';
 import 'package:http/http.dart';
 import 'package:http/retry.dart';
-import 'package:GeoInk/features/settings/page.dart';
+import 'package:geoink/features/settings/page.dart';
 import 'package:window_manager/window_manager.dart';
 
 final httpClient = RetryClient(Client());
@@ -27,17 +27,17 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(ProviderScope(child: MapifyApp()));
+  runApp(ProviderScope(child: GeoInkApp()));
 }
 
-class MapifyApp extends ConsumerStatefulWidget {
-  const MapifyApp({super.key});
+class GeoInkApp extends ConsumerStatefulWidget {
+  const GeoInkApp({super.key});
 
   @override
-  ConsumerState<MapifyApp> createState() => _MapifyAppState();
+  ConsumerState<GeoInkApp> createState() => _GeoInkAppState();
 }
 
-class _MapifyAppState extends ConsumerState<MapifyApp> {
+class _GeoInkAppState extends ConsumerState<GeoInkApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

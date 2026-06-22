@@ -6,9 +6,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/layer/tile_layer/tile_range_calculator.dart';
 import 'package:flutter_map/src/layer/tile_layer/tile_range.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:GeoInk/core/utils/max_merc_bounds.dart';
-import 'package:GeoInk/core/utils/map_to_image/camera_with_prefered_size.dart';
-import 'package:GeoInk/core/utils/map_to_image/map_to_image_waiter.dart';
+import 'package:geoink/core/utils/max_merc_bounds.dart';
+import 'package:geoink/core/utils/map_to_image/camera_with_prefered_size.dart';
+import 'package:geoink/core/utils/map_to_image/map_to_image_waiter.dart';
 
 Future<ImageInfo> _getImage(ImageProvider provider) {
   final completer = Completer<ImageInfo>();

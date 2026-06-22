@@ -1,8 +1,12 @@
-import 'package:GeoInk/core/services/tile_providers.dart';
-import 'package:GeoInk/data/models/flutter_map_entry.dart';
-import 'package:GeoInk/data/providers/map_tiles_provider.dart';
-import 'package:GeoInk/features/freestyle/widgets/floating_tool_bar.dart';
-import 'package:GeoInk/features/freestyle/widgets/free_style_buttons_bar.dart';
+import 'package:geoink/core/services/tile_providers.dart';
+import 'package:geoink/core/ui/floating_decoration.dart';
+import 'package:geoink/core/ui/floating_shadow.dart';
+import 'package:geoink/data/models/flutter_map_entry.dart';
+import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/features/freestyle/widgets/floating_tool_bar.dart';
+import 'package:geoink/features/freestyle/widgets/free_style_buttons_bar.dart';
+import 'package:geoink/features/freestyle/widgets/layer_selector.dart';
+import 'package:geoink/features/freestyle/widgets/toolbar_button.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,12 +24,12 @@ class FreeStylePage extends ConsumerStatefulWidget {
 }
 
 class _FreeStylePageState extends ConsumerState<FreeStylePage> {
-  MapLayerList tempMapLayerList = MapLayerList();
+  late MapLayerList oldMapLayerList;
+  late MapLayerList tempMapLayerList;
   late EntryType selectedType;
-  late Iterable<Widget> mapChildren;
   bool finishedDrawing = true;
   bool finishedMouseTrackDraw = true;
-  late var _focusNode = FocusNode();
+  var _focusNode = FocusNode();
   var _mousePosition = Offset.zero;
   var mapController = MapController();
   late MapLayer currentLayer;
@@ -33,7 +37,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   @override
   void initState() {
     super.initState();
-    mapChildren = ref.read(tileEntriesProvider).getMapChildren();
+    tempMapLayerList = ref.read(tileEntriesProvider);
+    oldMapLayerList = tempMapLayerList.deepCopy();
     _focusNode.requestFocus();
   }
 
@@ -143,6 +148,12 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               selectedType = type;
               currentLayer = tempMapLayerList.getDefaultLayerEntry(type);
             },
+            onConfirm: () {},
+            onCancel: () {
+              ref
+                  .read(tileEntriesProvider.notifier)
+                  .updateState(oldMapLayerList);
+            },
           ),
           extendBodyBehindAppBar: true,
           body: Stack(
@@ -162,9 +173,9 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                       switch (selectedType) {
                         case EntryType.Marker:
                           {
+
                             tempMapLayerList.addWithLayer(
                               MarkerEntry.withDefaults(
-                                name: "",
                                 coordinate: point,
                               ),
                             );
@@ -177,7 +188,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             if (finishedDrawing || layer.isEmpty) {
                               tempMapLayerList.addWithLayer(
                                 PolygonEntry.withDefaults(
-                                  name: "",
                                   coordinates: [point],
                                 ),
                                 layer: layer,
@@ -195,7 +205,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             if (finishedDrawing || layer.isEmpty) {
                               tempMapLayerList.addWithLayer(
                                 PolylineEntry.withDefaults(
-                                  name: "",
                                   coordinates: [point],
                                 ),
                                 layer: layer,
@@ -213,7 +222,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             if (finishedDrawing || layer.isEmpty) {
                               tempMapLayerList.addWithLayer(
                                 CircleEntry.withDefaults(
-                                  name: "",
                                   center: point,
                                   radius: 0,
                                 ),
@@ -232,28 +240,57 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                 ),
                 children: [
                   openStreetMapTileLayer,
-                  ...mapChildren,
                   ...tempMapLayerList.getMapChildren(),
                 ],
               ),
               Positioned(
                 bottom: 20,
                 left: 20,
-                child: FloatingToolBar(
-                  onCancel: () {
-                    setState(() {
-                      cancelDrawing();
-                    });
-                  },
-                  onOk: () {
-                    setState(() {
-                      confirmDrawing();
-                    });
-                  },
-                  onRedo: () {},
-                  onUndo: () {},
-                  enableCancel: !finishedDrawing,
-                  enableOk: !finishedDrawing,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 15,
+                  children: [
+                    // TODO: implement layer selector
+                    // Container(
+                    //   decoration: makeFloatingDecoration(context),
+                    //   padding: EdgeInsets.symmetric(horizontal: 15),
+                    //   child: Material(
+                    //     child: ToolbarButton(
+                    //       onTap: () {
+                    //         showDialog(
+                    //           context: context,
+                    //           builder: (context) =>
+                    //               LayerSelector(entryType: selectedType,),
+                    //         );
+                    //       },
+                    //       spacing: 10,
+                    //       children: [
+                    //         Icon(Icons.layers_outlined),
+                    //         Text(
+                    //           "main",
+                    //           style: TextStyle(fontWeight: FontWeight.w600),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    FloatingToolBar(
+                      onCancel: () {
+                        setState(() {
+                          cancelDrawing();
+                        });
+                      },
+                      onOk: () {
+                        setState(() {
+                          confirmDrawing();
+                        });
+                      },
+                      onRedo: () {},
+                      onUndo: () {},
+                      enableCancel: !finishedDrawing,
+                      enableOk: !finishedDrawing,
+                    ),
+                  ],
                 ),
               ),
             ],

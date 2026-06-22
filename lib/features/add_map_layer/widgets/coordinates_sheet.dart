@@ -1,13 +1,13 @@
-import 'package:GeoInk/features/add_map_layer/widgets/custom_color_picker.dart';
+import 'package:geoink/features/add_map_layer/widgets/custom_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:GeoInk/core/ui/widgets/custom_sheet_drag_handle.dart';
-import 'package:GeoInk/data/models/flutter_map_entry.dart';
-import 'package:GeoInk/data/providers/input_list_coordinates_provider.dart';
-import 'package:GeoInk/data/providers/map_tiles_provider.dart';
-import 'package:GeoInk/features/add_map_layer/widgets/input_list_view.dart';
-import 'package:GeoInk/features/add_map_layer/widgets/map_layer_picker.dart';
-import 'package:GeoInk/features/add_map_layer/widgets/sheet_options_menu.dart';
+import 'package:geoink/core/ui/widgets/custom_sheet_drag_handle.dart';
+import 'package:geoink/data/models/flutter_map_entry.dart';
+import 'package:geoink/data/providers/input_list_coordinates_provider.dart';
+import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/features/add_map_layer/widgets/input_list_view.dart';
+import 'package:geoink/features/add_map_layer/widgets/map_layer_picker.dart';
+import 'package:geoink/features/add_map_layer/widgets/sheet_options_menu.dart';
 
 class CoordinatesSheet extends ConsumerStatefulWidget {
   const CoordinatesSheet({
@@ -82,59 +82,61 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                         child: InputListView(formGlobalKey: formGlobalKey),
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 20,
-                      children: [
-                        if (inputListState.type == EntryType.Polygon ||
-                            inputListState.type == EntryType.Polyline)
-                          OutlinedButton(
-                            style: TextButton.styleFrom(
+                    FittedBox(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: 20,
+                        children: [
+                          if (inputListState.type == EntryType.Polygon ||
+                              inputListState.type == EntryType.Polyline)
+                            OutlinedButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.surface,
+                                minimumSize: const Size(110, 50),
+                                shape: const StadiumBorder(),
+                              ),
+                              onPressed: () {
+                                inputListNotifier.addCoordinatesField();
+                              },
+                              child: Text(
+                                "Add Coordinates",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Theme.of(context).colorScheme.secondary,
+                                ),
+                              ),
+                            ),
+                      
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(
                                 context,
-                              ).colorScheme.surface,
-                              minimumSize: const Size(110, 50),
-                              shape: const StadiumBorder(),
+                              ).colorScheme.primary,
+                              minimumSize: Size(110, 50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
                             ),
                             onPressed: () {
-                              inputListNotifier.addCoordinatesField();
+                              if (formGlobalKey.currentState!.validate()) {
+                                inputListNotifier.setColor(chosenColor);
+                                Navigator.of(
+                                  context,
+                                ).pop(inputListNotifier.takeFinalResult());
+                              }
                             },
                             child: Text(
-                              "Add Coordinates",
+                              "Apply",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Theme.of(context).colorScheme.secondary,
+                                color: Theme.of(context).colorScheme.onPrimary,
                               ),
                             ),
                           ),
-
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            minimumSize: Size(110, 50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          onPressed: () {
-                            if (formGlobalKey.currentState!.validate()) {
-                              inputListNotifier.setColor(chosenColor);
-                              Navigator.of(
-                                context,
-                              ).pop(inputListNotifier.takeFinalResult());
-                            }
-                          },
-                          child: Text(
-                            "Apply",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

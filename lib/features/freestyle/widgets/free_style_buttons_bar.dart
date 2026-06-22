@@ -1,11 +1,11 @@
-import 'package:GeoInk/core/ui/floating_shadow.dart';
-import 'package:GeoInk/core/ui/map_features_icons.dart';
-import 'package:GeoInk/data/models/flutter_map_entry.dart';
+import 'package:geoink/core/ui/floating_shadow.dart';
+import 'package:geoink/core/ui/map_features_icons.dart';
+import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class Togglebutton extends StatelessWidget {
-  Togglebutton({super.key, required this.icon, required this.label});
+  const Togglebutton({super.key, required this.icon, required this.label});
   final Icon icon;
   final String label;
 
@@ -30,9 +30,11 @@ class Togglebutton extends StatelessWidget {
 
 class FreeStyleButtonsBar extends StatefulWidget
     implements PreferredSizeWidget {
-  const FreeStyleButtonsBar({super.key,required this.initSelectedType,required this.onTypeSwitch});
+  const FreeStyleButtonsBar({super.key,required this.initSelectedType,required this.onTypeSwitch, required this.onConfirm, required this.onCancel});
   final EntryType initSelectedType;
   final void Function(EntryType type) onTypeSwitch;
+  final void Function() onConfirm;
+  final void Function() onCancel;
 
   @override
   State<FreeStyleButtonsBar> createState() => _FreeStyleButtonsBarState();
@@ -99,6 +101,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                                 ).colorScheme.surfaceContainerHighest,
                               ),
                               onPressed: () {
+                                widget.onCancel();
                                 Navigator.of(context).pop();
                               },
                               icon: Icon(Icons.close),
@@ -123,7 +126,10 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                                   context,
                                 ).colorScheme.surfaceContainerHighest,
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                widget.onConfirm();
+                                Navigator.of(context).pop();
+                              },
                               icon: Icon(Icons.check),
                             ),
                           ],

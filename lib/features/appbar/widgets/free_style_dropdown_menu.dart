@@ -1,8 +1,8 @@
-import 'package:GeoInk/data/models/flutter_map_entry.dart';
-import 'package:GeoInk/features/freestyle/page.dart';
+import 'package:geoink/data/models/flutter_map_entry.dart';
+import 'package:geoink/features/freestyle/page.dart';
 import 'package:flutter/material.dart';
-import 'package:GeoInk/core/ui/map_features_icons.dart';
-import 'package:GeoInk/features/appbar/widgets/ink_well_text_button.dart';
+import 'package:geoink/core/ui/map_features_icons.dart';
+import 'package:geoink/features/appbar/widgets/ink_well_text_button.dart';
 
 class FreeStyleDropdownMenu extends StatefulWidget {
   const FreeStyleDropdownMenu({super.key});

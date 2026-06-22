@@ -1,6 +1,6 @@
 {
-    "name": "mapify",
-    "short_name": "mapify",
+    "name": "geoink",
+    "short_name": "geoink",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

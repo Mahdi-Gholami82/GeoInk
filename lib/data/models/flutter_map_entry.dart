@@ -1,14 +1,14 @@
 import 'dart:math' as math;
 
-import 'package:GeoInk/core/utils/coordinates_tools.dart';
-import 'package:GeoInk/data/models/coordinates_sheet_data.dart';
+import 'package:geoink/core/utils/coordinates_tools.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:GeoInk/core/utils/map_colors.dart';
+import 'package:geoink/core/utils/map_colors.dart';
+import 'package:unique_list/unique_list.dart';
 import 'package:uuid/uuid.dart';
 
 const uuid = Uuid();
@@ -35,6 +35,11 @@ abstract class FlutterMapEntry {
     this.visible = true,
     this.description = "",
   });
+
+  @override
+  bool operator ==(Object other) {
+    return other is FlutterMapEntry ? this.name.trim() == other.name.trim()  : super == other; 
+  }
 }
 
 /// Keeps track of a [Marker] feature that will be added to map layers later.
@@ -51,7 +56,7 @@ class MarkerEntry extends FlutterMapEntry {
   });
 
   MarkerEntry.withDefaults({
-    required super.name,
+    super.name = "marker",
     required this.coordinate,
     Color? color,
     bool? visible,
@@ -109,7 +114,7 @@ class PolygonEntry extends FlutterMapEntry {
   }) : borderColor = borderColor ?? MapDefaultColors.polygon.withAlpha(128);
 
   PolygonEntry.withDefaults({
-    required super.name,
+    super.name = "polygon",
     required this.coordinates,
     Color? fillColor,
     Color? borderColor,
@@ -180,7 +185,7 @@ class PolylineEntry extends FlutterMapEntry {
   });
 
   PolylineEntry.withDefaults({
-    required super.name,
+    super.name = "polyline",
     required this.coordinates,
     Color? color,
     num? strokeWidth,
@@ -239,7 +244,7 @@ class CircleEntry extends FlutterMapEntry {
   });
 
   CircleEntry.withDefaults({
-    required super.name,
+    super.name = "circle",
     required this.center,
     required this.radius,
     Color? fillColor,
@@ -308,7 +313,7 @@ Map<EntryType, Type> entryTypeClasses = {
 /// Collection of [FlutterMapEntry] sub classes, which have the same type.
 class MapLayer {
   String name;
-  final List<FlutterMapEntry> items;
+  final UniqueList<FlutterMapEntry> items = UniqueList(strict: true);
   final bool isDefault;
   final String id;
   final EntryType entryType;
@@ -316,23 +321,46 @@ class MapLayer {
   MapLayer({
     required this.name,
     required this.entryType,
-    List<FlutterMapEntry>? items,
     this.isDefault = false,
-  }) : items = items ?? [],
-       id = uuid.v4();
+  }) : id = uuid.v4();
 
   bool get isEmpty => items.isEmpty;
+
+  @override
+  bool operator ==(Object other) => other is MapLayer ? (this.name.trim() == other.name.trim()) : super == other;
+
+  MapLayer copy() => MapLayer(name: name, entryType: entryType,isDefault: isDefault)..items.addAll(items);
+
+  String _getUniqueName(String name) {
+    var uniqueNamePattern = RegExp(r"^\s*" + name + r"\s*?(?:\s+\((\d+)\))?");
+    List<String> namesList = items.map((e) => e.name).toList();
+    if (namesList.any((e) => e.trim() == name.trim())) {
+      int maxNum = namesList
+          .map((e) {
+            var match = uniqueNamePattern.firstMatch(e);
+            if (match != null) {
+              return int.parse(match.group(1) ?? "0");
+            }
+            return null;
+          })
+          .nonNulls
+          .reduce(math.max);
+      return "$name (${maxNum + 1})";
+    }
+    return name;
+  }
+
+  void add(FlutterMapEntry entry) {
+    assert(entry.runtimeType == entryTypeClasses[entryType]);
+    entry.name = _getUniqueName(entry.name);
+    items.add(entry);
+  }
 
   /// Converts all [FlutterMapEntry] sub classes in [items] to a map layer which will be added to the [FlutterMap] children.
   Widget toFlutterMapObject() {
     List<FlutterMapEntry> filteredItems = items
         .where((element) => element.visible)
         .toList();
-    List<String> namesList = items.map((e) => e.name).toList();
-    // assert(
-    //   namesList.toSet().length == namesList.length,
-    //   "There shouldnt be duplicate names inside a layer.",
-    // );
     switch (entryType) {
       case EntryType.Marker:
         assert(filteredItems.every((e) => e is MarkerEntry));
@@ -383,29 +411,27 @@ Color? _stringToColor(String? text) {
   return null;
 }
 
-String _getUniqueName(String name, MapLayer layer) {
-  var uniqueNamePattern = RegExp(r"^\s*" + name + r"\s*?(?:\s+\((\d+)\))?");
-  List<String> namesList = layer.items.map((e) => e.name).toList();
-  if (namesList.any((e) => e.trim() == name.trim())) {
-    int maxNum = namesList
-        .map((e) {
-          var match = uniqueNamePattern.firstMatch(e);
-          if (match != null) {
-            return int.parse(match.group(1) ?? "0");
-          }
-          return null;
-        })
-        .nonNulls
-        .reduce(math.max);
-    return "$name (${maxNum + 1})";
-  }
-  return name;
-}
+
 
 class MapLayerList {
-  List<MapLayer> items = [];
+  final UniqueList<MapLayer> items = UniqueList(strict: true);
 
-  MapLayerList copy({List<MapLayer>? newItems}) => MapLayerList()..items = [...newItems ?? items];
+  MapLayerList() {}
+
+  MapLayerList.withMainLayers() {
+    items.addAll(
+      EntryType.values.map(
+        (type) => MapLayer(
+          name: "${type.name} main layer",
+          isDefault: true,
+          entryType: type,
+        ),
+      ),
+    );
+  }
+
+  MapLayerList copy({List<MapLayer>? newItems}) => MapLayerList()..items.addAll([...newItems ?? items]);
+  MapLayerList deepCopy({List<MapLayer>? newItems}) => MapLayerList()..items.addAll([...newItems ?? items].map((e)=>e.copy()));
 
   GeoJSONFeatureCollection toGeoJsonFeatureCollection() {
     final allFeatures = items
@@ -441,70 +467,21 @@ class MapLayerList {
     return items.firstWhereOrNull((e) => e.id == id);
   }
 
-  void addMapLayerEntry({
-    required MapLayer layerEntry,
-    bool ignoreIfExists = false,
-  }) {
+  
+
+  
+
+
+  void addLayer(MapLayer layerEntry,) {
     try {
-      assert(
-        !items.any((entry) => entry.name == layerEntry.name),
-        "Names of MapLayerEntry must be unique",
-      );
-    } on AssertionError {
-      if (ignoreIfExists) {
-        return;
-      }
-      rethrow;
-    }
+      items.add(layerEntry);
+    } on DuplicateValueError {}
     items.add(layerEntry);
   }
 
-  void addMarker(InputCoordinatesResult result) {
-    result.layer.items.add(
-      MarkerEntry(
-        coordinate: result.coordinates.first,
-        name: _getUniqueName(result.name ?? "marker", result.layer),
-        color: result.color,
-      ),
-    );
-  }
-
   void addWithLayer<T extends FlutterMapEntry>(T entry, {MapLayer? layer}) {
-    (layer == null ? getDefaultLayerEntryGeneric<T>() : layer).items.add(entry);
-  }
-
-  void addPolyLine(InputCoordinatesResult result) {
-    result.layer.items.add(
-      PolylineEntry(
-        name: _getUniqueName(result.name ?? "polyline", result.layer),
-        coordinates: result.coordinates,
-        color: result.color,
-      ),
-    );
-  }
-
-  void addPolygon(InputCoordinatesResult result) {
-    var coordinates = result.coordinates;
-    result.layer.items.add(
-      PolygonEntry(
-        name: _getUniqueName(result.name ?? "polygon", result.layer),
-        coordinates: processPolygonLatlngs(coordinates),
-        borderColor: result.color,
-        fillColor: result.color.withAlpha(128),
-      ),
-    );
-  }
-
-  void addCircle(InputCoordinatesResult result) {
-    result.layer.items.add(
-      CircleEntry(
-        name: _getUniqueName(result.name ?? "circle", result.layer),
-        center: result.coordinates[0],
-        radius: result.radius!,
-        fillColor: result.color,
-        borderColor: result.color.withAlpha(128),
-      ),
-    );
+    MapLayer mapLayer = layer ?? getDefaultLayerEntryGeneric<T>();
+    mapLayer.add(entry);
   }
 
   void addFromGeoJsonObject(
@@ -513,7 +490,7 @@ class MapLayerList {
     MapLayer? layer,
   }) {
     if (layer != null) {
-      addMapLayerEntry(layerEntry: layer, ignoreIfExists: true);
+      addLayer(layer);
     } else {
       layer = getLayerById(properties["layer-id"]);
     }
@@ -526,9 +503,9 @@ class MapLayerList {
         if (properties["radius"] == null) {
           MapLayer entryLayer =
               layer ?? getDefaultLayerEntry(EntryType.Marker);
-          entryLayer.items.add(
+          entryLayer.add(
             MarkerEntry.withDefaults(
-              name: _getUniqueName(name ?? "marker", entryLayer),
+              name: name ?? "marker",
               coordinate: listToLatLng(geoJsonPoint.coordinates),
               color: _stringToColor(properties["color"]),
               visible: visible,
@@ -537,9 +514,9 @@ class MapLayerList {
           );
         } else {
           MapLayer entryLayer = getDefaultLayerEntry(EntryType.Circle);
-          entryLayer.items.add(
+          entryLayer.add(
             CircleEntry.withDefaults(
-              name: _getUniqueName(name ?? "circle", entryLayer),
+              name: name ?? "circle",
               center: listToLatLng(geoJsonPoint.coordinates),
               radius: properties["radius"],
               fillColor: _stringToColor(properties["fill"]),
@@ -557,9 +534,9 @@ class MapLayerList {
         name ??= "marker";
         final Color? color = _stringToColor(properties["color"]);
         for (var polygonCoordinates in geoJsonMultiPoint.coordinates) {
-          entryLayer.items.add(
+          entryLayer.add(
             MarkerEntry.withDefaults(
-              name: _getUniqueName(name, entryLayer),
+              name: name,
               coordinate: listToLatLng(polygonCoordinates),
               color: color,
               visible: visible,
@@ -571,9 +548,9 @@ class MapLayerList {
       case GeoJSONType.lineString:
         var geoJsonLineString = geoJson as GeoJSONLineString;
         MapLayer entryLayer = getDefaultLayerEntry(EntryType.Polyline);
-        entryLayer.items.add(
+        entryLayer.add(
           PolylineEntry.withDefaults(
-            name: _getUniqueName(name ?? "polyline", entryLayer),
+            name: name ?? "polyline",
             coordinates: multipleListToLatLng(geoJsonLineString.coordinates),
             color: _stringToColor(properties["stroke"]),
             strokeWidth: properties["stroke-width"],
@@ -588,9 +565,9 @@ class MapLayerList {
         name ??= "polyline";
         final Color? stroke = _stringToColor(properties["stroke"]);
         for (var polylineCoordinates in geoJsonMultiLineString.coordinates) {
-          entryLayer.items.add(
+          entryLayer.add(
             PolylineEntry.withDefaults(
-              name: _getUniqueName(name, entryLayer),
+              name: name,
               coordinates: multipleListToLatLng(polylineCoordinates),
               color: stroke,
               strokeWidth: properties["stroke-width"],
@@ -609,9 +586,9 @@ class MapLayerList {
         List<LatLng>? polygonMainCoordinates = coordinates.length == 1
             ? coordinates.first
             : findMaxCoordinatesArea(coordinates);
-        entryLayer.items.add(
+        entryLayer.add(
           PolygonEntry.withDefaults(
-            name: _getUniqueName(name ?? "polygon", entryLayer),
+            name: name ?? "polygon",
             coordinates: polygonMainCoordinates,
             fillColor: _stringToColor(properties["fill"]),
             borderColor: _stringToColor(properties["stroke"]),
@@ -634,9 +611,9 @@ class MapLayerList {
           List<LatLng>? polygonMainCoordinates = coordinates.length == 1
               ? coordinates.first
               : findMaxCoordinatesArea(coordinates);
-          entryLayer.items.add(
+          entryLayer.add(
             PolygonEntry.withDefaults(
-              name: _getUniqueName(name, entryLayer),
+              name: name,
               coordinates: polygonMainCoordinates,
               fillColor: fill,
               borderColor: stroke,

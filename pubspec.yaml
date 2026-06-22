@@ -1,4 +1,4 @@
-name: GeoInk
+name: geoink
 description: "Geolocational data visualizer"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -49,6 +49,7 @@ dependencies:
   collection: ^1.19.1
   pool: ^1.5.2
   flutter_map_math: ^0.2.4
+  unique_list: ^1.0.1
 
 dev_dependencies:
   flutter_test:

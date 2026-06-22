@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:GeoInk/data/models/flutter_map_entry.dart';
-import 'package:GeoInk/core/utils/coordinates_reformatter.dart';
+import 'package:geoink/data/models/flutter_map_entry.dart';
+import 'package:geoink/core/utils/coordinates_reformatter.dart';
 
 List<LatLng> _stringToCoordinates(List<String> coordinates) {
   return coordinates.map((e) => tryParseSingle(e)!.toLatLng()!).toList();

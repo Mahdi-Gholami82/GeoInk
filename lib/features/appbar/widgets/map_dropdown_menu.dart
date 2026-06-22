@@ -5,10 +5,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geojson_vi/geojson_vi.dart';
-import 'package:GeoInk/data/models/flutter_map_entry.dart';
-import 'package:GeoInk/data/providers/map_tiles_provider.dart';
-import 'package:GeoInk/features/appbar/widgets/ink_well_text_button.dart';
-import 'package:GeoInk/features/save_map_to_image/utils/show_buttom_sheet.dart';
+import 'package:geoink/data/models/flutter_map_entry.dart';
+import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/features/appbar/widgets/ink_well_text_button.dart';
+import 'package:geoink/features/save_map_to_image/utils/show_buttom_sheet.dart';
 
 class MapDropdownMenu extends ConsumerStatefulWidget {
   const MapDropdownMenu({super.key});

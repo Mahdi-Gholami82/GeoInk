@@ -40,66 +40,64 @@ class _FloatingToolBarState extends State<FloatingToolBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: BoxConstraints(minHeight: 50),
       padding: EdgeInsets.symmetric(horizontal: 15),
       decoration: makeFloatingDecoration(context),
       child: Material(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: 50),
-          child: Row(
-            children: [
-              // TODO: implement undo redo
-              // ToolbarButton(
-              //   onTap: () {
-              //     widget.onUndo();
-              //   },
-              //   children: [
-              //     Icon(Icons.undo),
-              //     Text("Undo", style: TextStyle(fontWeight: FontWeight.w600)),
-              //   ],
-              // ),
-              // ToolbarButton(
-              //   onTap: () {
-              //     widget.onRedo();
-              //   },
-              //   children: [
-              //     Text("Redo", style: TextStyle(fontWeight: FontWeight.w600)),
-              //     Icon(Icons.redo),
-              //   ],
-              // ),
-              // Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: 10)),
-              Row(
-                spacing: 8,
-                children: [
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadiusGeometry.circular(10),
-                      ),
+        child: Row(
+          children: [
+            // TODO: implement undo redo
+            // ToolbarButton(
+            //   onTap: () {
+            //     widget.onUndo();
+            //   },
+            //   children: [
+            //     Icon(Icons.undo),
+            //     Text("Undo", style: TextStyle(fontWeight: FontWeight.w600)),
+            //   ],
+            // ),
+            // ToolbarButton(
+            //   onTap: () {
+            //     widget.onRedo();
+            //   },
+            //   children: [
+            //     Text("Redo", style: TextStyle(fontWeight: FontWeight.w600)),
+            //     Icon(Icons.redo),
+            //   ],
+            // ),
+            // Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: 10)),
+            Row(
+              spacing: 8,
+              children: [
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadiusGeometry.circular(10),
                     ),
-                    onPressed: widget.enableCancel
-                        ? () {
-                            widget.onCancel();
-                          }
-                        : null,
-                    child: Text("Cancel"),
                   ),
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadiusGeometry.circular(10),
-                      ),
+                  onPressed: widget.enableCancel
+                      ? () {
+                          widget.onCancel();
+                        }
+                      : null,
+                  child: Text("Cancel"),
+                ),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadiusGeometry.circular(10),
                     ),
-                    onPressed: widget.enableOk
-                        ? () {
-                            widget.onOk();
-                          }
-                        : null,
-                    child: Text("Ok"),
                   ),
-                ],
-              ),
-            ],
-          ),
+                  onPressed: widget.enableOk
+                      ? () {
+                          widget.onOk();
+                        }
+                      : null,
+                  child: Text("Ok"),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

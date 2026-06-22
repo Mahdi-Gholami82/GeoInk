@@ -33,12 +33,18 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   var _mousePosition = Offset.zero;
   var mapController = MapController();
   late MapLayer currentLayer;
+  late Map<EntryType, MapLayer> chosenLayers;
 
   @override
   void initState() {
     super.initState();
     tempMapLayerList = ref.read(tileEntriesProvider);
     oldMapLayerList = tempMapLayerList.deepCopy();
+    chosenLayers = Map.fromEntries(
+      EntryType.values.map(
+        (e) => MapEntry(e, tempMapLayerList.getDefaultLayerEntry(e)),
+      ),
+    );
     _focusNode.requestFocus();
   }
 
@@ -46,7 +52,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     selectedType = ModalRoute.of(context)!.settings.arguments as EntryType;
-    currentLayer = tempMapLayerList.getDefaultLayerEntry(selectedType);
+    currentLayer = chosenLayers[selectedType]!;
   }
 
   void endDrawing() {
@@ -145,8 +151,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           appBar: FreeStyleButtonsBar(
             initSelectedType: selectedType,
             onTypeSwitch: (EntryType type) {
-              selectedType = type;
-              currentLayer = tempMapLayerList.getDefaultLayerEntry(type);
+              setState(() {
+                selectedType = type;
+                currentLayer = chosenLayers[type]!;
+              });
             },
             onConfirm: () {},
             onCancel: () {
@@ -173,59 +181,47 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                       switch (selectedType) {
                         case EntryType.Marker:
                           {
-
-                            tempMapLayerList.addWithLayer(
-                              MarkerEntry.withDefaults(
-                                coordinate: point,
-                              ),
+                            currentLayer.add(
+                              MarkerEntry.withDefaults(coordinate: point),
                             );
                             break;
                           }
                         case EntryType.Polygon:
                           {
-                            MapLayer layer = tempMapLayerList
-                                .getDefaultLayerEntry(EntryType.Polygon);
-                            if (finishedDrawing || layer.isEmpty) {
-                              tempMapLayerList.addWithLayer(
-                                PolygonEntry.withDefaults(
-                                  coordinates: [point],
-                                ),
-                                layer: layer,
+                            if (finishedDrawing || currentLayer.isEmpty) {
+                              currentLayer.add(
+                                PolygonEntry.withDefaults(coordinates: [point]),
                               );
                               finishedDrawing = false;
                             } else {
-                              (layer.items.last as PolygonEntry).coordinates
+                              (currentLayer.items.last as PolygonEntry)
+                                  .coordinates
                                   .add(point);
                             }
                           }
                         case EntryType.Polyline:
                           {
-                            MapLayer layer = tempMapLayerList
-                                .getDefaultLayerEntry(EntryType.Polyline);
-                            if (finishedDrawing || layer.isEmpty) {
-                              tempMapLayerList.addWithLayer(
+                            if (finishedDrawing || currentLayer.isEmpty) {
+                              currentLayer.add(
                                 PolylineEntry.withDefaults(
                                   coordinates: [point],
                                 ),
-                                layer: layer,
                               );
                               finishedDrawing = false;
                             } else {
-                              (layer.items.last as PolylineEntry).coordinates
+                              (currentLayer.items.last as PolylineEntry)
+                                  .coordinates
                                   .add(point);
                             }
                           }
                         case EntryType.Circle:
                           {
-                            MapLayer layer = tempMapLayerList
-                                .getDefaultLayerEntry(EntryType.Circle);
-                            if (finishedDrawing || layer.isEmpty) {
-                              tempMapLayerList.addWithLayer(
+                            if (finishedDrawing || currentLayer.isEmpty) {
+                              currentLayer.add(
                                 CircleEntry.withDefaults(
                                   center: point,
                                   radius: 0,
                                 ),
-                                layer: layer,
                               );
                               finishedDrawing = false;
                             } else {
@@ -250,30 +246,35 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 15,
                   children: [
-                    // TODO: implement layer selector
-                    // Container(
-                    //   decoration: makeFloatingDecoration(context),
-                    //   padding: EdgeInsets.symmetric(horizontal: 15),
-                    //   child: Material(
-                    //     child: ToolbarButton(
-                    //       onTap: () {
-                    //         showDialog(
-                    //           context: context,
-                    //           builder: (context) =>
-                    //               LayerSelector(entryType: selectedType,),
-                    //         );
-                    //       },
-                    //       spacing: 10,
-                    //       children: [
-                    //         Icon(Icons.layers_outlined),
-                    //         Text(
-                    //           "main",
-                    //           style: TextStyle(fontWeight: FontWeight.w600),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
+                    Container(
+                      constraints: BoxConstraints(minHeight: 40),
+                      decoration: makeFloatingDecoration(context),
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      child: Material(
+                        child: ToolbarButton(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => LayerSelector(
+                                entryType: selectedType,
+                                initialLayer: currentLayer,
+                                onConfirm: (MapLayer selection) {
+                                  chosenLayers[selectedType] = selection;
+                                },
+                              ),
+                            );
+                          },
+                          spacing: 10,
+                          children: [
+                            Icon(Icons.layers_outlined),
+                            Text(
+                              currentLayer.name,
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     FloatingToolBar(
                       onCancel: () {
                         setState(() {

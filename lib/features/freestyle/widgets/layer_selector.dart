@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class LayerSelector extends ConsumerStatefulWidget {
   const LayerSelector({
-    super.key, required this.entryType,
+    super.key, required this.entryType, required this.initialLayer, required this.onConfirm,
   });
 
   final EntryType entryType;
+  final MapLayer initialLayer;
+  final void Function(MapLayer selection) onConfirm;
 
   @override
   ConsumerState<LayerSelector> createState() {
@@ -19,12 +21,14 @@ class LayerSelector extends ConsumerStatefulWidget {
 class _LayerSelectorState extends ConsumerState<LayerSelector> {
   late Iterable<MapLayer> layers;
   late Iterable<MapLayer> filteredLayers;
+  late MapLayer selectedLayer;
 
   @override
   void initState() {
     super.initState();
     layers = ref.read(tileEntriesProvider).items.where((layer)=> layer.entryType == widget.entryType);
     filteredLayers = layers;
+    selectedLayer = widget.initialLayer;
   }
 
   @override
@@ -62,7 +66,16 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
         height: 400,
         width: 300,
         child: ListView.separated(itemCount: filteredLayers.length,itemBuilder:(context, index) {
-          return ListTile(leading: Icon(Icons.layers_outlined),onTap: () {
+          MapLayer currentLayer = filteredLayers.elementAt(index);
+            return ListTile(
+              leading: Icon(Icons.layers_outlined),
+              trailing: currentLayer == selectedLayer
+                  ? Icon(Icons.check)
+                  : null,
+              onTap: () {
+                setState(() {
+                  selectedLayer = currentLayer;
+                });
           },title: Text(filteredLayers.elementAt(index).name),);
         },separatorBuilder: (context, index) => const Divider(),),
       ),
@@ -72,7 +85,9 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
           child: Text("cancel"),
         ),
         TextButton(
-          onPressed: () {Navigator.of(context).pop();},
+          onPressed: () {
+            widget.onConfirm(selectedLayer);
+            Navigator.of(context).pop();},
           child: Text("ok"),
         ),
       ],

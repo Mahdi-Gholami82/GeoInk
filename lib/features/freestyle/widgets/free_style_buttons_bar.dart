@@ -30,7 +30,13 @@ class Togglebutton extends StatelessWidget {
 
 class FreeStyleButtonsBar extends StatefulWidget
     implements PreferredSizeWidget {
-  const FreeStyleButtonsBar({super.key,required this.initSelectedType,required this.onTypeSwitch, required this.onConfirm, required this.onCancel});
+  const FreeStyleButtonsBar({
+    super.key,
+    required this.initSelectedType,
+    required this.onTypeSwitch,
+    required this.onConfirm,
+    required this.onCancel,
+  });
   final EntryType initSelectedType;
   final void Function(EntryType type) onTypeSwitch;
   final void Function() onConfirm;
@@ -51,7 +57,11 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
   @override
   void initState() {
     super.initState();
-    buttons = EntryType.values.map((e)=>Togglebutton(label: e.name,icon: Icon(MapIcons.fromType(e)),)).toList();
+    buttons = EntryType.values
+        .map(
+          (e) => Togglebutton(label: e.name, icon: Icon(MapIcons.fromType(e))),
+        )
+        .toList();
     selected = List.filled(buttons.length, false);
     selectedType = widget.initSelectedType;
     buttons.firstWhereIndexedOrNull((index, e) {
@@ -66,8 +76,9 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
   void updateSelectedType(int index) {
     selected = List.filled(selected.length, false);
     selected[index] = true;
-    selectedType = EntryType.values.firstWhere((element) => element.name == buttons[index].label);
-    widget.onTypeSwitch(selectedType);
+    selectedType = EntryType.values.firstWhere(
+      (element) => element.name == buttons[index].label,
+    );
   }
 
   @override
@@ -83,58 +94,59 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [FloatingShadow()]
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [FloatingShadow()],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          style: IconButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                          ),
+                          onPressed: () {
+                            widget.onCancel();
+                            Navigator.of(context).pop();
+                          },
+                          icon: Icon(Icons.close),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              style: IconButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerHighest,
-                              ),
-                              onPressed: () {
-                                widget.onCancel();
-                                Navigator.of(context).pop();
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Center(
+                            child: ToggleButtons(
+                              children: buttons,
+                              isSelected: selected,
+                              onPressed: (index) {
+                                setState(() {
+                                  updateSelectedType(index);
+                                  widget.onTypeSwitch(selectedType);
+                                });
                               },
-                              icon: Icon(Icons.close),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              child: Center(
-                                child: ToggleButtons(
-                                  children: buttons,
-                                  isSelected: selected,
-                                  onPressed: (index) {
-                                    setState(() {
-                                      updateSelectedType(index);
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              style: IconButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerHighest,
-                              ),
-                              onPressed: () {
-                                widget.onConfirm();
-                                Navigator.of(context).pop();
-                              },
-                              icon: Icon(Icons.check),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        IconButton(
+                          style: IconButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                          ),
+                          onPressed: () {
+                            widget.onConfirm();
+                            Navigator.of(context).pop();
+                          },
+                          icon: Icon(Icons.check),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

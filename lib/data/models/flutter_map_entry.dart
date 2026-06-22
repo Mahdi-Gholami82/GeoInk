@@ -422,7 +422,7 @@ class MapLayerList {
     items.addAll(
       EntryType.values.map(
         (type) => MapLayer(
-          name: "${type.name} main layer",
+          name: "${type.name} main",
           isDefault: true,
           entryType: type,
         ),
@@ -476,7 +476,6 @@ class MapLayerList {
     try {
       items.add(layerEntry);
     } on DuplicateValueError {}
-    items.add(layerEntry);
   }
 
   void addWithLayer<T extends FlutterMapEntry>(T entry, {MapLayer? layer}) {

@@ -91,7 +91,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                                       formKey.currentState?.validate() ?? false;
                                   if (isValid) {
                                     setState(() {
-                                      layers.add(MapLayer(
+                                      ref.read(tileEntriesProvider).addLayer(MapLayer(
                                                       name: controller.text,
                                                       entryType: selectedType,
                                                     ));

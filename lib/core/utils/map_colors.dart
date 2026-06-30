@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 
 abstract final class MapDefaultColors {
-  static const Color circle = Colors.red;
+  static const Color circle = Colors.green;
   static const Color marker = Colors.black;
   static const Color polygon = Colors.blue;
   static const Color polyline = Colors.red;
@@ -24,13 +24,13 @@ abstract final class MapDefaultColors {
 
   static Color fromType(EntryType type) {
     switch (type) {
-      case EntryType.Circle:
+      case EntryType.circle:
         return circle;
-      case EntryType.Marker:
+      case EntryType.marker:
         return marker;
-      case EntryType.Polygon:
+      case EntryType.polygon:
         return polygon;
-      case EntryType.Polyline:
+      case EntryType.polyline:
         return polyline;
     }
   }

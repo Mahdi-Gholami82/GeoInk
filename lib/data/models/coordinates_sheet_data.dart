@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geoink/core/utils/coordinates_tools.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/core/utils/coordinates_reformatter.dart';
@@ -21,6 +22,31 @@ class InputCoordinatesResult {
   Color color;
   String? name;
   MapLayer layer;
+
+  MarkerEntry toMarker() => MarkerEntry(
+    coordinate: coordinates.first,
+    name: layer.getUniqueName(name ?? "marker"),
+    color: color,
+  );
+
+  PolylineEntry toPolyline() => PolylineEntry(
+        name: layer.getUniqueName(name ?? "polyline"),
+        coordinates: coordinates,
+        color: color,
+      );
+  PolygonEntry toPolygon() => PolygonEntry(
+        name: name ?? "polygon",
+        coordinates: processPolygonLatlngs(coordinates),
+        borderColor: color,
+        fillColor: color.withAlpha(128),
+      );
+  CircleEntry toCircle() => CircleEntry(
+        name: layer.getUniqueName(name ?? "circle"),
+        center: coordinates[0],
+        radius: radius!,
+        fillColor: color,
+        borderColor: color.withAlpha(128),
+      );
 }
 
 enum SheetInputFieldType { name, coordinate, radius }

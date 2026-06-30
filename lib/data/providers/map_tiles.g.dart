@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'map_tiles_provider.dart';
+part of 'map_tiles.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -42,7 +42,7 @@ final class TileEntriesNotifierProvider
 }
 
 String _$tileEntriesNotifierHash() =>
-    r'4efd0013c173b00a5f1f4551f48b978cc6cb0d1e';
+    r'49fe27065df5760e17e6492ac79609a82f747f2a';
 
 abstract class _$TileEntriesNotifier extends $Notifier<MapLayerList> {
   MapLayerList build();

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'input_list_coordinates_provider.dart';
+part of 'input_list_coordinates.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -46,7 +46,7 @@ final class InputListCoordinatesNotifierProvider
 }
 
 String _$inputListCoordinatesNotifierHash() =>
-    r'9d2be1ee64b1da1bdc0eca9791ea99b3cadcf84a';
+    r'402f1768c1172cbaa2a5a5e194117ef0f2f6dda8';
 
 abstract class _$InputListCoordinatesNotifier
     extends $Notifier<InputListCoordinatesState> {

@@ -30,38 +30,38 @@ class _FreeStyleDropdownMenuState extends State<FreeStyleDropdownMenu> {
                 onPressed: () {
                   Navigator.of(
                     context,
-                  ).pushNamed(FreeStylePage.route, arguments: EntryType.Marker);
+                  ).pushNamed(FreeStylePage.route, arguments: EntryType.marker);
                 },
-                child: Text(EntryType.Marker.name),
+                child: Text(EntryType.marker.name),
               ),
               MenuItemButton(
                 leadingIcon: Icon(MapIcons.circle),
                 onPressed: () {
                   Navigator.of(
                     context,
-                  ).pushNamed(FreeStylePage.route, arguments: EntryType.Circle);
+                  ).pushNamed(FreeStylePage.route, arguments: EntryType.circle);
                 },
-                child: Text(EntryType.Circle.name),
+                child: Text(EntryType.circle.name),
               ),
               MenuItemButton(
                 leadingIcon: Icon(MapIcons.polygon),
                 onPressed: () {
                   Navigator.of(context).pushNamed(
                     FreeStylePage.route,
-                    arguments: EntryType.Polygon,
+                    arguments: EntryType.polygon,
                   );
                 },
-                child: Text(EntryType.Polygon.name),
+                child: Text(EntryType.polygon.name),
               ),
               MenuItemButton(
                 leadingIcon: Icon(MapIcons.polyline),
                 onPressed: () {
                   Navigator.of(context).pushNamed(
                     FreeStylePage.route,
-                    arguments: EntryType.Polyline,
+                    arguments: EntryType.polyline,
                   );
                 },
-                child: Text(EntryType.Polyline.name),
+                child: Text(EntryType.polyline.name),
               ),
             ],
           ),

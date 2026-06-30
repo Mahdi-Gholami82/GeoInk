@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'theme_provider.dart';
+part of 'history.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,52 +9,52 @@ part of 'theme_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(ThemeNotifier)
-const themeProvider = ThemeNotifierProvider._();
+@ProviderFor(HistoryNotifier)
+const historyProvider = HistoryNotifierProvider._();
 
-final class ThemeNotifierProvider
-    extends $NotifierProvider<ThemeNotifier, ThemeData> {
-  const ThemeNotifierProvider._()
+final class HistoryNotifierProvider
+    extends $NotifierProvider<HistoryNotifier, MapHistory> {
+  const HistoryNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'themeProvider',
-        isAutoDispose: true,
+        name: r'historyProvider',
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$themeNotifierHash();
+  String debugGetCreateSourceHash() => _$historyNotifierHash();
 
   @$internal
   @override
-  ThemeNotifier create() => ThemeNotifier();
+  HistoryNotifier create() => HistoryNotifier();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ThemeData value) {
+  Override overrideWithValue(MapHistory value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ThemeData>(value),
+      providerOverride: $SyncValueProvider<MapHistory>(value),
     );
   }
 }
 
-String _$themeNotifierHash() => r'c84e057e5a8f1799176b6c58adeff48246b2d6d6';
+String _$historyNotifierHash() => r'1463e204d486d7f7c47fd85ff5816823d6e8c35f';
 
-abstract class _$ThemeNotifier extends $Notifier<ThemeData> {
-  ThemeData build();
+abstract class _$HistoryNotifier extends $Notifier<MapHistory> {
+  MapHistory build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<ThemeData, ThemeData>;
+    final ref = this.ref as $Ref<MapHistory, MapHistory>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ThemeData, ThemeData>,
-              ThemeData,
+              AnyNotifier<MapHistory, MapHistory>,
+              MapHistory,
               Object?,
               Object?
             >;

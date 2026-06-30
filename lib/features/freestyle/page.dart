@@ -1,21 +1,18 @@
 import 'package:geoink/core/services/tile_providers.dart';
 import 'package:geoink/core/ui/floating_decoration.dart';
-import 'package:geoink/core/ui/floating_shadow.dart';
+import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/data/providers/history.dart';
+import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/freestyle/widgets/floating_tool_bar.dart';
 import 'package:geoink/features/freestyle/widgets/free_style_buttons_bar.dart';
 import 'package:geoink/features/freestyle/widgets/layer_selector.dart';
-import 'package:geoink/features/freestyle/widgets/toolbar_button.dart';
-import 'package:collection/collection.dart';
+import 'package:geoink/core/ui/widgets/toolbar_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_math/flutter_geo_math.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
-
-void showColorPicker() {}
 
 class FreeStylePage extends ConsumerStatefulWidget {
   static const String route = "/freestyle";
@@ -25,7 +22,8 @@ class FreeStylePage extends ConsumerStatefulWidget {
 
 class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   late MapLayerList oldMapLayerList;
-  late MapLayerList tempMapLayerList;
+  late MapLayerList mapLayerList;
+  late TileEntriesNotifier mapLayerListNotifier;
   late EntryType selectedType;
   bool finishedDrawing = true;
   bool finishedMouseTrackDraw = true;
@@ -34,17 +32,25 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   var mapController = MapController();
   late MapLayer currentLayer;
   late Map<EntryType, MapLayer> chosenLayers;
+  late Map<MapLayer, int> oldLayerLenghts;
+  late HistoryNotifier historyNotifier;
 
   @override
   void initState() {
     super.initState();
-    tempMapLayerList = ref.read(tileEntriesProvider);
-    oldMapLayerList = tempMapLayerList.deepCopy();
+    mapLayerList = ref.read(tileEntriesProvider);
+    mapLayerListNotifier = ref.read(tileEntriesProvider.notifier);
+    oldMapLayerList = mapLayerList.deepCopy();
     chosenLayers = Map.fromEntries(
       EntryType.values.map(
-        (e) => MapEntry(e, tempMapLayerList.getDefaultLayerEntry(e)),
+        (e) => MapEntry(e, mapLayerList.getDefaultLayerEntry(e)),
       ),
     );
+    oldLayerLenghts = Map.fromEntries(
+      mapLayerList.items.map((e) => MapEntry(e, e.length)),
+    );
+    historyNotifier = ref.read(historyProvider.notifier);
+    historyNotifier.setRestorePoint();
     _focusNode.requestFocus();
   }
 
@@ -62,27 +68,39 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
 
   void confirmDrawing() {
     switch (currentLayer.entryType) {
-      case EntryType.Polygon:
-        (currentEntry as PolygonEntry).coordinates.removeLast();
+      case EntryType.polygon:
+        historyNotifier.actionListRemoveLast(
+          (currentEntry as PolygonEntry).coordinates,
+        );
         break;
-      case EntryType.Polyline:
-        (currentEntry as PolylineEntry).coordinates.removeLast();
+      case EntryType.polyline:
+        historyNotifier.actionListRemoveLast(
+          (currentEntry as PolylineEntry).coordinates,
+        );
         break;
-      case EntryType.Marker:
-      case EntryType.Circle:
+      case EntryType.marker:
+      case EntryType.circle:
     }
     endDrawing();
   }
 
   void cancelDrawing() {
-    currentLayer.items.remove(currentEntry);
+    historyNotifier.actionListRemoveLast(currentLayer.items);
     endDrawing();
+  }
+
+  void _addToLayerWithHistory(FlutterMapEntry entry) {
+    ref
+        .read(historyProvider.notifier)
+        .actionAddToLayer(currentLayer, entry: entry);
   }
 
   FlutterMapEntry get currentEntry => currentLayer.items.last;
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(historyProvider);
+
     return MouseRegion(
       onHover: (event) {
         _mousePosition = event.position;
@@ -93,9 +111,9 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
             );
             if (!currentLayer.isEmpty) {
               switch (currentLayer.entryType) {
-                case EntryType.Marker:
+                case EntryType.marker:
                   break;
-                case EntryType.Polygon:
+                case EntryType.polygon:
                   {
                     var polygon = (currentEntry as PolygonEntry);
                     if (finishedMouseTrackDraw) {
@@ -105,9 +123,9 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                       polygon.coordinates.last = mouseCoords;
                     }
                   }
-                case EntryType.Polyline:
+                case EntryType.polyline:
                   {
-                    var polyline = (currentLayer.items.last as PolylineEntry);
+                    var polyline = (currentEntry as PolylineEntry);
                     if (finishedMouseTrackDraw) {
                       polyline.coordinates.add(mouseCoords);
                       finishedMouseTrackDraw = false;
@@ -115,9 +133,9 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                       polyline.coordinates.last = mouseCoords;
                     }
                   }
-                case EntryType.Circle:
+                case EntryType.circle:
                   {
-                    var circle = (currentLayer.items.last as CircleEntry);
+                    var circle = (currentEntry as CircleEntry);
                     circle.radius = FlutterMapMath.distanceBetween(
                       circle.center.latitude,
                       circle.center.longitude,
@@ -131,170 +149,183 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           });
         }
       },
-      child: KeyboardListener(
-        focusNode: _focusNode,
-        onKeyEvent: (event) {
-          if (!finishedDrawing) {
+      child: Scaffold(
+        appBar: FreeStyleButtonsBar(
+          initSelectedType: selectedType,
+          onTypeSwitch: (EntryType type) {
             setState(() {
-              switch (event.logicalKey) {
-                case LogicalKeyboardKey.escape:
-                  cancelDrawing();
-                  break;
-                case LogicalKeyboardKey.enter:
-                  confirmDrawing();
-                  break;
-              }
+              selectedType = type;
+              currentLayer = chosenLayers[type]!;
             });
-          }
-        },
-        child: Scaffold(
-          appBar: FreeStyleButtonsBar(
-            initSelectedType: selectedType,
-            onTypeSwitch: (EntryType type) {
-              setState(() {
-                selectedType = type;
-                currentLayer = chosenLayers[type]!;
-              });
-            },
-            onConfirm: () {},
-            onCancel: () {
-              ref
-                  .read(tileEntriesProvider.notifier)
-                  .updateState(oldMapLayerList);
-            },
-          ),
-          extendBodyBehindAppBar: true,
-          body: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              FlutterMap(
-                mapController: mapController,
-                options: MapOptions(
-                  interactionOptions: InteractionOptions(
-                    flags:
-                        InteractiveFlag.all &
-                        ~InteractiveFlag.doubleTapZoom &
-                        ~InteractiveFlag.doubleTapDragZoom,
-                  ),
-                  onTap: (tapPosition, point) {
-                    setState(() {
-                      switch (selectedType) {
-                        case EntryType.Marker:
-                          {
-                            currentLayer.add(
-                              MarkerEntry.withDefaults(coordinate: point),
-                            );
-                            break;
-                          }
-                        case EntryType.Polygon:
-                          {
-                            if (finishedDrawing || currentLayer.isEmpty) {
-                              currentLayer.add(
-                                PolygonEntry.withDefaults(coordinates: [point]),
-                              );
-                              finishedDrawing = false;
-                            } else {
-                              (currentLayer.items.last as PolygonEntry)
-                                  .coordinates
-                                  .add(point);
-                            }
-                          }
-                        case EntryType.Polyline:
-                          {
-                            if (finishedDrawing || currentLayer.isEmpty) {
-                              currentLayer.add(
-                                PolylineEntry.withDefaults(
-                                  coordinates: [point],
-                                ),
-                              );
-                              finishedDrawing = false;
-                            } else {
-                              (currentLayer.items.last as PolylineEntry)
-                                  .coordinates
-                                  .add(point);
-                            }
-                          }
-                        case EntryType.Circle:
-                          {
-                            if (finishedDrawing || currentLayer.isEmpty) {
-                              currentLayer.add(
-                                CircleEntry.withDefaults(
-                                  center: point,
-                                  radius: 0,
-                                ),
-                              );
-                              finishedDrawing = false;
-                            } else {
-                              confirmDrawing();
-                            }
-                          }
-                      }
-                    });
-                  },
-                  initialCenter: LatLng(51.5, -0.09),
-                  initialZoom: 5,
-                ),
-                children: [
-                  openStreetMapTileLayer,
-                  ...tempMapLayerList.getMapChildren(),
-                ],
+          },
+          onConfirm: () {
+            historyNotifier.applyFromPoints();
+          },
+          onCancel: () {
+            for (var layer in mapLayerList.items) {
+              int start = oldLayerLenghts[layer]!;
+              int end = layer.items.length;
+              layer.items.removeRange(start, end);
+            }
+            historyNotifier.restoreFromPoints();
+          },
+        ),
+        extendBodyBehindAppBar: true,
+        body: BaseShortcuts(
+          freeStyleShortcuts: true,
+          child: Actions(
+            actions: {
+              CancelDrawIntent: CallbackAction(
+                onInvoke: (_) {
+                  setState(() {
+                    if (!finishedDrawing) cancelDrawing();
+                  });
+                  return true;
+                },
               ),
-              Positioned(
-                bottom: 20,
-                left: 20,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 15,
+              ConfirmDrawIntent: CallbackAction(
+                onInvoke: (_) {
+                  setState(() {
+                    if (!finishedDrawing) confirmDrawing();
+                  });
+                  return true;
+                },
+              ),
+            },
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                FlutterMap(
+                  mapController: mapController,
+                  options: MapOptions(
+                    interactionOptions: InteractionOptions(
+                      flags:
+                          InteractiveFlag.all &
+                          ~InteractiveFlag.doubleTapZoom &
+                          ~InteractiveFlag.doubleTapDragZoom,
+                    ),
+                    onTap: (tapPosition, point) {
+                      setState(() {
+                        switch (selectedType) {
+                          case EntryType.marker:
+                            {
+                              _addToLayerWithHistory(
+                                MarkerEntry.withDefaults(coordinate: point),
+                              );
+                              break;
+                            }
+                          case EntryType.polygon:
+                            {
+                              if (finishedDrawing || currentLayer.isEmpty) {
+                                _addToLayerWithHistory(
+                                  PolygonEntry.withDefaults(
+                                    coordinates: [point],
+                                  ),
+                                );
+                                finishedDrawing = false;
+                              } else {
+                                (currentLayer.items.last as PolygonEntry)
+                                    .coordinates
+                                    .add(point);
+                              }
+                            }
+                          case EntryType.polyline:
+                            {
+                              if (finishedDrawing || currentLayer.isEmpty) {
+                                _addToLayerWithHistory(
+                                  PolylineEntry.withDefaults(
+                                    coordinates: [point],
+                                  ),
+                                );
+                                finishedDrawing = false;
+                              } else {
+                                (currentLayer.items.last as PolylineEntry)
+                                    .coordinates
+                                    .add(point);
+                              }
+                            }
+                          case EntryType.circle:
+                            {
+                              if (finishedDrawing || currentLayer.isEmpty) {
+                                _addToLayerWithHistory(
+                                  CircleEntry.withDefaults(
+                                    center: point,
+                                    radius: 0,
+                                  ),
+                                );
+                                finishedDrawing = false;
+                              } else {
+                                confirmDrawing();
+                              }
+                            }
+                        }
+                      });
+                    },
+                    initialCenter: LatLng(51.5, -0.09),
+                    initialZoom: 5,
+                  ),
                   children: [
-                    Container(
-                      constraints: BoxConstraints(minHeight: 40),
-                      decoration: makeFloatingDecoration(context),
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      child: Material(
-                        child: ToolbarButton(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => LayerSelector(
-                                entryType: selectedType,
-                                initialLayer: currentLayer,
-                                onConfirm: (MapLayer selection) {
-                                  chosenLayers[selectedType] = selection;
-                                },
-                              ),
-                            );
-                          },
-                          spacing: 10,
-                          children: [
-                            Icon(Icons.layers_outlined),
-                            Text(
-                              currentLayer.name,
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    FloatingToolBar(
-                      onCancel: () {
-                        setState(() {
-                          cancelDrawing();
-                        });
-                      },
-                      onOk: () {
-                        setState(() {
-                          confirmDrawing();
-                        });
-                      },
-                      onRedo: () {},
-                      onUndo: () {},
-                      enableCancel: !finishedDrawing,
-                      enableOk: !finishedDrawing,
-                    ),
+                    openStreetMapTileLayer,
+                    ...mapLayerList.getMapChildren(),
                   ],
                 ),
-              ),
-            ],
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 15,
+                    children: [
+                      Container(
+                        constraints: BoxConstraints(minHeight: 40),
+                        decoration: makeFloatingDecoration(context),
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: Material(
+                          child: ToolbarButton(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => LayerSelector(
+                                  entryType: selectedType,
+                                  initialLayer: currentLayer,
+                                  onConfirm: (MapLayer selection) {
+                                    chosenLayers[selectedType] = selection;
+                                  },
+                                ),
+                              );
+                            },
+                            spacing: 10,
+                            children: [
+                              Icon(Icons.layers_outlined),
+                              Text(
+                                currentLayer.name,
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      FloatingToolBar(
+                        onCancel: () {
+                          setState(() {
+                            cancelDrawing();
+                          });
+                        },
+                        onOk: () {
+                          setState(() {
+                            confirmDrawing();
+                          });
+                        },
+                        onRedo: () {},
+                        onUndo: () {},
+                        enableCancel: !finishedDrawing,
+                        enableOk: !finishedDrawing,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

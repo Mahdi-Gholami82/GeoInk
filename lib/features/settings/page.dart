@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/theme/theme.dart' as theme;
-import 'package:geoink/data/providers/theme_provider.dart';
+import 'package:geoink/data/providers/theme.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:geoink/core/utils/map_colors.dart';
 import 'package:geoink/data/models/coordinates_sheet_data.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'input_list_coordinates_provider.g.dart';
+part 'input_list_coordinates.g.dart';
 
 class InputListCoordinatesState {
   Color color;
@@ -14,10 +14,10 @@ class InputListCoordinatesState {
   EntryType type;
 
   static const Map<EntryType, int> minNumberOfCoordinatesFields = {
-    EntryType.Circle: 1,
-    EntryType.Marker: 1,
-    EntryType.Polyline: 2,
-    EntryType.Polygon: 3,
+    EntryType.circle: 1,
+    EntryType.marker: 1,
+    EntryType.polyline: 2,
+    EntryType.polygon: 3,
   };
 
   InputListCoordinatesState({
@@ -30,7 +30,7 @@ class InputListCoordinatesState {
   InputListCoordinatesState.empty()
     : color = Colors.red,
       layer = null,
-      type = EntryType.Marker,
+      type = EntryType.marker,
       fields = [];
 
   InputListCoordinatesState copyWith({
@@ -90,7 +90,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
         (index) => SheetListInput.coordinateField(),
       ),
     );
-    if (initType == EntryType.Circle) {
+    if (initType == EntryType.circle) {
       fields.add(SheetListInput.radiusField());
     }
     state = state.copyWith(

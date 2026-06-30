@@ -2,7 +2,7 @@ import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/home/widgets/flutter_map_dropdown_menu.dart';
 
 class MapDrawer extends ConsumerStatefulWidget {
@@ -84,7 +84,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                           showDialog(context: context, builder:(context) {
                                 final formKey = GlobalKey<FormState>();
                                 var controller = TextEditingController();
-                                EntryType selectedType = EntryType.Circle;
+                                EntryType selectedType = EntryType.circle;
 
                                 void validateAndPop() {
                                   final bool isValid =

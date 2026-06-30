@@ -1,7 +1,7 @@
 import 'package:geoink/features/freestyle/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geoink/data/providers/theme_provider.dart';
+import 'package:geoink/data/providers/theme.dart';
 import 'package:geoink/features/home/page.dart';
 import 'package:http/http.dart';
 import 'package:http/retry.dart';

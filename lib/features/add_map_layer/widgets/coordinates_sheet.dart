@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/widgets/custom_sheet_drag_handle.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/input_list_coordinates_provider.dart';
-import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/data/providers/input_list_coordinates.dart';
 import 'package:geoink/features/add_map_layer/widgets/input_list_view.dart';
 import 'package:geoink/features/add_map_layer/widgets/map_layer_picker.dart';
 import 'package:geoink/features/add_map_layer/widgets/sheet_options_menu.dart';
@@ -27,14 +26,12 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
   final formGlobalKey = GlobalKey<FormState>();
   late InputListCoordinatesState inputListState;
   late InputListCoordinatesNotifier inputListNotifier;
-  late TileEntriesNotifier tileEntriesNotifier;
   MenuController menuController = MenuController();
 
   @override
   void initState() {
     super.initState();
     inputListNotifier = ref.read(inputListCoordinatesProvider.notifier);
-    tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
     inputListState = ref.read(inputListCoordinatesProvider);
     chosenColor = inputListState.color;
   }
@@ -87,8 +84,8 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         spacing: 20,
                         children: [
-                          if (inputListState.type == EntryType.Polygon ||
-                              inputListState.type == EntryType.Polyline)
+                          if (inputListState.type == EntryType.polygon ||
+                              inputListState.type == EntryType.polyline)
                             OutlinedButton(
                               style: TextButton.styleFrom(
                                 backgroundColor: Theme.of(

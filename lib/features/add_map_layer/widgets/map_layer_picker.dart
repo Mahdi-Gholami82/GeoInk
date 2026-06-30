@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/input_list_coordinates_provider.dart';
-import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/data/providers/input_list_coordinates.dart';
+import 'package:geoink/data/providers/map_tiles.dart';
 
 class MapLayerPicker extends ConsumerStatefulWidget {
   const MapLayerPicker({super.key,required this.entryType});
@@ -13,7 +13,6 @@ class MapLayerPicker extends ConsumerStatefulWidget {
 
 class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
   late TextEditingController controller;
-  late MapLayerList mapLayerList;
   late InputListCoordinatesNotifier inputListCoordinatesNotifier;
   late InputListCoordinatesState inputListState;
 
@@ -29,7 +28,6 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
   @override
   void initState() {
     super.initState();
-    mapLayerList = ref.read(tileEntriesProvider);
     inputListCoordinatesNotifier = ref.read(
       inputListCoordinatesProvider.notifier,
     );

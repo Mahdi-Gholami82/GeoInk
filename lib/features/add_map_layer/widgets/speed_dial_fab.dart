@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/add_map_layer/utils/show_coordinates_buttom_sheet.dart';
 
 class AddMapElementFab extends ConsumerWidget {
@@ -12,9 +12,6 @@ class AddMapElementFab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     TileEntriesNotifier tileEntriesNotifier = ref.read(
       tileEntriesProvider.notifier,
-    );
-    MapLayerList tileEntries = ref.read(
-      tileEntriesProvider
     );
 
     return SpeedDial(
@@ -30,7 +27,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Marker",
-              type: EntryType.Marker,
+              type: EntryType.marker,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addMarker(value);
@@ -46,7 +43,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Polyline",
-              type: EntryType.Polyline,
+              type: EntryType.polyline,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addPolyLine(value);
@@ -62,7 +59,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Circle",
-              type: EntryType.Circle,
+              type: EntryType.circle,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addCircle(value);
@@ -78,7 +75,7 @@ class AddMapElementFab extends ConsumerWidget {
               context,
               ref,
               title: "Add Polygon",
-              type: EntryType.Polygon,
+              type: EntryType.polygon,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addPolygon(value);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/data/providers/map_tiles.dart';
 
 class FlutterMapDropdownMenu extends ConsumerWidget {
   final Widget child;
@@ -20,8 +20,6 @@ class FlutterMapDropdownMenu extends ConsumerWidget {
     TileEntriesNotifier tileEntriesNotifier = ref.read(
       tileEntriesProvider.notifier,
     );
-
-    List<MapLayer> tileEntries = ref.read(tileEntriesProvider).items;
 
     List<Widget> menu = [
       MenuItemButton(

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
+import 'package:geoink/data/models/action_manager.dart';
+import 'package:geoink/data/providers/history.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/core/services/tile_providers.dart';
-import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/add_map_layer/widgets/speed_dial_fab.dart';
 import 'package:geoink/features/home/widgets/drawer.dart';
 import 'package:geoink/features/appbar/floating_appbar.dart';
@@ -17,10 +20,19 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  late DoableHistory history;
+
+  @override
+  void initState() {
+    super.initState();
+    history = ref.read(historyProvider);
+  }
+
   @override
   Widget build(BuildContext context) {
     Iterable<Widget> mapChildren = ref
         .watch(tileEntriesProvider).getMapChildren();
+    ref.watch(historyProvider);
 
     return Scaffold(
       drawer: MapDrawer(),
@@ -33,12 +45,14 @@ class _HomePageState extends ConsumerState<HomePage> {
         },
       ),
       floatingActionButton: AddMapElementFab(),
-      body: FlutterMap(
-        options: const MapOptions(
-          initialCenter: LatLng(51.5, -0.09),
-          initialZoom: 5,
+      body: BaseShortcuts(
+        child: FlutterMap(
+          options: const MapOptions(
+            initialCenter: LatLng(51.5, -0.09),
+            initialZoom: 5,
+          ),
+          children: [openStreetMapTileLayer, ...mapChildren],
         ),
-        children: [openStreetMapTileLayer, ...mapChildren],
       ),
     );
   }

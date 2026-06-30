@@ -9,13 +9,13 @@ abstract final class MapIcons {
 
   static IconData fromType(EntryType type) {
     switch (type) {
-      case EntryType.Circle:
+      case EntryType.circle:
         return circle;
-      case EntryType.Marker:
+      case EntryType.marker:
         return marker;
-      case EntryType.Polygon:
+      case EntryType.polygon:
         return polygon;
-      case EntryType.Polyline:
+      case EntryType.polyline:
         return polyline;
     }
   }

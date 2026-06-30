@@ -4,9 +4,10 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geoink/data/providers/history.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/map_tiles_provider.dart';
+import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/appbar/widgets/ink_well_text_button.dart';
 import 'package:geoink/features/save_map_to_image/utils/show_buttom_sheet.dart';
 
@@ -19,25 +20,13 @@ class MapDropdownMenu extends ConsumerStatefulWidget {
 
 class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
   late MapLayerList mapLayerList;
+  late TileEntriesNotifier tileEntriesNotifier;
 
   @override
   void initState() {
     super.initState();
     mapLayerList = ref.read(tileEntriesProvider);
-  }
-
-  EntryType? entryTypeFromGeomatryType(GeoJSONType type, bool hasRadius) {
-    switch (type) {
-      case GeoJSONType.multiLineString || GeoJSONType.lineString:
-        return EntryType.Polyline;
-      case GeoJSONType.multiPolygon || GeoJSONType.polygon:
-        return EntryType.Polygon;
-      case GeoJSONType.point:
-        if (hasRadius) return EntryType.Circle;
-        return EntryType.Marker;
-      default:
-        return null;
-    }
+    tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
   }
 
   @override
@@ -63,38 +52,10 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                       var featureCollection = GeoJSONFeatureCollection.fromJSON(
                         file.readAsStringSync(),
                       );
-                      for (var feature in featureCollection.features) {
-                        if (feature == null || feature.geometry == null) {
-                          continue;
-                        }
-                        GeoJSONGeometry geometry = feature.geometry!;
-                        Map<String, dynamic> properties =
-                            feature.properties ?? {};
-                        List<GeoJSONGeometry> geomatries = [geometry];
-                        while (geomatries.isNotEmpty) {
-                          List<GeoJSONGeometry> filteredGeomatries = geomatries
-                              .where(
-                                (e) => e.type != GeoJSONType.geometryCollection,
-                              )
-                              .toList();
-
-                          for (var geomatryObject in filteredGeomatries) {
-                            {
-                              mapLayerList.addFromGeoJsonObject(
-                                geomatryObject,
-                                properties: properties,
-                              );
-                            }
-                          }
-                          geomatries.removeWhere(
-                            (e) => filteredGeomatries.contains(e),
-                          );
-                          geomatries = geomatries.expand((e) {
-                            return (e as GeoJSONGeometryCollection).geometries;
-                          }).toList();
-                        }
-                      }
-                    } on AssertionError {
+                      List<LayerEntryMap> layerEntryMaps = tileEntriesNotifier
+                          .fromGeoJSONFeatureCollection(featureCollection); 
+                      ref.read(historyProvider.notifier).actionListAddAllToAllLayer(layerEntryMaps);
+                    } on Exception {
                       // TODO: message to user
                     }
                     ref.read(tileEntriesProvider.notifier).forceRebuild();
@@ -126,6 +87,20 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               //   onPressed: () {},
               //   child: const Text('Parser'),
               // ),
+              MenuItemButton(
+                leadingIcon: Icon(Icons.undo),
+                onPressed: () {
+                  ref.read(historyProvider.notifier).undo();
+                },
+                child: const Text('Undo'),
+              ),
+              MenuItemButton(
+                leadingIcon: Icon(Icons.redo),
+                onPressed: () {
+                  ref.read(historyProvider.notifier).redo();
+                },
+                child: const Text('Redo'),
+              ),
             ],
           ),
         ),

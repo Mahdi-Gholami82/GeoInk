@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geoink/core/theme/theme.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'theme_provider.g.dart';
+part 'theme.g.dart';
 
 @riverpod
 class ThemeNotifier extends _$ThemeNotifier {

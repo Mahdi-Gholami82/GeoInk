@@ -2,6 +2,7 @@ import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/models/map_actions.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history.g.dart';
@@ -51,6 +52,11 @@ class HistoryNotifier extends _$HistoryNotifier {
     forceRebuild();
   }
 
+  void addAndMarkDone(Doable doable) {
+    doable.done = true;
+    state.add(doable);
+  }
+
   void addAndDo(Doable doable) {
     state.addAndDo(doable);
     forceRebuild();
@@ -75,6 +81,28 @@ class HistoryNotifier extends _$HistoryNotifier {
         },
       ),
     );
+  }
+
+  void actionSetLastPointPolygon(PolygonEntry polygon, LatLng point) {
+    LatLng? oldPoint;
+    state.addAndDo(
+      ManualDoable(
+        executeBase: () {
+          polygon.coordinates.last = point;
+        },
+        undoBase: () {
+          polygon.coordinates.removeLast();
+        },
+      ),
+    );
+  }
+
+  void actionAddPointToPolyline(PolylineEntry polyline, LatLng point) {
+    state.addAndDo(ManualDoable(executeBase: () {
+      polyline.coordinates.add(point);
+    }, undoBase: () {
+      polyline.coordinates.removeLast();
+    }));
   }
 
   void actionAddAllToLayer(
@@ -184,6 +212,10 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   void restoreFromPoints() {
     state.restore();
+  }
+
+  void setClearAfterRedo() {
+    state.clearUndoAfterUndo = true;
   }
 
   void applyFromPoints() {

@@ -1,6 +1,7 @@
 import 'package:geoink/core/services/tile_providers.dart';
 import 'package:geoink/core/ui/floating_decoration.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
+import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
@@ -28,6 +29,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   bool finishedMouseTrackDraw = true;
   var _focusNode = FocusNode();
   var _mousePosition = Offset.zero;
+  late LatLng lastMouseClickPoint;
   var mapController = MapController();
   late MapLayer currentLayer;
   late Map<EntryType, MapLayer> chosenLayers;
@@ -59,6 +61,11 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     currentLayer = chosenLayers[selectedType]!;
   }
 
+  void beginDrawing() {
+    historyNotifier.setRestorePoint();
+    finishedDrawing = false;
+  }
+
   void endDrawing() {
     finishedDrawing = true;
     finishedMouseTrackDraw = true;
@@ -67,84 +74,112 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   void confirmDrawing() {
     switch (currentLayer.entryType) {
       case EntryType.polygon:
-        historyNotifier.actionListRemoveLast(
-          (currentEntry as PolygonEntry).coordinates,
-        );
-        break;
+        (currentEntry as PolygonEntry).coordinates.removeLast();
       case EntryType.polyline:
-        historyNotifier.actionListRemoveLast(
-          (currentEntry as PolylineEntry).coordinates,
-        );
-        break;
-      case EntryType.marker:
+        (currentEntry as PolylineEntry).coordinates.removeLast();
       case EntryType.circle:
+      case EntryType.marker:
     }
+    historyNotifier.restoreFromPoints();
+    historyNotifier.addAndMarkDone(
+      ContainerDoable(
+        data: currentEntry,
+        executeBase: (data) {
+          currentLayer.add(data);
+        },
+        undoBase: (data) {
+          currentLayer.items.removeLast();
+        },
+      ),
+    );
     endDrawing();
   }
 
   void cancelDrawing() {
-    historyNotifier.actionListRemoveLast(currentLayer.items);
+    currentLayer.items.removeLast();
     endDrawing();
   }
 
   void _addToLayerWithHistory(FlutterMapEntry entry) {
-    ref
-        .read(historyProvider.notifier)
-        .actionAddToLayer(currentLayer, entry: entry);
+    var layer = currentLayer;
+    historyNotifier.addAndDo(
+      ManualDoable(
+        executeBase: () {
+          layer.addUnique(entry);
+        },
+        undoBase: () {
+          // If undo has reached a point when the shape isnt being drawn anymore
+          // Happens in the middle of drawing
+          if (!finishedDrawing) {
+            historyNotifier.setClearAfterRedo();
+            endDrawing();
+          }
+          layer.items.removeLast();
+        },
+      ),
+    );
   }
 
   FlutterMapEntry get currentEntry => currentLayer.items.last;
+
+
+
+  LatLng mousePositionToCoords(Offset mousePosition) => mapController.camera.screenOffsetToLatLng(
+        mousePosition,
+      );
+
+  void updateHover(Offset mousePosition) {
+    var mouseCoords = mousePositionToCoords(mousePosition);
+    setState(() {
+      if (!currentLayer.isEmpty) {
+        switch (currentLayer.entryType) {
+          case EntryType.marker:
+            break;
+          case EntryType.polygon:
+            {
+              var polygon = (currentEntry as PolygonEntry);
+              if (finishedMouseTrackDraw) {
+                polygon.coordinates.add(mouseCoords);
+                finishedMouseTrackDraw = false;
+              } else {
+                polygon.coordinates.last = mouseCoords;
+              }
+            }
+          case EntryType.polyline:
+            {
+              var polyline = (currentEntry as PolylineEntry);
+              if (finishedMouseTrackDraw) {
+                polyline.coordinates.add(mouseCoords);
+                finishedMouseTrackDraw = false;
+              } else {
+                polyline.coordinates.last = mouseCoords;
+              }
+            }
+          case EntryType.circle:
+            {
+              var circle = (currentEntry as CircleEntry);
+              circle.radius = FlutterMapMath.distanceBetween(
+                circle.center.latitude,
+                circle.center.longitude,
+                mouseCoords.latitude,
+                mouseCoords.longitude,
+                "m",
+              );
+            }
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     ref.watch(historyProvider);
 
-    return MouseRegion(
-      onHover: (event) {
+    return Listener(
+      onPointerHover: (event) {
         _mousePosition = event.position;
         if (!finishedDrawing) {
-          setState(() {
-            LatLng mouseCoords = mapController.camera.screenOffsetToLatLng(
-              _mousePosition,
-            );
-            if (!currentLayer.isEmpty) {
-              switch (currentLayer.entryType) {
-                case EntryType.marker:
-                  break;
-                case EntryType.polygon:
-                  {
-                    var polygon = (currentEntry as PolygonEntry);
-                    if (finishedMouseTrackDraw) {
-                      polygon.coordinates.add(mouseCoords);
-                      finishedMouseTrackDraw = false;
-                    } else {
-                      polygon.coordinates.last = mouseCoords;
-                    }
-                  }
-                case EntryType.polyline:
-                  {
-                    var polyline = (currentEntry as PolylineEntry);
-                    if (finishedMouseTrackDraw) {
-                      polyline.coordinates.add(mouseCoords);
-                      finishedMouseTrackDraw = false;
-                    } else {
-                      polyline.coordinates.last = mouseCoords;
-                    }
-                  }
-                case EntryType.circle:
-                  {
-                    var circle = (currentEntry as CircleEntry);
-                    circle.radius = FlutterMapMath.distanceBetween(
-                      circle.center.latitude,
-                      circle.center.longitude,
-                      mouseCoords.latitude,
-                      mouseCoords.longitude,
-                      "m",
-                    );
-                  }
-              }
-            }
-          });
+          updateHover(_mousePosition);
         }
       },
       child: Scaffold(
@@ -203,6 +238,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                           ~InteractiveFlag.doubleTapDragZoom,
                     ),
                     onTap: (tapPosition, point) {
+                      lastMouseClickPoint = point;
                       setState(() {
                         switch (selectedType) {
                           case EntryType.marker:
@@ -220,11 +256,21 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                     coordinates: [point],
                                   ),
                                 );
-                                finishedDrawing = false;
+                                beginDrawing();
                               } else {
-                                (currentLayer.items.last as PolygonEntry)
-                                    .coordinates
-                                    .add(point);
+                                var polygon =
+                                    (currentLayer.items.last as PolygonEntry);
+                                historyNotifier.addAndDo(
+                                  ManualDoable(
+                                    executeBase: () {
+                                      polygon.coordinates.add(point);
+                                    },
+                                    undoBase: () {
+                                      polygon.coordinates.removeLast();
+                                      updateHover(_mousePosition);
+                                    },
+                                  ),
+                                );
                               }
                             }
                           case EntryType.polyline:
@@ -235,11 +281,20 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                     coordinates: [point],
                                   ),
                                 );
-                                finishedDrawing = false;
+                                beginDrawing();
                               } else {
-                                (currentLayer.items.last as PolylineEntry)
-                                    .coordinates
-                                    .add(point);
+                                var polyline = (currentLayer.items.last as PolylineEntry);
+                                historyNotifier.addAndDo(
+                                  ManualDoable(
+                                    executeBase: () {
+                                      polyline.coordinates.add(point);
+                                    },
+                                    undoBase: () {
+                                      polyline.coordinates.removeLast();
+                                      updateHover(_mousePosition);
+                                    },
+                                  ),
+                                );
                               }
                             }
                           case EntryType.circle:
@@ -253,7 +308,13 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                 );
                                 finishedDrawing = false;
                               } else {
-                                confirmDrawing();
+                                historyNotifier.addAndDo(ManualDoable(executeBase: () {
+                                  confirmDrawing();
+                                }, undoBase: () {
+                                  beginDrawing();
+                                  finishedMouseTrackDraw = false;
+                                  updateHover(_mousePosition);
+                                }));
                               }
                             }
                         }

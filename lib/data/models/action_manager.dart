@@ -1,13 +1,15 @@
 
 abstract class Doable {
-  Doable({Function? executeBase,Function? undoBase}) {
-    if (executeBase != null) this.executeBase = executeBase;
-    if (undoBase != null) this.undoBase = undoBase;
-  }
-
   bool done = false;
-  late final Function executeBase;
-  late final Function undoBase;
+  void doIt();
+  void undoIt();
+}
+
+class ManualDoable extends Doable {
+  ManualDoable({required this.executeBase,required this.undoBase}) {}
+
+  final Function executeBase;
+  final Function undoBase;
   void doIt() {
     assert(!done);
     executeBase();
@@ -21,16 +23,27 @@ abstract class Doable {
   }
 }
 
-class ManualDoable extends Doable {
-  ManualDoable({required super.executeBase, required super.undoBase});
+class ContainerDoable<T> extends Doable{
+  ContainerDoable({required this.data,required this.executeBase,required this.undoBase}) {}
+
+  bool done = false;
+  T data;
+  final void Function(T data) executeBase;
+  final void Function(T data) undoBase;
+  void doIt() {
+    assert(!done);
+    executeBase(data);
+    done = true;
+  }
+
+  void undoIt() {
+    assert(done);
+    undoBase(data);
+    done = false;
+  }
 }
 
-class ContainerDoable<T> extends Doable {
-  ContainerDoable({required super.executeBase, required super.undoBase});
-  T? data;
-}
-
-class BatchDoable extends Doable {
+class BatchDoable extends ManualDoable {
   BatchDoable({required List<Doable> batch}) :
       super(
         executeBase: () {

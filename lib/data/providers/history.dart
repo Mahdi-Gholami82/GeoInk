@@ -1,9 +1,16 @@
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/models/map_actions.dart';
+import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history.g.dart';
+
+extension <T> on List<T> {
+  void swapByIndex(int oldIndex, int newIndex) {
+    this.insert(newIndex, this.removeAt(oldIndex));
+  }
+} 
 
 @Riverpod(keepAlive: true)
 class HistoryNotifier extends _$HistoryNotifier {
@@ -152,6 +159,27 @@ class HistoryNotifier extends _$HistoryNotifier {
         },
       ),
     );
+  }
+
+  void actionReorderLayer(int oldIndex, int newIndex) {
+    state.addAndDo(
+      ManualDoable(
+        executeBase: () {
+          ref.read(tileEntriesProvider).items.swapByIndex(oldIndex, newIndex);
+        },
+        undoBase: () {
+          ref.read(tileEntriesProvider).items.swapByIndex(newIndex, oldIndex);
+        },
+      ),
+    );
+  }
+
+  void actionReorderEntry(MapLayer layer,int oldIndex, int newIndex) {
+    state.addAndDo(ManualDoable(executeBase: () {
+      layer.items.swapByIndex(oldIndex, newIndex);
+    }, undoBase: () {
+      layer.items.swapByIndex(newIndex, oldIndex);
+    }));
   }
 
   void restoreFromPoints() {

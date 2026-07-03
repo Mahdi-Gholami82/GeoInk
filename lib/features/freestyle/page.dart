@@ -21,7 +21,6 @@ class FreeStylePage extends ConsumerStatefulWidget {
 }
 
 class _FreeStylePageState extends ConsumerState<FreeStylePage> {
-  late MapLayerList oldMapLayerList;
   late MapLayerList mapLayerList;
   late TileEntriesNotifier mapLayerListNotifier;
   late EntryType selectedType;
@@ -40,7 +39,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     super.initState();
     mapLayerList = ref.read(tileEntriesProvider);
     mapLayerListNotifier = ref.read(tileEntriesProvider.notifier);
-    oldMapLayerList = mapLayerList.deepCopy();
     chosenLayers = Map.fromEntries(
       EntryType.values.map(
         (e) => MapEntry(e, mapLayerList.getDefaultLayerEntry(e)),
@@ -316,8 +314,12 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             confirmDrawing();
                           });
                         },
-                        onRedo: () {},
-                        onUndo: () {},
+                        onRedo: () {
+                          historyNotifier.redo();
+                        },
+                        onUndo: () {
+                          historyNotifier.undo();
+                        },
                         enableCancel: !finishedDrawing,
                         enableOk: !finishedDrawing,
                       ),

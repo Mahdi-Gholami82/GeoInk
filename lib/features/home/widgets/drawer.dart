@@ -2,6 +2,7 @@ import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
+import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/home/widgets/flutter_map_dropdown_menu.dart';
 
@@ -15,7 +16,7 @@ class MapDrawer extends ConsumerStatefulWidget {
 class _MapDrawerState extends ConsumerState<MapDrawer> {
   late TileEntriesNotifier tileEntriesNotifier;
   late List<MapLayer> layers;
-  late List<ExpansibleController> controllers;
+  Map<MapLayer,ExpansibleController> controllers = {};
 
   Color _colorFromEntry(FlutterMapEntry entry) {
     switch (EntryType.fromType(entry.runtimeType)) {
@@ -39,10 +40,11 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    controllers = List.generate(
-      ref.read(tileEntriesProvider).items.length,
-      (index) => ExpansibleController(),
-    );
+    for (var layer in ref.read(tileEntriesProvider).items) {
+      if (!controllers.containsKey(layer)) {
+        controllers[layer] = ExpansibleController();
+      }
+    }
   }
 
   @override
@@ -53,6 +55,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
         .items
         .where((element) => !(element.isDefault && element.isEmpty))
         .toList();
+    HistoryNotifier historyNotifier = ref.watch(historyProvider.notifier);
 
     return Drawer(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -202,14 +205,12 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
           Expanded(
             child: ReorderableListView.builder(
               onReorderItem: (oldIndex, newIndex) {
-                layers.insert(newIndex, layers.removeAt(oldIndex));
-                controllers.insert(newIndex, controllers.removeAt(oldIndex));
-                tileEntriesNotifier.updateStateByItems(layers);
+                historyNotifier.actionReorderLayer(oldIndex, newIndex);
               },
               buildDefaultDragHandles: false,
               itemBuilder: (BuildContext context, int layerIndex) {
                 MapLayer layer = layers[layerIndex];
-                var controller = controllers[layerIndex];
+                var controller = controllers[layer];
                 return ReorderableDragStartListener(
                   key: ValueKey(layer.name),
                   index: layerIndex,
@@ -232,15 +233,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               onReorderItem: (int oldIndex, int newIndex) {
-                                tileEntriesNotifier.setConsumersState(() {
-                                  if (oldIndex < newIndex) {
-                                    newIndex -= 1;
-                                  }
-                                  final FlutterMapEntry item = layer.items.removeAt(
-                                    oldIndex,
-                                  );
-                                  layer.items.insert(newIndex + 1, item);
-                                });
+                                historyNotifier.actionReorderEntry(layer, oldIndex, newIndex);
                               },
                               itemCount: layer.items.length,
                               itemBuilder: (context, itemIndex) {

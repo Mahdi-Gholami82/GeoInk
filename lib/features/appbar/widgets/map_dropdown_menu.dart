@@ -21,12 +21,14 @@ class MapDropdownMenu extends ConsumerStatefulWidget {
 class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
   late MapLayerList mapLayerList;
   late TileEntriesNotifier tileEntriesNotifier;
+  late HistoryNotifier historyNotifier;
 
   @override
   void initState() {
     super.initState();
     mapLayerList = ref.read(tileEntriesProvider);
     tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
+    historyNotifier = ref.read(historyProvider.notifier);
   }
 
   @override
@@ -90,14 +92,14 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               MenuItemButton(
                 leadingIcon: Icon(Icons.undo),
                 onPressed: () {
-                  ref.read(historyProvider.notifier).undo();
+                  historyNotifier.undo();
                 },
                 child: const Text('Undo'),
               ),
               MenuItemButton(
                 leadingIcon: Icon(Icons.redo),
                 onPressed: () {
-                  ref.read(historyProvider.notifier).redo();
+                  historyNotifier.redo();
                 },
                 child: const Text('Redo'),
               ),

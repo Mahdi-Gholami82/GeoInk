@@ -114,7 +114,6 @@ class FlutterMapDropdownMenu extends ConsumerWidget {
       child: GestureDetector(
         child: child,
         onSecondaryTap: toggleMenu,
-        onLongPress: toggleMenu,
         onTap: () {
           menuController.close();
         },

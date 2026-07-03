@@ -17,6 +17,19 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
   late List<MapLayer> layers;
   late List<ExpansibleController> controllers;
 
+  Color _colorFromEntry(FlutterMapEntry entry) {
+    switch (EntryType.fromType(entry.runtimeType)) {
+      case EntryType.polygon:
+        return (entry as PolygonEntry).borderColor;
+      case EntryType.polyline:
+        return (entry as PolylineEntry).color;
+      case EntryType.circle:
+        return (entry as CircleEntry).borderColor;
+      case EntryType.marker:
+        return (entry as MarkerEntry).color;
+    }
+  }
+
   @override
   void initState() {
     tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
@@ -24,20 +37,22 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    layers = ref.watch(tileEntriesProvider).items.where((element) => !(element.isDefault && element.isEmpty)).toList();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     controllers = List.generate(
-      layers.length,
+      ref.read(tileEntriesProvider).items.length,
       (index) => ExpansibleController(),
     );
+  }
 
-    void collapseAllExceptIndex(int selectedIndex) {
-      for (int index = 0; index < controllers.length; index++) {
-        if (index != selectedIndex) {
-          controllers[index].collapse();
-        }
-      }
-    }
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    layers = ref
+        .watch(tileEntriesProvider)
+        .items
+        .where((element) => !(element.isDefault && element.isEmpty))
+        .toList();
 
     return Drawer(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -80,8 +95,11 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                         );
                       },
                       menuChildren: [
-                        MenuItemButton(onPressed: () {
-                          showDialog(context: context, builder:(context) {
+                        MenuItemButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
                                 final formKey = GlobalKey<FormState>();
                                 var controller = TextEditingController();
                                 EntryType selectedType = EntryType.circle;
@@ -91,10 +109,14 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                                       formKey.currentState?.validate() ?? false;
                                   if (isValid) {
                                     setState(() {
-                                      ref.read(tileEntriesProvider).addLayer(MapLayer(
-                                                      name: controller.text,
-                                                      entryType: selectedType,
-                                                    ));
+                                      ref
+                                          .read(tileEntriesProvider)
+                                          .addLayer(
+                                            MapLayer(
+                                              name: controller.text,
+                                              entryType: selectedType,
+                                            ),
+                                          );
                                     });
                                     Navigator.of(context).pop();
                                   }
@@ -147,7 +169,8 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                                     ],
                                   ),
                                   actions: [
-                                    TextButton(onPressed: () {
+                                    TextButton(
+                                      onPressed: () {
                                         validateAndPop();
                                       },
                                       child: Text("ok"),
@@ -160,8 +183,11 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                                     ),
                                   ],
                                 );
-                          },);
-                        },child: Text("New Layer"),)
+                              },
+                            );
+                          },
+                          child: Text("New Layer"),
+                        ),
                       ],
                       child: IconButton(
                         onPressed: () {},
@@ -188,62 +214,75 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                   key: ValueKey(layer.name),
                   index: layerIndex,
                   child: Material(
-                    child: Listener(
-                      onPointerDown: (event) {
-                        collapseAllExceptIndex(layerIndex);
-                      },
-                      child: ExpansionTile(
-                        key: ValueKey(layer.name),
-                        leading: Icon(MapIcons.fromType(layer.entryType)),
-                        title: Text(layer.name),
-                        controller: controller,
-                        children: [
-                          ReorderableListView.builder(
-                            key: PageStorageKey('inner-${layer.name}'),
-                            buildDefaultDragHandles: false,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            onReorderItem: (int oldIndex, int newIndex) {
-                              tileEntriesNotifier.setConsumersState(() {
-                                if (oldIndex < newIndex) {
-                                  newIndex -= 1;
-                                }
-                                final FlutterMapEntry item = layer.items
-                                    .removeAt(oldIndex);
-                                layer.items.insert(newIndex, item);
-                              });
-                            },
-                            itemCount: layer.items.length,
-                            itemBuilder: (context, itemIndex) {
-                              FlutterMapEntry item = layer.items[itemIndex];
-                              return ReorderableDragStartListener(
-                                key: ValueKey('${item.name}-padding'),
-                                index: itemIndex,
-                                child: FlutterMapDropdownMenu(
-                                  entry: item,
-                                  layer: layer,
-                                  child: ListTile(
-                                    title: Text(item.name),
-                                    key: ValueKey(item.name),
-                                    trailing: IconButton(
-                                      onPressed: () {
-                                        tileEntriesNotifier.setConsumersState(
-                                          item.toggleVisiblity,
-                                        );
-                                      },
-                                      icon: Icon(
-                                        item.visible
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
+                    color: theme.colorScheme.surfaceContainer,
+                    child: ExpansionTile(
+                      key: ValueKey(layer.name),
+                      leading: Icon(MapIcons.fromType(layer.entryType)),
+                      title: Text(layer.name),
+                      controller: controller,
+                      expansionAnimationStyle: AnimationStyle.noAnimation,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsGeometry.only(left: 10),
+                          child: Material(
+                            color: theme.colorScheme.surfaceContainer,
+                            child: ReorderableListView.builder(
+                              key: PageStorageKey('inner-${layer.name}'),
+                              buildDefaultDragHandles: false,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              onReorderItem: (int oldIndex, int newIndex) {
+                                tileEntriesNotifier.setConsumersState(() {
+                                  if (oldIndex < newIndex) {
+                                    newIndex -= 1;
+                                  }
+                                  final FlutterMapEntry item = layer.items.removeAt(
+                                    oldIndex,
+                                  );
+                                  layer.items.insert(newIndex + 1, item);
+                                });
+                              },
+                              itemCount: layer.items.length,
+                              itemBuilder: (context, itemIndex) {
+                                FlutterMapEntry item = layer.items[itemIndex];
+                                return ReorderableDragStartListener(
+                                  key: ValueKey('${item.name}-padding'),
+                                  index: itemIndex,
+                                  child: FlutterMapDropdownMenu(
+                                    entry: item,
+                                    layer: layer,
+                                    child: ListTile(
+                                      onTap: () {},
+                                      leading: SizedBox(
+                                        height: 40,
+                                        child: VerticalDivider(
+                                          thickness: 3,
+                                          color: _colorFromEntry(item),
+                                          radius: BorderRadius.circular(3),
+                                        ),
+                                      ),
+                                      title: Text(item.name),
+                                      key: ValueKey(item.name),
+                                      trailing: IconButton(
+                                        onPressed: () {
+                                          tileEntriesNotifier.setConsumersState(
+                                            item.toggleVisiblity,
+                                          );
+                                        },
+                                        icon: Icon(
+                                          item.visible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 );

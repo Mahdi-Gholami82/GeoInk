@@ -55,7 +55,8 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
         .items
         .where((element) => !(element.isDefault && element.isEmpty))
         .toList();
-    HistoryNotifier historyNotifier = ref.watch(historyProvider.notifier);
+    ref.watch(historyProvider);
+    HistoryNotifier historyNotifier = ref.read(historyProvider.notifier);
 
     return Drawer(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -258,9 +259,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                                       key: ValueKey(item.name),
                                       trailing: IconButton(
                                         onPressed: () {
-                                          tileEntriesNotifier.setConsumersState(
-                                            item.toggleVisiblity,
-                                          );
+                                          historyNotifier.actionToggleEntryVisibility(item);
                                         },
                                         icon: Icon(
                                           item.visible

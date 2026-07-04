@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
+import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
 
 class FlutterMapDropdownMenu extends ConsumerWidget {
@@ -20,6 +21,8 @@ class FlutterMapDropdownMenu extends ConsumerWidget {
     TileEntriesNotifier tileEntriesNotifier = ref.read(
       tileEntriesProvider.notifier,
     );
+    final HistoryNotifier historyNotifier = ref.read(historyProvider.notifier);
+
 
     List<Widget> menu = [
       MenuItemButton(
@@ -28,15 +31,14 @@ class FlutterMapDropdownMenu extends ConsumerWidget {
         ),
         child: Text("Visibility"),
         onPressed: () {
-          entry.toggleVisiblity();
-          tileEntriesNotifier.forceRebuild();
+          historyNotifier.actionToggleEntryVisibility(entry);
         },
       ),
       MenuItemButton(
         leadingIcon: Icon(Icons.delete),
         child: Text("Remove"),
         onPressed: () {
-          showDialog(
+          showDialog<bool>(
             context: context,
             builder: (context) {
               return AlertDialog(
@@ -59,12 +61,8 @@ class FlutterMapDropdownMenu extends ConsumerWidget {
               );
             },
           ).then((value) {
-            if (value) {
-              layer.items.remove(entry);
-              if (layer.isEmpty) {
-                ref.read(tileEntriesProvider).items.remove(layer);
-              }
-              tileEntriesNotifier.forceRebuild();
+            if (value!) {
+              historyNotifier.actionRemoveEntryFromLayer(entry,layer);
             }
           });
         },
@@ -73,18 +71,14 @@ class FlutterMapDropdownMenu extends ConsumerWidget {
         leadingIcon: Icon(Icons.arrow_upward),
         child: Text("Move to top"),
         onPressed: () {
-          layer.items.remove(entry);
-          layer.items.insert(0, entry);
-          tileEntriesNotifier.forceRebuild();
+          historyNotifier.actionMoveEntryToTop(entry, layer);
         },
       ),
       MenuItemButton(
         leadingIcon: Icon(Icons.arrow_downward),
-        child: Text("Move to buttom"),
+        child: Text("Move to bottom"),
         onPressed: () {
-          layer.items.remove(entry);
-          layer.items.add(entry);
-          tileEntriesNotifier.forceRebuild();
+          historyNotifier.actionMoveEntryToBottom(entry, layer);
         },
       ),
       // TODO: Change properties impl in menu

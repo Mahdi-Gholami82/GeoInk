@@ -20,6 +20,8 @@ class HistoryNotifier extends _$HistoryNotifier {
     return MapHistory();
   }
 
+  MapLayerList get _mapLayerList => ref.read(tileEntriesProvider);
+
   void setRestorePoint() {
     state.setRestorePoint();
   }
@@ -67,7 +69,7 @@ class HistoryNotifier extends _$HistoryNotifier {
     required FlutterMapEntry entry,
     bool unique = true,
   }) {
-    state.addAndDo(
+    addAndDo(
       ManualDoable(
         executeBase: () {
           if (unique) {
@@ -85,7 +87,7 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   void actionSetLastPointPolygon(PolygonEntry polygon, LatLng point) {
     LatLng? oldPoint;
-    state.addAndDo(
+    addAndDo(
       ManualDoable(
         executeBase: () {
           polygon.coordinates.last = point;
@@ -98,7 +100,7 @@ class HistoryNotifier extends _$HistoryNotifier {
   }
 
   void actionAddPointToPolyline(PolylineEntry polyline, LatLng point) {
-    state.addAndDo(ManualDoable(executeBase: () {
+    addAndDo(ManualDoable(executeBase: () {
       polyline.coordinates.add(point);
     }, undoBase: () {
       polyline.coordinates.removeLast();
@@ -109,7 +111,7 @@ class HistoryNotifier extends _$HistoryNotifier {
     MapLayer layer, {
     required List<FlutterMapEntry> entries,
   }) {
-    state.addAndDo(
+    addAndDo(
       ManualDoable(
         executeBase: () {
           layer.addAllUnique(entries);
@@ -123,7 +125,7 @@ class HistoryNotifier extends _$HistoryNotifier {
   }
 
   void actionAddAllToAllLayer(LayerEntryMap layerEntryMap) {
-    state.addAndDo(
+    addAndDo(
       ManualDoable(
         executeBase: () {
           for (var layerFlutterMapEntriesPair in layerEntryMap.entries) {
@@ -147,7 +149,7 @@ class HistoryNotifier extends _$HistoryNotifier {
   }
 
   void actionListAddAllToAllLayer(List<LayerEntryMap> layerEntryMaps) {
-    state.addAndDo(
+    addAndDo(
       ManualDoable(
         executeBase: () {
           for (var layerEntryMap in layerEntryMaps) {
@@ -176,7 +178,7 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   void actionListRemoveLast<T>(List<T> inputList) {
     T? data;
-    state.addAndDo(
+    addAndDo(
       ManualDoable(
         executeBase: () {
           data = inputList.removeLast();
@@ -190,23 +192,71 @@ class HistoryNotifier extends _$HistoryNotifier {
   }
 
   void actionReorderLayer(int oldIndex, int newIndex) {
-    state.addAndDo(
+    addAndDo(
       ManualDoable(
         executeBase: () {
-          ref.read(tileEntriesProvider).items.swapByIndex(oldIndex, newIndex);
+          _mapLayerList.items.swapByIndex(oldIndex, newIndex);
         },
         undoBase: () {
-          ref.read(tileEntriesProvider).items.swapByIndex(newIndex, oldIndex);
+          _mapLayerList.items.swapByIndex(newIndex, oldIndex);
         },
       ),
     );
   }
 
   void actionReorderEntry(MapLayer layer,int oldIndex, int newIndex) {
-    state.addAndDo(ManualDoable(executeBase: () {
+    addAndDo(ManualDoable(executeBase: () {
       layer.items.swapByIndex(oldIndex, newIndex);
     }, undoBase: () {
       layer.items.swapByIndex(newIndex, oldIndex);
+    }));
+  }
+
+  void actionToggleEntryVisibility(FlutterMapEntry entry) {
+    addAndDo(ManualDoable(executeBase: entry.toggleVisiblity, undoBase: entry.toggleVisiblity));
+  }
+
+  void actionRemoveLayer(MapLayer layer) {
+    MapLayer? data;
+    addAndDo(ManualDoable(executeBase: () {
+      data = layer;
+      _mapLayerList.items.remove(layer);
+    }, undoBase: () {
+      _mapLayerList.items.add(data!);
+    }));
+  }
+
+  void actionRemoveEntryFromLayer(FlutterMapEntry entry,MapLayer layer) {
+    FlutterMapEntry? data;
+    int? index;
+    addAndDo(ManualDoable(executeBase: () {
+      data = entry;
+      index = layer.items.indexOf(entry);
+      layer.items.removeAt(index!);
+    }, undoBase: () {
+      layer.items.insert(index!,data!);
+    }));
+  }
+
+  void actionMoveEntryToBottom(FlutterMapEntry entry,MapLayer layer) {
+    int? index;
+    addAndDo(ManualDoable(executeBase: () {
+      index = layer.items.indexOf(entry);
+      layer.items.removeAt(index!);
+      layer.items.add(entry);
+    }, undoBase: () {
+      layer.items.insert(index!, layer.items.removeLast());
+    }));
+  }
+
+  void actionMoveEntryToTop(FlutterMapEntry entry,MapLayer layer) {
+    int? index;
+    addAndDo(ManualDoable(executeBase: () {
+      index = layer.items.indexOf(entry);
+      layer.items.removeAt(index!);
+      layer.items.insert(0, entry);
+    }, undoBase: () {
+      layer.items.insert(index!, layer.items.removeAt(0));
     }));
   }
 

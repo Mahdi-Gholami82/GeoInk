@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
-import 'package:geoink/features/add_map_layer/utils/show_coordinates_buttom_sheet.dart';
+import 'package:geoink/features/add_map_layer/utils/show_coordinates_bottom_sheet.dart';
 
 class AddMapElementFab extends ConsumerWidget {
   const AddMapElementFab({super.key, on});

@@ -30,8 +30,6 @@ class MapHistory extends DoableHistory {
 
   void restore() {
     assert(canRestore);
-    print(undoStack.length);
-    print(redoStack.length);
     try {
       undoStack.removeRange(_undoRestorePoint!, undoStack.length);
     } on RangeError {}

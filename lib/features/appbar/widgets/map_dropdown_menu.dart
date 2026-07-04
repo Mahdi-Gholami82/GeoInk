@@ -9,7 +9,7 @@ import 'package:geojson_vi/geojson_vi.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/appbar/widgets/ink_well_text_button.dart';
-import 'package:geoink/features/save_map_to_image/utils/show_buttom_sheet.dart';
+import 'package:geoink/features/save_map_to_image/utils/show_bottom_sheet.dart';
 
 class MapDropdownMenu extends ConsumerStatefulWidget {
   const MapDropdownMenu({super.key});
@@ -79,7 +79,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               MenuItemButton(
                 leadingIcon: Icon(Icons.image_outlined),
                 onPressed: () {
-                  showSaveToImageButtomSheet(context);
+                  showSaveToImageBottomSheet(context);
                 },
                 child: const Text('To Image'),
               ),

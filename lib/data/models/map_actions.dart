@@ -5,43 +5,42 @@ class TempDoable extends ManualDoable {
 }
 
 class MapHistory extends DoableHistory {
-  MapHistory({super.redoStack, super.undoStack, int? undoRestorePoint, int? redoRestorePoint}) : _redoRestorePoint = redoRestorePoint, _undoRestorePoint = undoRestorePoint {}
-  int? _undoRestorePoint;
-  int? _redoRestorePoint;
-  bool get canRestore => _undoRestorePoint != null && _redoRestorePoint != null;
-  bool get undoReachedRestore => _undoRestorePoint == undoStack.length;
-  bool clearUndoAfterUndo = false;
+  MapHistory({
+    super.redoStack,
+    super.undoStack,
+    List<int>? undoRestorePoint,
+    List<int>? redoRestorePoint,
+  }) : _redoRestorePoints = redoRestorePoint ?? [],
+       _undoRestorePoints = undoRestorePoint ?? [] {}
+  List<int> _undoRestorePoints;
+  List<int> _redoRestorePoints;
+  bool get canRestore => _undoRestorePoints.isNotEmpty && _redoRestorePoints.isNotEmpty && _undoRestorePoints.length == _redoRestorePoints.length;
+  bool get undoReachedRestore => _undoRestorePoints == undoStack.length;
+  bool clearRedoAfterUndo = false;
 
   @override
   bool undo() {
     var result = super.undo();
-    if (clearUndoAfterUndo) {
-      undoStack.clear();
-      clearUndoAfterUndo = false;
-      redoStack.removeLast();
+    if (clearRedoAfterUndo) {
+      redoStack.clear();
+      clearRedoAfterUndo = false;
     }
     return result;
   }
 
   void setRestorePoint() {
-    _undoRestorePoint = undoStack.length;
-    _redoRestorePoint = redoStack.length;
+    _undoRestorePoints.add(undoStack.length);
+    _redoRestorePoints.add(redoStack.length);
   }
 
   void restore() {
     assert(canRestore);
-    try {
-      undoStack.removeRange(_undoRestorePoint!, undoStack.length);
-    } on RangeError {}
-    try {
-      redoStack.removeRange(_redoRestorePoint!, redoStack.length);
-    } on RangeError {}
-    _undoRestorePoint = null;
-    _redoRestorePoint = null;
+    undoStack.removeRange(_undoRestorePoints.removeLast(), undoStack.length);
+    redoStack.removeRange(_redoRestorePoints.removeLast(), redoStack.length);
   }
 
   List<Doable> getDoableFromRestorePoint() {
-    return undoStack.sublist(_undoRestorePoint!);
+    return undoStack.sublist(_undoRestorePoints.last);
   }
-  MapHistory copy() => MapHistory(redoStack: redoStack,undoStack: undoStack,undoRestorePoint: _undoRestorePoint,redoRestorePoint: _redoRestorePoint);
+  MapHistory copy() => MapHistory(redoStack: redoStack,undoStack: undoStack,undoRestorePoint: _undoRestorePoints,redoRestorePoint: _redoRestorePoints);
 }

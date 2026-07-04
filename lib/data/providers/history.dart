@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/models/map_actions.dart';
@@ -46,11 +47,15 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   void undo() {
     state.undo();
+    debugPrint("Job : Undo");
+    debugPrint("Undo stack lenght : ${state.undoStack.length} ");
     forceRebuild();
   }
 
   void redo() {
     state.redo();
+    debugPrint("Job : Redo");
+    debugPrint("Redo stack lenght : ${state.redoStack.length} ");
     forceRebuild();
   }
 
@@ -272,8 +277,8 @@ class HistoryNotifier extends _$HistoryNotifier {
     state.restore();
   }
 
-  void setClearAfterRedo() {
-    state.clearUndoAfterUndo = true;
+  void setClearRedoAfterRedo() {
+    state.clearRedoAfterUndo = true;
   }
 
   void applyFromPoints() {

@@ -31,7 +31,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   var _mousePosition = Offset.zero;
   late LatLng lastMouseClickPoint;
   var mapController = MapController();
-  late MapLayer currentLayer;
+  MapLayer get currentLayer => chosenLayers[selectedType]!;
   late Map<EntryType, MapLayer> chosenLayers;
   late Map<MapLayer, int> oldLayerLenghts;
   late HistoryNotifier historyNotifier;
@@ -58,7 +58,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     selectedType = ModalRoute.of(context)!.settings.arguments as EntryType;
-    currentLayer = chosenLayers[selectedType]!;
   }
 
   void beginDrawing() {
@@ -81,17 +80,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
       case EntryType.marker:
     }
     historyNotifier.restoreFromPoints();
-    historyNotifier.addAndMarkDone(
-      ContainerDoable(
-        data: currentEntry,
-        executeBase: (data) {
-          currentLayer.add(data);
-        },
-        undoBase: (data) {
-          currentLayer.items.removeLast();
-        },
-      ),
-    );
     endDrawing();
   }
 
@@ -110,8 +98,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
         undoBase: () {
           // If undo has reached a point when the shape isnt being drawn anymore
           // Happens in the middle of drawing
-          if (!finishedDrawing) {
-            historyNotifier.setClearAfterRedo();
+          if (!finishedDrawing && !finishedMouseTrackDraw) {
+            historyNotifier.setClearRedoAfterRedo();
             endDrawing();
           }
           layer.items.removeLast();
@@ -188,7 +176,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           onTypeSwitch: (EntryType type) {
             setState(() {
               selectedType = type;
-              currentLayer = chosenLayers[type]!;
             });
           },
           onConfirm: () {
@@ -306,15 +293,9 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                     radius: 0,
                                   ),
                                 );
-                                finishedDrawing = false;
+                                beginDrawing();
                               } else {
-                                historyNotifier.addAndDo(ManualDoable(executeBase: () {
-                                  confirmDrawing();
-                                }, undoBase: () {
-                                  beginDrawing();
-                                  finishedMouseTrackDraw = false;
-                                  updateHover(_mousePosition);
-                                }));
+                                confirmDrawing();
                               }
                             }
                         }
@@ -356,9 +337,16 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             spacing: 10,
                             children: [
                               Icon(Icons.layers_outlined),
-                              Text(
-                                currentLayer.name,
-                                style: TextStyle(fontWeight: FontWeight.w600),
+                              FittedBox(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(minWidth: 0,maxWidth: 100),
+                                  child: Text(
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    currentLayer.name,
+                                    style: TextStyle(fontWeight: FontWeight.w600),
+                                  ),
+                                ),
                               ),
                             ],
                           ),

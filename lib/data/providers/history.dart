@@ -260,6 +260,14 @@ class HistoryNotifier extends _$HistoryNotifier {
     }));
   }
 
+  void actionAddLayer(MapLayer layer) {
+    addAndDo(ManualDoable(executeBase: () {
+      _mapLayerList.items.add(layer);
+    }, undoBase: () {
+      _mapLayerList.items.removeLast();
+    }));
+  } 
+
   void restoreFromPoints() {
     state.restore();
   }

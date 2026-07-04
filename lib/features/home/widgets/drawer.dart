@@ -5,6 +5,7 @@ import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/home/widgets/flutter_map_dropdown_menu.dart';
+import 'package:geoink/features/home/widgets/new_layer_dialogue.dart';
 
 class MapDrawer extends ConsumerStatefulWidget {
   const MapDrawer({super.key});
@@ -104,89 +105,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                             showDialog(
                               context: context,
                               builder: (context) {
-                                final formKey = GlobalKey<FormState>();
-                                var controller = TextEditingController();
-                                EntryType selectedType = EntryType.circle;
-
-                                void validateAndPop() {
-                                  final bool isValid =
-                                      formKey.currentState?.validate() ?? false;
-                                  if (isValid) {
-                                    setState(() {
-                                      ref
-                                          .read(tileEntriesProvider)
-                                          .addLayer(
-                                            MapLayer(
-                                              name: controller.text,
-                                              entryType: selectedType,
-                                            ),
-                                          );
-                                    });
-                                    Navigator.of(context).pop();
-                                  }
-                                }
-
-                                return AlertDialog(
-                                  title: Text("Add a layer"),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      DropdownMenu(
-                                        initialSelection: selectedType,
-                                        dropdownMenuEntries: EntryType.values
-                                            .map(
-                                              (e) => DropdownMenuEntry(
-                                                value: e,
-                                                label: e.name,
-                                              ),
-                                            )
-                                            .toList(),
-                                        onSelected: (value) {
-                                          selectedType = value ?? selectedType;
-                                        },
-                                      ),
-                                      Form(
-                                        key: formKey,
-                                        child: TextFormField(
-                                          controller: controller,
-                                          onFieldSubmitted: (Text) {
-                                            validateAndPop();
-                                          },
-                                          validator: (value) {
-                                            if (value == null ||
-                                                !RegExp(
-                                                  r"^[\w\s]+$",
-                                                ).hasMatch(value.trim())) {
-                                              return "Invalid name";
-                                            } else if (layers.contains(
-                                              MapLayer(
-                                                name: value,
-                                                entryType: selectedType,
-                                              ),
-                                            )) {
-                                              return "Duplicate name";
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        validateAndPop();
-                                      },
-                                      child: Text("ok"),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text("cancel"),
-                                    ),
-                                  ],
-                                );
+                                return NewLayerDialogue();
                               },
                             );
                           },

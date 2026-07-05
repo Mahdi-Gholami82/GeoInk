@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
-import 'package:geoink/features/home/widgets/flutter_map_dropdown_menu.dart';
 import 'package:geoink/features/home/widgets/new_layer_dialogue.dart';
 
 class MapDrawer extends ConsumerStatefulWidget {
@@ -17,7 +16,7 @@ class MapDrawer extends ConsumerStatefulWidget {
 class _MapDrawerState extends ConsumerState<MapDrawer> {
   late TileEntriesNotifier tileEntriesNotifier;
   late List<MapLayer> layers;
-  Map<MapLayer,ExpansibleController> controllers = {};
+  Map<MapLayer, ExpansibleController> controllers = {};
 
   Color _colorFromEntry(FlutterMapEntry entry) {
     switch (EntryType.fromType(entry.runtimeType)) {
@@ -144,7 +143,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                       expansionAnimationStyle: AnimationStyle.noAnimation,
                       children: [
                         Padding(
-                          padding: EdgeInsetsGeometry.only(left: 10),
+                          padding: EdgeInsetsGeometry.only(left: 25),
                           child: Material(
                             color: theme.colorScheme.surfaceContainer,
                             child: ReorderableListView.builder(
@@ -153,37 +152,163 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               onReorderItem: (int oldIndex, int newIndex) {
-                                historyNotifier.actionReorderEntry(layer, oldIndex, newIndex);
+                                historyNotifier.actionReorderEntry(
+                                  layer,
+                                  oldIndex,
+                                  newIndex,
+                                );
                               },
                               itemCount: layer.items.length,
                               itemBuilder: (context, itemIndex) {
-                                FlutterMapEntry item = layer.items[itemIndex];
-                                return ReorderableDragStartListener(
-                                  key: ValueKey('${item.name}-padding'),
-                                  index: itemIndex,
-                                  child: FlutterMapDropdownMenu(
-                                    entry: item,
-                                    layer: layer,
-                                    child: ListTile(
-                                      onTap: () {},
-                                      leading: SizedBox(
-                                        height: 40,
-                                        child: VerticalDivider(
-                                          thickness: 3,
-                                          color: _colorFromEntry(item),
-                                          radius: BorderRadius.circular(3),
-                                        ),
-                                      ),
-                                      title: Text(item.name),
-                                      key: ValueKey(item.name),
-                                      trailing: IconButton(
-                                        onPressed: () {
-                                          historyNotifier.actionToggleEntryVisibility(item);
+                                FlutterMapEntry entry = layer.items[itemIndex];
+                                var menuController = MenuController();
+
+                                List<Widget> menu = [
+                                  MenuItemButton(
+                                    leadingIcon: Icon(
+                                      entry.visible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                    child: Text("Visibility"),
+                                    onPressed: () {
+                                      historyNotifier
+                                          .actionToggleEntryVisibility(entry);
+                                    },
+                                  ),
+                                  MenuItemButton(
+                                    leadingIcon: Icon(Icons.delete),
+                                    child: Text("Remove"),
+                                    onPressed: () {
+                                      showDialog<bool>(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            content: Text(
+                                              "Remove \"${entry.name}\"?",
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(
+                                                    context,
+                                                  ).pop(false);
+                                                },
+                                                child: Text("cancel"),
+                                              ),
+
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(
+                                                    context,
+                                                  ).pop(true);
+                                                },
+                                                child: Text("ok"),
+                                              ),
+                                            ],
+                                          );
                                         },
-                                        icon: Icon(
-                                          item.visible
-                                              ? Icons.visibility
-                                              : Icons.visibility_off,
+                                      ).then((value) {
+                                        if (value!) {
+                                          historyNotifier
+                                              .actionRemoveEntryFromLayer(
+                                                entry,
+                                                layer,
+                                              );
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  MenuItemButton(
+                                    leadingIcon: Icon(Icons.arrow_upward),
+                                    child: Text("Move to top"),
+                                    onPressed: () {
+                                      historyNotifier.actionMoveEntryToTop(
+                                        entry,
+                                        layer,
+                                      );
+                                    },
+                                  ),
+                                  MenuItemButton(
+                                    leadingIcon: Icon(Icons.arrow_downward),
+                                    child: Text("Move to bottom"),
+                                    onPressed: () {
+                                      historyNotifier.actionMoveEntryToBottom(
+                                        entry,
+                                        layer,
+                                      );
+                                    },
+                                  ),
+                                  // TODO: Change properties impl in menu
+                                  // MenuItemButton(
+                                  //   leadingIcon: Icon(Icons.settings_applications),
+                                  //   child: Text("Change properties"),
+                                  //   onPressed: () {},
+                                  // ),
+                                ];
+
+                                void toggleMenu([Offset? position]) {
+                                  if (!menuController.isOpen) {
+                                    menuController.open(position: position);
+                                  } else {
+                                    menuController.close();
+                                  }
+                                }
+
+                                return ReorderableDragStartListener(
+                                  key: ValueKey('${entry.name}-padding'),
+                                  index: itemIndex,
+                                  child: MenuAnchor(
+                                    controller: menuController,
+                                    menuChildren: menu,
+                                    child: GestureDetector(
+                                      onSecondaryTapDown: (details) {
+                                        toggleMenu(details.localPosition);
+                                      },
+                                      onTap: () {
+                                        menuController.close();
+                                      },
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.all(0),
+                                        leading: SizedBox(
+                                          height: 40,
+                                          child: VerticalDivider(
+                                            thickness: 3,
+                                            color: _colorFromEntry(entry),
+                                            radius: BorderRadius.circular(3),
+                                          ),
+                                        ),
+                                        title: Text(entry.name),
+                                        key: ValueKey(entry.name),
+                                        trailing: MenuAnchor(
+                                          menuChildren: menu,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                IconButton(
+                                                  onPressed: () {
+                                                    historyNotifier
+                                                        .actionToggleEntryVisibility(
+                                                          entry,
+                                                        );
+                                                  },
+                                                  icon: Icon(
+                                                    entry.visible
+                                                        ? Icons.visibility
+                                                        : Icons.visibility_off,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    toggleMenu();
+                                                  },
+                                                  icon: Icon(Icons.more_vert),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),

@@ -91,7 +91,6 @@ class HistoryNotifier extends _$HistoryNotifier {
   }
 
   void actionSetLastPointPolygon(PolygonEntry polygon, LatLng point) {
-    LatLng? oldPoint;
     addAndDo(
       ManualDoable(
         executeBase: () {

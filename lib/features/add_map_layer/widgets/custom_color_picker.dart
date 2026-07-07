@@ -27,7 +27,7 @@ class _CustomColorPickerState extends State<CustomColorPicker> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text('Select a color'),
+                  title: const Text('Select a color',),
                   content: SingleChildScrollView(
                     child: BlockPicker(
                       pickerColor: widget.initialColor,
@@ -44,7 +44,7 @@ class _CustomColorPickerState extends State<CustomColorPicker> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: Icon(Icons.colorize, color: Colors.white, size: 18),
         ),
-        Text("Change color", style: TextStyle(fontWeight: FontWeight.w500)),
+        Text("Color", style: TextStyle(fontWeight: FontWeight.w500),overflow: TextOverflow.ellipsis,),
       ],
     );
   }

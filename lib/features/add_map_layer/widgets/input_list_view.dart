@@ -24,17 +24,17 @@ class _InputListViewState extends ConsumerState<InputListView> {
 
   String? Function(String?) getFieldValidator(SheetInputFieldType type) {
     switch (type) {
-      case SheetInputFieldType.coordinate:
+      case SheetInputFieldType.coordinates:
         return (value) {
           if (value == null || value.isEmpty) {
-            return "The coordinate field cannot be empty.";
+            return "The coordinates field cannot be empty.";
           }
           if (tryParseSingle(value) == null) {
             return "Unable to parse data.";
           }
           return hasMatchField(value)
               ? null
-              : "The input does not match any supported coordinate formats.";
+              : "The input does not match any supported coordinates formats.";
         };
       case SheetInputFieldType.name:
         return (value) {
@@ -65,8 +65,6 @@ class _InputListViewState extends ConsumerState<InputListView> {
     return Form(
       key: widget.formGlobalKey,
       child: ListView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
         itemCount: inputs.length,
         itemBuilder: (context, index) {
           SheetListInput input = inputs[index];
@@ -74,6 +72,7 @@ class _InputListViewState extends ConsumerState<InputListView> {
           return ListTile(
             leading: input.icon,
             title: TextFormField(
+              maxLines: 1,
               controller: input.controller,
               autofocus: true,
               onChanged: (value) {},
@@ -84,7 +83,7 @@ class _InputListViewState extends ConsumerState<InputListView> {
               decoration: InputDecoration(
                 labelText: input.type.name,
                 border: OutlineInputBorder(),
-                suffixIcon: input.type == SheetInputFieldType.coordinate
+                suffixIcon: input.type == SheetInputFieldType.coordinates
                     ? IconButton(
                         onPressed: () {
                           inputListNotifier.removeField(input);

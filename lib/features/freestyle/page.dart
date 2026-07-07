@@ -8,7 +8,7 @@ import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/freestyle/widgets/floating_tool_bar.dart';
 import 'package:geoink/features/freestyle/widgets/free_style_buttons_bar.dart';
 import 'package:geoink/features/freestyle/widgets/layer_selector.dart';
-import 'package:geoink/core/ui/widgets/toolbar_button.dart';
+import 'package:geoink/features/freestyle/widgets/toolbar_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_math/flutter_geo_math.dart';
@@ -73,9 +73,9 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   void confirmDrawing() {
     switch (currentLayer.entryType) {
       case EntryType.polygon:
-        (currentEntry as PolygonEntry).coordinates.removeLast();
+        (currentEntry as PolygonEntry).points.removeLast();
       case EntryType.polyline:
-        (currentEntry as PolylineEntry).coordinates.removeLast();
+        (currentEntry as PolylineEntry).points.removeLast();
       case EntryType.circle:
       case EntryType.marker:
     }
@@ -110,14 +110,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
 
   FlutterMapEntry get currentEntry => currentLayer.items.last;
 
+  LatLng mousePositionToCoords(Offset mousePosition) =>
+      mapController.camera.screenOffsetToLatLng(mousePosition);
 
-
-  LatLng mousePositionToCoords(Offset mousePosition) => mapController.camera.screenOffsetToLatLng(
-        mousePosition,
-      );
-
-  void updateHover(Offset mousePosition) {
-    var mouseCoords = mousePositionToCoords(mousePosition);
+  void updateOnMousePosition(LatLng mouseCoords) {
     setState(() {
       if (!currentLayer.isEmpty) {
         switch (currentLayer.entryType) {
@@ -127,20 +123,20 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
             {
               var polygon = (currentEntry as PolygonEntry);
               if (finishedMouseTrackDraw) {
-                polygon.coordinates.add(mouseCoords);
+                polygon.points.add(mouseCoords);
                 finishedMouseTrackDraw = false;
               } else {
-                polygon.coordinates.last = mouseCoords;
+                polygon.points.last = mouseCoords;
               }
             }
           case EntryType.polyline:
             {
               var polyline = (currentEntry as PolylineEntry);
               if (finishedMouseTrackDraw) {
-                polyline.coordinates.add(mouseCoords);
+                polyline.points.add(mouseCoords);
                 finishedMouseTrackDraw = false;
               } else {
-                polyline.coordinates.last = mouseCoords;
+                polyline.points.last = mouseCoords;
               }
             }
           case EntryType.circle:
@@ -167,7 +163,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
       onPointerHover: (event) {
         _mousePosition = event.position;
         if (!finishedDrawing) {
-          updateHover(_mousePosition);
+          updateOnMousePosition(mousePositionToCoords(_mousePosition));
         }
       },
       child: Scaffold(
@@ -231,7 +227,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                           case EntryType.marker:
                             {
                               _addToLayerWithHistory(
-                                MarkerEntry.withDefaults(coordinate: point),
+                                MarkerEntry.withDefaults(point: point),
                               );
                               break;
                             }
@@ -239,9 +235,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             {
                               if (finishedDrawing || currentLayer.isEmpty) {
                                 _addToLayerWithHistory(
-                                  PolygonEntry.withDefaults(
-                                    coordinates: [point],
-                                  ),
+                                  PolygonEntry.withDefaults(points: [point]),
                                 );
                                 beginDrawing();
                               } else {
@@ -250,11 +244,13 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                 historyNotifier.addAndDo(
                                   ManualDoable(
                                     executeBase: () {
-                                      polygon.coordinates.add(point);
+                                      polygon.points.add(point);
                                     },
                                     undoBase: () {
-                                      polygon.coordinates.removeLast();
-                                      updateHover(_mousePosition);
+                                      polygon.points.removeLast();
+                                      updateOnMousePosition(
+                                        mousePositionToCoords(_mousePosition),
+                                      );
                                     },
                                   ),
                                 );
@@ -264,21 +260,22 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             {
                               if (finishedDrawing || currentLayer.isEmpty) {
                                 _addToLayerWithHistory(
-                                  PolylineEntry.withDefaults(
-                                    coordinates: [point],
-                                  ),
+                                  PolylineEntry.withDefaults(points: [point]),
                                 );
                                 beginDrawing();
                               } else {
-                                var polyline = (currentLayer.items.last as PolylineEntry);
+                                var polyline =
+                                    (currentLayer.items.last as PolylineEntry);
                                 historyNotifier.addAndDo(
                                   ManualDoable(
                                     executeBase: () {
-                                      polyline.coordinates.add(point);
+                                      polyline.points.add(point);
                                     },
                                     undoBase: () {
-                                      polyline.coordinates.removeLast();
-                                      updateHover(_mousePosition);
+                                      polyline.points.removeLast();
+                                      updateOnMousePosition(
+                                        mousePositionToCoords(_mousePosition),
+                                      );
                                     },
                                   ),
                                 );
@@ -295,6 +292,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                 );
                                 beginDrawing();
                               } else {
+                                updateOnMousePosition(point);
                                 confirmDrawing();
                               }
                             }
@@ -309,70 +307,84 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                     ...mapLayerList.getMapChildren(),
                   ],
                 ),
-                Positioned(
-                  bottom: 20,
-                  left: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 15,
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(minHeight: 40),
-                        decoration: makeFloatingDecoration(context),
-                        padding: EdgeInsets.symmetric(horizontal: 15),
-                        child: Material(
-                          child: ToolbarButton(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => LayerSelector(
-                                  entryType: selectedType,
-                                  initialLayer: currentLayer,
-                                  onConfirm: (MapLayer selection) {
-                                    chosenLayers[selectedType] = selection;
+                Align(
+                  alignment: AlignmentGeometry.bottomStart,
+                  child: Padding(
+                    padding: const EdgeInsetsGeometry.only(
+                      left: 20,
+                      right: 20,
+                      bottom: 20,
+                    ),
+                    child: SafeArea(
+                      child: FittedBox(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 15,
+                          children: [
+                            Container(
+                              constraints: BoxConstraints(minHeight: 40),
+                              decoration: makeFloatingDecoration(context),
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: Material(
+                                child: ToolbarButton(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => LayerSelector(
+                                        entryType: selectedType,
+                                        initialLayer: currentLayer,
+                                        onConfirm: (MapLayer selection) {
+                                          chosenLayers[selectedType] =
+                                              selection;
+                                        },
+                                      ),
+                                    );
                                   },
-                                ),
-                              );
-                            },
-                            spacing: 10,
-                            children: [
-                              Icon(Icons.layers_outlined),
-                              FittedBox(
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 0,maxWidth: 100),
-                                  child: Text(
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    currentLayer.name,
-                                    style: TextStyle(fontWeight: FontWeight.w600),
-                                  ),
+                                  spacing: 10,
+                                  children: [
+                                    Icon(Icons.layers_outlined),
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        minWidth: 0,
+                                        maxWidth: 100,
+                                      ),
+                                      child: Text(
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        currentLayer.name,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            FloatingToolBar(
+                              onCancel: () {
+                                setState(() {
+                                  cancelDrawing();
+                                });
+                              },
+                              onOk: () {
+                                setState(() {
+                                  confirmDrawing();
+                                });
+                              },
+                              onRedo: () {
+                                historyNotifier.redo();
+                              },
+                              onUndo: () {
+                                historyNotifier.undo();
+                              },
+                              enableCancel: !finishedDrawing,
+                              enableOk: !finishedDrawing,
+                            ),
+                          ],
                         ),
                       ),
-                      FloatingToolBar(
-                        onCancel: () {
-                          setState(() {
-                            cancelDrawing();
-                          });
-                        },
-                        onOk: () {
-                          setState(() {
-                            confirmDrawing();
-                          });
-                        },
-                        onRedo: () {
-                          historyNotifier.redo();
-                        },
-                        onUndo: () {
-                          historyNotifier.undo();
-                        },
-                        enableCancel: !finishedDrawing,
-                        enableOk: !finishedDrawing,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ],

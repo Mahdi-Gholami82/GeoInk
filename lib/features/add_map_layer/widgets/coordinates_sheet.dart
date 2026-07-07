@@ -43,96 +43,114 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
         Column(
           children: [
             CustomSheetDragHandle(),
-            Expanded(
+            Flexible(
+              fit: FlexFit.loose,
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  spacing: 10,
                   children: [
-                    Text(
-                      widget.title,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Padding(padding: EdgeInsets.symmetric(vertical: 15)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        spacing: 30,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: Column(
                         children: [
-                          CustomColorPicker(
-                            onColorChanged: (Color value) {
-                              setState(() {
-                                chosenColor = value;
-                              });
-                            },
-                            initialColor: chosenColor,
+                          Text(
+                            widget.title,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          MapLayerPicker(entryType: inputListState.type,),
+                          Padding(padding: EdgeInsets.symmetric(vertical: 15)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: FittedBox(
+                              child: Row(
+                                spacing: 30,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CustomColorPicker(
+                                    onColorChanged: (Color value) {
+                                      setState(() {
+                                        chosenColor = value;
+                                      });
+                                    },
+                                    initialColor: chosenColor,
+                                  ),
+                                  MapLayerPicker(
+                                    entryType: inputListState.type,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: InputListView(
+                              formGlobalKey: formGlobalKey,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        controller: widget.scrollController,
-                        child: InputListView(formGlobalKey: formGlobalKey),
-                      ),
-                    ),
-                    FittedBox(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        spacing: 20,
-                        children: [
-                          if (inputListState.type == EntryType.polygon ||
-                              inputListState.type == EntryType.polyline)
-                            OutlinedButton(
-                              style: TextButton.styleFrom(
+                    SafeArea(
+                      child: FittedBox(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 20,
+                          children: [
+                            if (inputListState.type == EntryType.polygon ||
+                                inputListState.type == EntryType.polyline)
+                              OutlinedButton(
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.surface,
+                                  minimumSize: const Size(110, 50),
+                                  shape: const StadiumBorder(),
+                                ),
+                                onPressed: () {
+                                  inputListNotifier.addCoordinatesField();
+                                },
+                                child: Text(
+                                  "Add Coordinates",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.secondary,
+                                  ),
+                                ),
+                              ),
+                        
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(
                                   context,
-                                ).colorScheme.surface,
-                                minimumSize: const Size(110, 50),
-                                shape: const StadiumBorder(),
+                                ).colorScheme.primary,
+                                minimumSize: Size(110, 50),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
                               ),
                               onPressed: () {
-                                inputListNotifier.addCoordinatesField();
+                                if (formGlobalKey.currentState!.validate()) {
+                                  inputListNotifier.setColor(chosenColor);
+                                  Navigator.of(
+                                    context,
+                                  ).pop(inputListNotifier.takeFinalResult());
+                                }
                               },
                               child: Text(
-                                "Add Coordinates",
+                                "Apply",
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: Theme.of(context).colorScheme.secondary,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                 ),
                               ),
                             ),
-                      
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(
-                                context,
-                              ).colorScheme.primary,
-                              minimumSize: Size(110, 50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            onPressed: () {
-                              if (formGlobalKey.currentState!.validate()) {
-                                inputListNotifier.setColor(chosenColor);
-                                Navigator.of(
-                                  context,
-                                ).pop(inputListNotifier.takeFinalResult());
-                              }
-                            },
-                            child: Text(
-                              "Apply",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                              ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -141,7 +159,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
             ),
           ],
         ),
-        Positioned(top: 10, right: 10, child: SheetOptionsMenu()),
+
         Positioned(
           top: 10,
           left: 10,
@@ -152,6 +170,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
             icon: Icon(Icons.close),
           ),
         ),
+        Positioned(top: 10, right: 10, child: SheetOptionsMenu()),
       ],
     );
   }

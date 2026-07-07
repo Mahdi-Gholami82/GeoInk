@@ -84,6 +84,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      fit: StackFit.passthrough,
       children: [
         Positioned(
           top: 30,

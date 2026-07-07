@@ -24,19 +24,19 @@ class InputCoordinatesResult {
   MapLayer layer;
 
   MarkerEntry toMarker() => MarkerEntry(
-    coordinate: coordinates.first,
+    point: coordinates.first,
     name: layer.getUniqueName(name ?? "marker"),
     color: color,
   );
 
   PolylineEntry toPolyline() => PolylineEntry(
         name: layer.getUniqueName(name ?? "polyline"),
-        coordinates: coordinates,
+        points: coordinates,
         color: color,
       );
   PolygonEntry toPolygon() => PolygonEntry(
         name: name ?? "polygon",
-        coordinates: processPolygonLatlngs(coordinates),
+        points: processPolygonLatlngs(coordinates),
         borderColor: color,
         fillColor: color.withAlpha(128),
       );
@@ -49,11 +49,11 @@ class InputCoordinatesResult {
       );
 }
 
-enum SheetInputFieldType { name, coordinate, radius }
+enum SheetInputFieldType { name, coordinates, radius }
 
 class SheetListInput {
   SheetListInput({
-    this.type = SheetInputFieldType.coordinate,
+    this.type = SheetInputFieldType.coordinates,
     String input = "",
   }) {
     value = input;
@@ -68,14 +68,14 @@ class SheetListInput {
 
   SheetListInput.nameField({String input = ""})
     : this(type: SheetInputFieldType.name, input: input);
-  SheetListInput.coordinateField({String input = ""})
-    : this(type: SheetInputFieldType.coordinate, input: input);
+  SheetListInput.coordinatesField({String input = ""})
+    : this(type: SheetInputFieldType.coordinates, input: input);
   SheetListInput.radiusField({String input = ""})
     : this(type: SheetInputFieldType.radius, input: input);
 
   Icon get icon {
     switch (type) {
-      case SheetInputFieldType.coordinate:
+      case SheetInputFieldType.coordinates:
         return Icon(Icons.location_on);
       case SheetInputFieldType.name:
         return Icon(Icons.abc);

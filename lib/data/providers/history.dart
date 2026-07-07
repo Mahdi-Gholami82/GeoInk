@@ -94,10 +94,10 @@ class HistoryNotifier extends _$HistoryNotifier {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          polygon.coordinates.last = point;
+          polygon.points.last = point;
         },
         undoBase: () {
-          polygon.coordinates.removeLast();
+          polygon.points.removeLast();
         },
       ),
     );
@@ -105,9 +105,9 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   void actionAddPointToPolyline(PolylineEntry polyline, LatLng point) {
     addAndDo(ManualDoable(executeBase: () {
-      polyline.coordinates.add(point);
+      polyline.points.add(point);
     }, undoBase: () {
-      polyline.coordinates.removeLast();
+      polyline.points.removeLast();
     }));
   }
 

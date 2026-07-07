@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/providers/history.dart';
+import 'package:geoink/features/settings/page.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/core/services/tile_providers.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
@@ -31,7 +32,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     Iterable<Widget> mapChildren = ref
-        .watch(tileEntriesProvider).getMapChildren();
+        .watch(tileEntriesProvider)
+        .getMapChildren();
     ref.watch(historyProvider);
 
     return Scaffold(
@@ -41,7 +43,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         borderRadius: 16,
         drawer: MapDrawer(),
         onTapSettings: () {
-          Navigator.of(context).pushNamed("/settings");
+          Navigator.of(context).pushNamed(SettingsPage.route);
         },
       ),
       floatingActionButton: AddMapElementFab(),

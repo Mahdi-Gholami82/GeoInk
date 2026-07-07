@@ -51,7 +51,7 @@ List<FlutterMapEntry> mapEntriesFromGeoJsonObject(
           resultEntries.add(
             MarkerEntry.withDefaults(
               name: name ?? "marker",
-              coordinate: listToLatLng(geoJsonPoint.coordinates),
+              point: listToLatLng(geoJsonPoint.coordinates),
               color: stringToColor(properties["color"]),
               visible: visible,
               description: description,
@@ -80,7 +80,7 @@ List<FlutterMapEntry> mapEntriesFromGeoJsonObject(
           resultEntries.add(
             MarkerEntry.withDefaults(
               name: name,
-              coordinate: listToLatLng(polygonCoordinates),
+              point: listToLatLng(polygonCoordinates),
               color: color,
               visible: visible,
               description: description,
@@ -93,7 +93,7 @@ List<FlutterMapEntry> mapEntriesFromGeoJsonObject(
         resultEntries.add(
           PolylineEntry.withDefaults(
             name: name ?? "polyline",
-            coordinates: multipleListToLatLng(geoJsonLineString.coordinates),
+            points: multipleListToLatLng(geoJsonLineString.coordinates),
             color: stringToColor(properties["stroke"]),
             strokeWidth: properties["stroke-width"],
             visible: visible,
@@ -109,7 +109,7 @@ List<FlutterMapEntry> mapEntriesFromGeoJsonObject(
           resultEntries.add(
             PolylineEntry.withDefaults(
               name: name,
-              coordinates: multipleListToLatLng(polylineCoordinates),
+              points: multipleListToLatLng(polylineCoordinates),
               color: stroke,
               strokeWidth: properties["stroke-width"],
               visible: visible,
@@ -129,7 +129,7 @@ List<FlutterMapEntry> mapEntriesFromGeoJsonObject(
         resultEntries.add(
           PolygonEntry.withDefaults(
             name: name ?? "polygon",
-            coordinates: polygonMainCoordinates,
+            points: polygonMainCoordinates,
             fillColor: stringToColor(properties["fill"]),
             borderColor: stringToColor(properties["stroke"]),
             borderWidth: properties["stroke-width"],
@@ -153,7 +153,7 @@ List<FlutterMapEntry> mapEntriesFromGeoJsonObject(
           resultEntries.add(
             PolygonEntry.withDefaults(
               name: name,
-              coordinates: polygonMainCoordinates,
+              points: polygonMainCoordinates,
               fillColor: fill,
               borderColor: stroke,
               borderWidth: properties["stroke-width"],

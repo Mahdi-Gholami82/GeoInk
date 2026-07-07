@@ -45,12 +45,12 @@ abstract class FlutterMapEntry {
 
 /// Keeps track of a [Marker] feature that will be added to map layers later.
 class MarkerEntry extends FlutterMapEntry {
-  LatLng coordinate;
+  LatLng point;
   Color color;
 
   MarkerEntry({
     required super.name,
-    required this.coordinate,
+    required this.point,
     this.color = MapDefaultColors.marker,
     super.visible,
     super.description,
@@ -58,7 +58,7 @@ class MarkerEntry extends FlutterMapEntry {
 
   MarkerEntry.withDefaults({
     super.name = "marker",
-    required this.coordinate,
+    required this.point,
     Color? color,
     bool? visible,
     String? description,
@@ -68,7 +68,7 @@ class MarkerEntry extends FlutterMapEntry {
   /// Generates a [Marker] from a [MarkerEntry] to be used in a [MarkerLayer].
   @override
   Marker get flutterMapFeature => Marker(
-    point: coordinate,
+    point: point,
     width: 64,
     height: 64,
     child: Align(alignment: AlignmentGeometry.topCenter,child: Icon(Icons.location_pin, size: 40, color: color)),
@@ -76,7 +76,7 @@ class MarkerEntry extends FlutterMapEntry {
 
   @override
   GeoJSONPoint get geoJasonObject =>
-      GeoJSONPoint([coordinate.longitude, coordinate.latitude]);
+      GeoJSONPoint([point.longitude, point.latitude]);
 
   @override
   GeoJSONFeature toGeoJsonFeature(String layerName, String layerId) =>
@@ -94,19 +94,19 @@ class MarkerEntry extends FlutterMapEntry {
 
   @override
   String toString() {
-    return "MarkerEntry: $name\npoint: $coordinate";
+    return "MarkerEntry: $name\npoint: $point";
   }
 }
 
 /// Keeps track of a [Polygon] feature that will be added to map layers later.
 class PolygonEntry extends FlutterMapEntry {
-  final List<LatLng> coordinates;
+  final List<LatLng> points;
   final Color fillColor;
   final Color borderColor;
   final double borderWidth;
   PolygonEntry({
     required super.name,
-    required this.coordinates,
+    required this.points,
     this.fillColor = MapDefaultColors.polygon,
     Color? borderColor,
     this.borderWidth = 2.0,
@@ -116,7 +116,7 @@ class PolygonEntry extends FlutterMapEntry {
 
   PolygonEntry.withDefaults({
     super.name = "polygon",
-    required this.coordinates,
+    required this.points,
     Color? fillColor,
     Color? borderColor,
     num? borderWidth,
@@ -134,7 +134,7 @@ class PolygonEntry extends FlutterMapEntry {
   /// Generates a [Polygon] from a [PolygonEntry] to be used in a [PolygonLayer].
   @override
   Polygon get flutterMapFeature => Polygon(
-    points: coordinates,
+    points: points,
     borderColor: borderColor,
     borderStrokeWidth: borderWidth,
     color: fillColor,
@@ -144,7 +144,7 @@ class PolygonEntry extends FlutterMapEntry {
   @override
   GeoJSONPolygon get geoJasonObject {
     return GeoJSONPolygon([
-      coordinates.map((p) => [p.longitude, p.latitude]).toList(),
+      points.map((p) => [p.longitude, p.latitude]).toList(),
     ]);
   }
 
@@ -166,19 +166,19 @@ class PolygonEntry extends FlutterMapEntry {
 
   @override
   String toString() {
-    return "PolygonEntry: $name\nnumber of points: ${coordinates.length}";
+    return "PolygonEntry: $name\nnumber of points: ${points.length}";
   }
 }
 
 /// Keeps track of a [Polyline] feature that will be added to map layers later.
 class PolylineEntry extends FlutterMapEntry {
-  List<LatLng> coordinates;
+  List<LatLng> points;
   Color color;
   double strokeWidth;
 
   PolylineEntry({
     required super.name,
-    required this.coordinates,
+    required this.points,
     this.color = MapDefaultColors.polyline,
     this.strokeWidth = 3.0,
     super.visible,
@@ -187,7 +187,7 @@ class PolylineEntry extends FlutterMapEntry {
 
   PolylineEntry.withDefaults({
     super.name = "polyline",
-    required this.coordinates,
+    required this.points,
     Color? color,
     num? strokeWidth,
     bool? visible,
@@ -199,11 +199,11 @@ class PolylineEntry extends FlutterMapEntry {
   /// Generates a [Polyline] from a [PolylineEntry] to be used in a [PolylineLayer].
   @override
   Polyline get flutterMapFeature =>
-      Polyline(points: coordinates, strokeWidth: strokeWidth, color: color,hitValue: HitReference(this));
+      Polyline(points: points, strokeWidth: strokeWidth, color: color,hitValue: HitReference(this));
 
   @override
   GeoJSONLineString get geoJasonObject => GeoJSONLineString(
-    coordinates.map((p) => [p.longitude, p.latitude]).toList(),
+    points.map((p) => [p.longitude, p.latitude]).toList(),
   );
 
   @override
@@ -223,7 +223,7 @@ class PolylineEntry extends FlutterMapEntry {
 
   @override
   String toString() {
-    return "PolylineEntry: $name\nnumber of points: ${coordinates.length}";
+    return "PolylineEntry: $name\nnumber of points: ${points.length}";
   }
 }
 

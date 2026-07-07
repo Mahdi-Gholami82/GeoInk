@@ -55,7 +55,7 @@ class InputListCoordinatesState {
       .value;
 
   List<String> get coordinates => fields
-      .where((input) => input.type == SheetInputFieldType.coordinate)
+      .where((input) => input.type == SheetInputFieldType.coordinates)
       .map((input) => input.value)
       .toList();
 
@@ -87,7 +87,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     fields.addAll(
       List.generate(
         numberOfCoordinatesFields,
-        (index) => SheetListInput.coordinateField(),
+        (index) => SheetListInput.coordinatesField(),
       ),
     );
     if (initType == EntryType.circle) {
@@ -110,7 +110,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
   }
 
   void addCoordinatesField({String input = ""}) {
-    state.fields.add(SheetListInput.coordinateField(input: input));
+    state.fields.add(SheetListInput.coordinatesField(input: input));
     _forceRebuild();
   }
 
@@ -120,7 +120,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     Function? onLenghtLimit,
   }) {
     var fields = state.fields;
-    if (!(fields.where((e) => e.type == SheetInputFieldType.coordinate).length >
+    if (!(fields.where((e) => e.type == SheetInputFieldType.coordinates).length >
         InputListCoordinatesState.minNumberOfCoordinatesFields[state.type]!)) {
       if (onLenghtLimit != null) onLenghtLimit;
       return;
@@ -148,9 +148,9 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     var fields = state.fields;
 
     for (int index = fields.length - 1; index > 0; index--) {
-      var coordinateField = fields[index];
+      var coordinatesField = fields[index];
       _removeFieldUnlessEmpty(
-        coordinateField,
+        coordinatesField,
         onNotEmpty: onNotEmpty,
         onLenghtLimit: onLenghtLimit,
       );
@@ -160,7 +160,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
 
   void addMultipleCoordinates(Iterable<String> results) {
     state.fields.addAll(
-      results.map((e) => SheetListInput.coordinateField(input: e)),
+      results.map((e) => SheetListInput.coordinatesField(input: e)),
     );
     clearEmptyFields();
   }

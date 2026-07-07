@@ -48,15 +48,15 @@ const String defaultSeperatorPattern =
     r"(?:(?:\s{0,3},\s{0,3}|\s)|(?<=[NWES])|(?=[NWES]))";
 const String defaultSeperatorPatternNonEmpty = r"(?:(?:\s{0,3},\s{0,3}|\s))";
 
-const String _coordinateMainGroupNamePostFix =
+const String _coordinatesMainGroupNamePostFix =
     r"_(?<LatOrLong>(?:LAT|LONG))(?:_(?<LeadingOrTrailing>TD|LD))?";
-final RegExp coordinateMainGroupNameParser = RegExp(
+final RegExp coordinatesMainGroupNameParser = RegExp(
   "^<?(?<type>${CoordinatesFormatTypes.values.asNameMap().keys.join("|")})" +
-      _coordinateMainGroupNamePostFix +
+      _coordinatesMainGroupNamePostFix +
       r">?$",
 );
 
-/// Predefined matchers for various coordinate formats.
+/// Predefined matchers for various coordinates formats.
 Map<CoordinatesFormatTypes, CoordinatesMatcher> matchers = {
   CoordinatesFormatTypes.notamCompactDDMMSS: CoordinatesMatcher(
     latPattern: r"(?<degrees>\d{2})(?<minutes>\d{2})(?<seconds>\d{2})",
@@ -158,7 +158,7 @@ class CoordinatesParseResult {
     final longMatch = RegExp(longPattern).firstMatch(longValue);
 
     if (latMatch == null || longMatch == null) {
-      throw FormatException('Invalid coordinate format for $type');
+      throw FormatException('Invalid coordinates format for $type');
     }
 
     return CoordinatesParseResult._(
@@ -216,7 +216,7 @@ class CoordinatesParseResult {
           .where(
             (e) =>
                 !(e.contains(RegExp(r"northOrSouth|eastOrWest")) ||
-                    coordinateMainGroupNameParser.hasMatch(e)),
+                    coordinatesMainGroupNameParser.hasMatch(e)),
           )
           .toList();
     }
@@ -263,11 +263,11 @@ class CoordinatesParseResult {
 String _removeGroupNamesExceptMain(String patternInput) {
   return patternInput.replaceAllMapped(RegExp(r"(?<=\(\?)(\<\w+\>)"), (match) {
     String origin = match.group(1)!;
-    return coordinateMainGroupNameParser.hasMatch(origin) ? origin : ":";
+    return coordinatesMainGroupNameParser.hasMatch(origin) ? origin : ":";
   });
 }
 
-/// Holds regex patterns and format type for coordinate matching.
+/// Holds regex patterns and format type for coordinates matching.
 class CoordinatesMatcher {
   CoordinatesMatcher({
     required this.latPattern,
@@ -349,7 +349,7 @@ double _getMultiplierEW(String value) {
 
 /// Extracts whether the key corresponds to latitude or longitude.
 LatOrLong _latOrLong(String key) {
-  RegExpMatch match = coordinateMainGroupNameParser.firstMatch(key)!;
+  RegExpMatch match = coordinatesMainGroupNameParser.firstMatch(key)!;
   return LatOrLong.values.firstWhere(
     (element) => element.name.toUpperCase() == match.namedGroup("LatOrLong"),
   );
@@ -357,14 +357,14 @@ LatOrLong _latOrLong(String key) {
 
 /// Extracts the coordinate format type from the key.
 CoordinatesFormatTypes _getTypeFromKey(String key) {
-  RegExpMatch match = coordinateMainGroupNameParser.firstMatch(key)!;
+  RegExpMatch match = coordinatesMainGroupNameParser.firstMatch(key)!;
   return matchers.keys.firstWhere(
     (CoordinatesFormatTypes type) => match.namedGroup("type") == type.name,
   );
 }
 
 LeadingOrTrailing? _getLeadingOrTrailingFromKey(String key) {
-  RegExpMatch match = coordinateMainGroupNameParser.firstMatch(key)!;
+  RegExpMatch match = coordinatesMainGroupNameParser.firstMatch(key)!;
   String? leadingOrTrailingText = match.namedGroup("LeadingOrTrailing");
   if (leadingOrTrailingText == "LD") {
     return LeadingOrTrailing.leading;

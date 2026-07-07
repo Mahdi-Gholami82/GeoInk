@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:geoink/core/ui/widgets/toolbar_container.dart';
-import 'package:geoink/core/ui/widgets/undo_redo_buttons.dart';
+import 'package:geoink/core/ui/floating_decoration.dart';
+import 'package:geoink/features/freestyle/widgets/toolbar_button.dart';
 
 class FloatingToolBar extends StatefulWidget {
   const FloatingToolBar({
@@ -38,43 +38,67 @@ class _FloatingToolBarState extends State<FloatingToolBar> {
 
   @override
   Widget build(BuildContext context) {
-    return ToolbarContainer(
-      child: Row(
-        children: [
-          UndoRedoButtons(onUndo: widget.onUndo, onRedo: widget.onRedo),
-          Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: 10)),
-          Row(
-            spacing: 8,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      decoration: makeFloatingDecoration(context),
+      child: Material(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: 50),
+          child: Row(
             children: [
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(10),
-                  ),
-                ),
-                onPressed: widget.enableCancel
-                    ? () {
-                        widget.onCancel();
-                      }
-                    : null,
-                child: Text("Cancel"),
+              ToolbarButton(
+                onTap: () {
+                  widget.onUndo();
+                },
+                children: [
+                  Icon(Icons.undo),
+                  Text("Undo", style: TextStyle(fontWeight: FontWeight.w600)),
+                ],
               ),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(10),
+              ToolbarButton(
+                onTap: () {
+                  widget.onRedo();
+                },
+                children: [
+                  Text("Redo", style: TextStyle(fontWeight: FontWeight.w600)),
+                  Icon(Icons.redo),
+                ],
+              ),
+              Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: 10)),
+              Row(
+                spacing: 8,
+                children: [
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusGeometry.circular(10),
+                      ),
+                    ),
+                    onPressed: widget.enableCancel
+                        ? () {
+                            widget.onCancel();
+                          }
+                        : null,
+                    child: Text("Cancel"),
                   ),
-                ),
-                onPressed: widget.enableOk
-                    ? () {
-                        widget.onOk();
-                      }
-                    : null,
-                child: Text("Ok"),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusGeometry.circular(10),
+                      ),
+                    ),
+                    onPressed: widget.enableOk
+                        ? () {
+                            widget.onOk();
+                          }
+                        : null,
+                    child: Text("Ok"),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

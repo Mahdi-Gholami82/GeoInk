@@ -35,22 +35,29 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          top: 15,
-          left: 15,
-          child: SafeArea(
+    return SafeArea(
+      child: Align(
+        alignment: AlignmentGeometry.topStart,
+        child: FittedBox(
+          child: Padding(
+            padding: const EdgeInsetsGeometry.only(
+              top: 15,
+              left: 15,
+              right: 15,
+            ),
             child: Row(
               spacing: widget.height / 8,
               children: [
                 Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      FloatingShadow(),
-                    ],
+                    boxShadow: [FloatingShadow()],
                   ),
                   child: IconButton(
                     icon: Icon(Icons.menu),
@@ -75,9 +82,7 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
                     color:
                         widget.backgroundColor ??
                         Theme.of(context).colorScheme.surface,
-                    boxShadow: [
-                      FloatingShadow(),
-                    ],
+                    boxShadow: [FloatingShadow()],
                   ),
                   child: Material(
                     child: Row(
@@ -102,7 +107,7 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

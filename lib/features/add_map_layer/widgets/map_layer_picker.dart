@@ -52,6 +52,7 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
       mainAxisSize: MainAxisSize.min,
       children: [
         DropdownMenu(
+          width: 180,
           hintText: "main",
           onSelected: (value) {
                 inputListState.layer = value;
@@ -73,7 +74,7 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
               ),
           ],
         ),
-        Text("Select Layer", style: TextStyle(fontWeight: FontWeight.w500)),
+        Text("Layer", style: TextStyle(fontWeight: FontWeight.w500),overflow: TextOverflow.ellipsis,),
       ],
     );
   }

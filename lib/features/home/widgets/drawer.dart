@@ -283,7 +283,9 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                                         trailing: MenuAnchor(
                                           menuChildren: menu,
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                            ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [

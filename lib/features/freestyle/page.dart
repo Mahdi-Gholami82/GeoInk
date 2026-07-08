@@ -1,14 +1,18 @@
 import 'package:geoink/core/services/tile_providers.dart';
 import 'package:geoink/core/ui/floating_decoration.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
+import 'package:geoink/core/utils/map_colors.dart';
+import 'package:geoink/core/utils/show_color_picker.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/features/freestyle/widgets/floating_container.dart';
 import 'package:geoink/features/freestyle/widgets/floating_tool_bar.dart';
 import 'package:geoink/features/freestyle/widgets/free_style_buttons_bar.dart';
 import 'package:geoink/features/freestyle/widgets/layer_selector.dart';
 import 'package:geoink/features/freestyle/widgets/toolbar_button.dart';
+import 'package:geoink/core/utils/color_tools.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_math/flutter_geo_math.dart';
@@ -22,6 +26,7 @@ class FreeStylePage extends ConsumerStatefulWidget {
 }
 
 class _FreeStylePageState extends ConsumerState<FreeStylePage> {
+  bool _isInitialized = false;
   late MapLayerList mapLayerList;
   late TileEntriesNotifier mapLayerListNotifier;
   late EntryType selectedType;
@@ -35,6 +40,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   late Map<EntryType, MapLayer> chosenLayers;
   late Map<MapLayer, int> oldLayerLenghts;
   late HistoryNotifier historyNotifier;
+  Map<EntryType, Color> chosenColors = Map.fromEntries(
+    EntryType.values.map((e) => MapEntry(e, MapDefaultColors.fromType(e))),
+  );
+  Color get currentColor => chosenColors[selectedType]!;
 
   @override
   void initState() {
@@ -57,7 +66,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    selectedType = ModalRoute.of(context)!.settings.arguments as EntryType;
+    if (!_isInitialized) {
+      selectedType = ModalRoute.of(context)!.settings.arguments as EntryType;
+      _isInitialized = true;
+    }
   }
 
   void beginDrawing() {
@@ -227,7 +239,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                           case EntryType.marker:
                             {
                               _addToLayerWithHistory(
-                                MarkerEntry.withDefaults(point: point),
+                                MarkerEntry.withDefaults(
+                                  color: currentColor,
+                                  point: point,
+                                ),
                               );
                               break;
                             }
@@ -235,7 +250,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             {
                               if (finishedDrawing || currentLayer.isEmpty) {
                                 _addToLayerWithHistory(
-                                  PolygonEntry.withDefaults(points: [point]),
+                                  PolygonEntry.withDefaults(
+                                    borderColor: currentColor,
+                                    points: [point],
+                                  ),
                                 );
                                 beginDrawing();
                               } else {
@@ -260,7 +278,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             {
                               if (finishedDrawing || currentLayer.isEmpty) {
                                 _addToLayerWithHistory(
-                                  PolylineEntry.withDefaults(points: [point]),
+                                  PolylineEntry.withDefaults(
+                                    color: currentColor,
+                                    points: [point],
+                                  ),
                                 );
                                 beginDrawing();
                               } else {
@@ -286,6 +307,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                               if (finishedDrawing || currentLayer.isEmpty) {
                                 _addToLayerWithHistory(
                                   CircleEntry.withDefaults(
+                                    borderColor: currentColor,
                                     center: point,
                                     radius: 0,
                                   ),
@@ -321,45 +343,78 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 15,
                           children: [
-                            Container(
-                              constraints: BoxConstraints(minHeight: 40),
-                              decoration: makeFloatingDecoration(context),
-                              padding: EdgeInsets.symmetric(horizontal: 15),
-                              child: Material(
-                                child: ToolbarButton(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => LayerSelector(
-                                        entryType: selectedType,
-                                        initialLayer: currentLayer,
-                                        onConfirm: (MapLayer selection) {
-                                          chosenLayers[selectedType] =
-                                              selection;
-                                        },
-                                      ),
-                                    );
-                                  },
-                                  spacing: 10,
-                                  children: [
-                                    Icon(Icons.layers_outlined),
-                                    ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        minWidth: 0,
-                                        maxWidth: 100,
-                                      ),
-                                      child: Text(
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        currentLayer.name,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                            Row(
+                              spacing: 10,
+                              children: [
+                                Container(
+                                  decoration: makeFloatingDecoration(context),
+                                  padding: EdgeInsets.all(2),
+                                  child: IconButton(
+                                    color: currentColor.onColor(),
+                                    style: IconButton.styleFrom(
+                                      iconSize: 18,
+                                      backgroundColor: currentColor,
+                                      fixedSize: Size.square(40),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadiusGeometry.circular(15),
                                       ),
                                     ),
-                                  ],
+                                    onPressed: () {
+                                      showSimpleColorPicker(
+                                        context: context,
+                                        initialColor: currentColor,
+                                      ).then((chosenColor) {
+                                        if (chosenColor != null) {
+                                          chosenColors[selectedType] =
+                                              chosenColor;
+                                        }
+                                      });
+                                    },
+                                    icon: Icon(Icons.colorize),
+                                  ),
                                 ),
-                              ),
+                                FloatingContainer(
+                                  child: Material(
+                                    child: ToolbarButton(
+                                      constraints: BoxConstraints.tightFor(
+                                        height: 42,
+                                      ),
+                                      onTap: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => LayerSelector(
+                                            entryType: selectedType,
+                                            initialLayer: currentLayer,
+                                            onConfirm: (MapLayer selection) {
+                                              chosenLayers[selectedType] =
+                                                  selection;
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      spacing: 10,
+                                      children: [
+                                        Icon(Icons.layers_outlined),
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            minWidth: 0,
+                                            maxWidth: 100,
+                                          ),
+                                          child: Text(
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            currentLayer.name,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             FloatingToolBar(
                               onCancel: () {

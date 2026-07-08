@@ -96,7 +96,7 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
               inputListState.layer = initialSelection;
               return;
             }
-            var match = standardNameRegex.firstMatch(value!.name);
+            var match = standardNameRegex.firstMatch(value.name);
             String? name = match?.group(1);
             if (match == null || name == null) {
               ScaffoldMessenger.of(context).showSnackBar(

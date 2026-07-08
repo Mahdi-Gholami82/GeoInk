@@ -5,8 +5,13 @@ import 'package:geoink/data/models/coordinates_sheet_data.dart';
 import 'package:geoink/data/providers/input_list_coordinates.dart';
 
 class InputListView extends ConsumerStatefulWidget {
-  const InputListView({super.key, required this.formGlobalKey});
+  const InputListView({
+    super.key,
+    required this.formGlobalKey,
+    required this.scrollController,
+  });
   final GlobalKey formGlobalKey;
+  final ScrollController scrollController;
 
   @override
   ConsumerState<InputListView> createState() => _InputListViewState();
@@ -65,6 +70,7 @@ class _InputListViewState extends ConsumerState<InputListView> {
     return Form(
       key: widget.formGlobalKey,
       child: ListView.builder(
+        controller: widget.scrollController,
         itemCount: inputs.length,
         itemBuilder: (context, index) {
           SheetListInput input = inputs[index];

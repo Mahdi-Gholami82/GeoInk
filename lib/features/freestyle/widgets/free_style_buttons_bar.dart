@@ -93,7 +93,6 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
           child: SafeArea(
             child: Center(
               child: FittedBox(
-                fit: BoxFit.scaleDown,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(

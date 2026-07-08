@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geoink/core/utils/standard_name_regex.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
@@ -35,13 +36,14 @@ class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text("Add a layer"),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FittedBox(
-            child: SegmentedButton<EntryType>(
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: AlertDialog(
+        title: Text("Add a layer"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SegmentedButton<EntryType>(
               showSelectedIcon: false,
               selected: {selectedType},
               segments: EntryType.values
@@ -53,43 +55,47 @@ class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
                 });
               },
             ),
-          ),
-          Form(
-            key: formKey,
-            child: TextFormField(
-              controller: controller,
-              onFieldSubmitted: (Text) {
-                validateAndPop();
-              },
-              validator: (value) {
-                if (value == null ||
-                    !RegExp(r"^[\p{Letter}\s]+$",unicode: true).hasMatch(value.trim())) {
-                  return "Invalid name";
-                } else if (mapLayerList.items.contains(
-                  MapLayer(name: value, entryType: selectedType),
-                )) {
-                  return "Duplicate name";
-                }
-                return null;
-              },
+            Form(
+              key: formKey,
+              child: TextFormField(
+                decoration: InputDecoration(hintText: "Name"),
+                controller: controller,
+                onFieldSubmitted: (Text) {
+                  validateAndPop();
+                },
+                validator: (value) {
+                  if (value == null) {
+                    return "Please enter a name";
+                  }
+                  RegExpMatch? match = standardNameRegex.firstMatch(value);
+                  String? name = match?.group(1);
+                  if (match == null || name == null) {
+                    return "Invalid name / Must be shorter than $maxCharInName";
+                  }
+                  if (mapLayerList.items.any((e) => e.name == name)) {
+                    return "Duplicate name";
+                  }
+                  return null;
+                },
+              ),
             ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              validateAndPop();
+            },
+            child: Text("ok"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("cancel"),
           ),
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            validateAndPop();
-          },
-          child: Text("ok"),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text("cancel"),
-        ),
-      ],
     );
   }
 }

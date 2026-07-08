@@ -120,7 +120,9 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     Function? onLenghtLimit,
   }) {
     var fields = state.fields;
-    if (!(fields.where((e) => e.type == SheetInputFieldType.coordinates).length >
+    if (!(fields
+            .where((e) => e.type == SheetInputFieldType.coordinates)
+            .length >
         InputListCoordinatesState.minNumberOfCoordinatesFields[state.type]!)) {
       if (onLenghtLimit != null) onLenghtLimit;
       return;
@@ -167,17 +169,15 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
 
   InputCoordinatesResult takeFinalResult() {
     final String name = state.name.trim();
-    MapLayer layer = state.layer ??
-          ref
-              .read(tileEntriesProvider)
-              .getDefaultLayerEntry(state.type);
+    MapLayer layer =
+        state.layer ??
+        ref.read(tileEntriesProvider).getDefaultLayerEntry(state.type);
     return InputCoordinatesResult(
       name: name.isNotEmpty ? name : null,
       coordinates: state.coordinates,
       color: state.color,
       radius: state.radius,
-      layer:
-          layer,
+      layer: layer,
     );
   }
 }

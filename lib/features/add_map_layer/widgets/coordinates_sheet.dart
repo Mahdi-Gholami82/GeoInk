@@ -88,6 +88,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                             fit: FlexFit.loose,
                             child: InputListView(
                               formGlobalKey: formGlobalKey,
+                              scrollController: widget.scrollController,
                             ),
                           ),
                         ],
@@ -122,7 +123,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                                   ),
                                 ),
                               ),
-                        
+
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(
@@ -145,7 +146,9 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                                 "Apply",
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
                                 ),
                               ),
                             ),

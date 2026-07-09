@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
-import 'package:geoink/data/inherited/inherited_map_controller.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/features/settings/page.dart';

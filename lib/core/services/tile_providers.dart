@@ -7,6 +7,7 @@ final networkTileProvider = NetworkTileProvider(httpClient: httpClient);
 
 TileLayer openStreetMapTileLayer = TileLayer(
   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  keepBuffer: 0,
   userAgentPackageName: "geoink",
   tileProvider: networkTileProvider,
 );

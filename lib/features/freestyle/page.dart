@@ -27,7 +27,6 @@ class FreeStylePage extends ConsumerStatefulWidget {
 }
 
 class _FreeStylePageState extends ConsumerState<FreeStylePage> {
-  late FreestyleArguments arguments;
   bool _isInitialized = false;
   late MapLayerList mapLayerList;
   late TileEntriesNotifier mapLayerListNotifier;
@@ -37,7 +36,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   var _focusNode = FocusNode();
   var _mousePosition = Offset.zero;
   late LatLng lastMouseClickPoint;
-  late MapCamera mapCamera;
+  late MapCamera homeMapCamera;
   MapLayer get currentLayer => chosenLayers[selectedType]!;
   late Map<EntryType, MapLayer> chosenLayers;
   late Map<MapLayer, int> oldLayerLenghts;
@@ -69,10 +68,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInitialized) {
-      arguments =
+      FreestyleArguments arguments =
           ModalRoute.of(context)!.settings.arguments as FreestyleArguments;
       selectedType = arguments.initSelectedType;
-      mapCamera = arguments.mapCamera;
+      homeMapCamera = arguments.mapCamera;
       _isInitialized = true;
     }
   }
@@ -128,7 +127,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   FlutterMapEntry get currentEntry => currentLayer.items.last;
 
   LatLng mousePositionToCoords(Offset mousePosition) =>
-      mapCamera.screenOffsetToLatLng(mousePosition);
+      homeMapCamera.screenOffsetToLatLng(mousePosition);
 
   void updateOnMousePosition(LatLng mouseCoords) {
     setState(() {
@@ -230,8 +229,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               children: [
                 FlutterMap(
                   options: MapOptions(
-                    initialZoom: mapCamera.zoom,
-                    initialCenter: mapCamera.center,
+                    initialZoom: homeMapCamera.zoom,
+                    initialCenter: homeMapCamera.center,
                     interactionOptions: InteractionOptions(
                       flags:
                           InteractiveFlag.all &

@@ -54,6 +54,7 @@ class _CustomDraggableSheetState extends State<CustomDraggableSheet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
       body: DraggableScrollableSheet(
         controller: controller,

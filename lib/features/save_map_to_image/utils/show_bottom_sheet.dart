@@ -4,6 +4,7 @@ import 'package:geoink/features/save_map_to_image/bottom_sheet.dart';
 
 Future showSaveToImageBottomSheet(BuildContext context) {
   return showModalBottomSheet(
+    useSafeArea: true,
     isDismissible: false,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,

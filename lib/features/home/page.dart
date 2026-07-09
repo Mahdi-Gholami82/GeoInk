@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/providers/history.dart';
+import 'package:geoink/data/providers/theme.dart';
 import 'package:geoink/features/settings/page.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/core/services/tile_providers.dart';
@@ -40,6 +41,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       drawer: MapDrawer(),
       extendBodyBehindAppBar: true,
+      resizeToAvoidBottomInset: false,
       appBar: FloatingAppBar(
         mapController: mapController,
         borderRadius: 16,
@@ -56,7 +58,12 @@ class _HomePageState extends ConsumerState<HomePage> {
             initialCenter: LatLng(51.5, -0.09),
             initialZoom: 5,
           ),
-          children: [openStreetMapTileLayer, ...mapChildren],
+          children: [
+            getOpenStreetMapTileLayer(
+              darkMode: ref.watch(themeProvider.notifier).isDark(context),
+            ),
+            ...mapChildren,
+          ],
         ),
       ),
     );

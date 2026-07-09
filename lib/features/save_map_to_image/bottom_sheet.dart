@@ -8,6 +8,7 @@ import 'package:geoink/core/services/tile_providers.dart';
 import 'package:geoink/core/ui/widgets/custom_sheet_drag_handle.dart';
 import 'package:geoink/core/utils/map_to_image.dart';
 import 'package:geoink/core/ui/widgets/load_error.dart';
+import 'package:geoink/data/providers/theme.dart';
 
 class SaveToImageButtomSheet extends ConsumerStatefulWidget {
   const SaveToImageButtomSheet({super.key, required this.scrollController});
@@ -33,7 +34,9 @@ class _SaveToImageButtomSheetState
   @override
   Widget build(BuildContext context) {
     imageFuture = mapToImage(
-      tileLayer: openStreetMapTileLayerWaitLoad,
+      tileLayer: getOpenStreetMapTileLayer(
+        darkMode: ref.read(themeProvider.notifier).isDark(context),
+      ),
       mapChildren: mapChildren,
     );
 
@@ -94,28 +97,30 @@ class _SaveToImageButtomSheetState
                   },
                 ),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  minimumSize: Size(110, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+              SafeArea(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    minimumSize: Size(110, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
-                ),
-                onPressed: () {
-                  if (mapImage != null) {
-                    FilePicker.platform
-                        .saveFile(bytes: mapImage, type: FileType.image)
-                        .then((_) {
-                          if (context.mounted) Navigator.of(context).pop();
-                        });
-                  }
-                },
-                child: Text(
-                  "Save",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                  onPressed: () {
+                    if (mapImage != null) {
+                      FilePicker.platform
+                          .saveFile(bytes: mapImage, type: FileType.image)
+                          .then((_) {
+                            if (context.mounted) Navigator.of(context).pop();
+                          });
+                    }
+                  },
+                  child: Text(
+                    "Save",
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                   ),
                 ),
               ),

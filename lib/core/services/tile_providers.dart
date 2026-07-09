@@ -5,16 +5,16 @@ import 'package:http/retry.dart';
 final httpClient = RetryClient(Client());
 final networkTileProvider = NetworkTileProvider(httpClient: httpClient);
 
-TileLayer openStreetMapTileLayer = TileLayer(
+TileLayer getOpenStreetMapTileLayer({
+  bool darkMode = false,
+  bool instantLoad = false,
+}) => TileLayer(
   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  tileBuilder: darkMode ? darkModeTileBuilder : null,
   keepBuffer: 0,
   userAgentPackageName: "com.example.geoink",
   tileProvider: networkTileProvider,
-);
-
-TileLayer openStreetMapTileLayerWaitLoad = TileLayer(
-  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-  userAgentPackageName: "com.example.geoink",
-  tileProvider: networkTileProvider,
-  tileDisplay: TileDisplay.instantaneous(),
+  tileDisplay: instantLoad
+      ? const TileDisplay.fadeIn()
+      : const TileDisplay.instantaneous(),
 );

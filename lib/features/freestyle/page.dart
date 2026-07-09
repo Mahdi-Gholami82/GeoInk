@@ -8,6 +8,7 @@ import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/models/freestyle_arguments.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/data/providers/theme.dart';
 import 'package:geoink/features/freestyle/widgets/floating_container.dart';
 import 'package:geoink/features/freestyle/widgets/floating_tool_bar.dart';
 import 'package:geoink/features/freestyle/widgets/free_style_buttons_bar.dart';
@@ -33,6 +34,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   late EntryType selectedType;
   bool finishedDrawing = true;
   bool finishedMouseTrackDraw = true;
+  bool addedTempPoint = false;
   var _focusNode = FocusNode();
   var _mousePosition = Offset.zero;
   late LatLng lastMouseClickPoint;
@@ -84,16 +86,21 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   void endDrawing() {
     finishedDrawing = true;
     finishedMouseTrackDraw = true;
+    addedTempPoint = false;
   }
 
   void confirmDrawing() {
-    switch (currentLayer.entryType) {
-      case EntryType.polygon:
-        (currentEntry as PolygonEntry).points.removeLast();
-      case EntryType.polyline:
-        (currentEntry as PolylineEntry).points.removeLast();
-      case EntryType.circle:
-      case EntryType.marker:
+    print(finishedDrawing);
+    print(finishedMouseTrackDraw);
+    if (addedTempPoint) {
+      switch (currentLayer.entryType) {
+        case EntryType.polygon:
+          (currentEntry as PolygonEntry).points.removeLast();
+        case EntryType.polyline:
+          (currentEntry as PolylineEntry).points.removeLast();
+        case EntryType.circle:
+        case EntryType.marker:
+      }
     }
     historyNotifier.restoreFromPoints();
     endDrawing();
@@ -141,6 +148,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               if (finishedMouseTrackDraw) {
                 polygon.points.add(mouseCoords);
                 finishedMouseTrackDraw = false;
+                addedTempPoint = true;
               } else {
                 polygon.points.last = mouseCoords;
               }
@@ -151,6 +159,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               if (finishedMouseTrackDraw) {
                 polyline.points.add(mouseCoords);
                 finishedMouseTrackDraw = false;
+                addedTempPoint = true;
               } else {
                 polyline.points.last = mouseCoords;
               }
@@ -328,7 +337,11 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                     },
                   ),
                   children: [
-                    openStreetMapTileLayer,
+                    getOpenStreetMapTileLayer(
+                      darkMode: ref
+                          .watch(themeProvider.notifier)
+                          .isDark(context),
+                    ),
                     ...mapLayerList.getMapChildren(),
                   ],
                 ),

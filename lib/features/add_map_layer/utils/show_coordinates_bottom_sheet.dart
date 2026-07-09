@@ -18,9 +18,9 @@ Future<InputCoordinatesResult?> showCoordinatesButtomSheet(
   inputListNotifier.initSheetListInput(initType: type);
   ref.watch(inputListCoordinatesProvider);
   return showModalBottomSheet<InputCoordinatesResult>(
-    useSafeArea: true,
     isDismissible: false,
     isScrollControlled: true,
+    useSafeArea: true,
     backgroundColor: Colors.transparent,
     context: context,
     builder: (context) => CustomDraggableSheet(

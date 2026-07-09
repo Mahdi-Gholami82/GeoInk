@@ -50,6 +50,7 @@ dependencies:
   pool: ^1.5.2
   flutter_map_math: ^0.2.4
   unique_list: ^1.0.1
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

@@ -5,6 +5,7 @@ import 'package:geoink/core/utils/map_colors.dart';
 import 'package:geoink/core/utils/show_color_picker.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
+import 'package:geoink/data/models/freestyle_arguments.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_tiles.dart';
 import 'package:geoink/features/freestyle/widgets/floating_container.dart';
@@ -26,6 +27,7 @@ class FreeStylePage extends ConsumerStatefulWidget {
 }
 
 class _FreeStylePageState extends ConsumerState<FreeStylePage> {
+  late FreestyleArguments arguments;
   bool _isInitialized = false;
   late MapLayerList mapLayerList;
   late TileEntriesNotifier mapLayerListNotifier;
@@ -35,7 +37,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   var _focusNode = FocusNode();
   var _mousePosition = Offset.zero;
   late LatLng lastMouseClickPoint;
-  var mapController = MapController();
+  late MapCamera mapCamera;
   MapLayer get currentLayer => chosenLayers[selectedType]!;
   late Map<EntryType, MapLayer> chosenLayers;
   late Map<MapLayer, int> oldLayerLenghts;
@@ -67,7 +69,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInitialized) {
-      selectedType = ModalRoute.of(context)!.settings.arguments as EntryType;
+      arguments =
+          ModalRoute.of(context)!.settings.arguments as FreestyleArguments;
+      selectedType = arguments.initSelectedType;
+      mapCamera = arguments.mapCamera;
       _isInitialized = true;
     }
   }
@@ -123,7 +128,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   FlutterMapEntry get currentEntry => currentLayer.items.last;
 
   LatLng mousePositionToCoords(Offset mousePosition) =>
-      mapController.camera.screenOffsetToLatLng(mousePosition);
+      mapCamera.screenOffsetToLatLng(mousePosition);
 
   void updateOnMousePosition(LatLng mouseCoords) {
     setState(() {
@@ -224,8 +229,9 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               clipBehavior: Clip.none,
               children: [
                 FlutterMap(
-                  mapController: mapController,
                   options: MapOptions(
+                    initialZoom: mapCamera.zoom,
+                    initialCenter: mapCamera.center,
                     interactionOptions: InteractionOptions(
                       flags:
                           InteractiveFlag.all &
@@ -321,8 +327,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                         }
                       });
                     },
-                    initialCenter: LatLng(51.5, -0.09),
-                    initialZoom: 5,
                   ),
                   children: [
                     openStreetMapTileLayer,

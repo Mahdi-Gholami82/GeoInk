@@ -55,8 +55,10 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                         file.readAsStringSync(),
                       );
                       List<LayerEntryMap> layerEntryMaps = tileEntriesNotifier
-                          .fromGeoJSONFeatureCollection(featureCollection); 
-                      ref.read(historyProvider.notifier).actionListAddAllToAllLayer(layerEntryMaps);
+                          .fromGeoJSONFeatureCollection(featureCollection);
+                      ref
+                          .read(historyProvider.notifier)
+                          .actionListAddAllToAllLayer(layerEntryMaps);
                     } on Exception {
                       // TODO: message to user
                     }

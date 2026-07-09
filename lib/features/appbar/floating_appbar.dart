@@ -1,5 +1,7 @@
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geoink/core/ui/floating_shadow.dart';
 import 'package:flutter/material.dart';
+import 'package:geoink/data/inherited/inherited_map_controller.dart';
 import 'package:geoink/features/appbar/widgets/free_style_dropdown_menu.dart';
 import 'package:geoink/features/appbar/widgets/map_dropdown_menu.dart';
 
@@ -9,6 +11,7 @@ class FloatingAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final double borderRadius;
   final double height;
+  final MapController mapController;
   const FloatingAppBar({
     super.key,
     required this.drawer,
@@ -16,6 +19,7 @@ class FloatingAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.borderRadius = 6,
     this.height = 50,
+    required this.mapController,
   });
 
   @override
@@ -85,21 +89,24 @@ class _FloatingAppBarState extends State<FloatingAppBar> {
                     boxShadow: [FloatingShadow()],
                   ),
                   child: Material(
-                    child: Row(
-                      spacing: 3,
-                      children: [
-                        MapDropdownMenu(),
-                        FreeStyleDropdownMenu(),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: IconButton(
-                            onPressed: () {
-                              widget.onTapSettings();
-                            },
-                            icon: Icon(Icons.settings),
+                    child: InheritedMapController(
+                      mapController: widget.mapController,
+                      child: Row(
+                        spacing: 3,
+                        children: [
+                          MapDropdownMenu(),
+                          FreeStyleDropdownMenu(),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: IconButton(
+                              onPressed: () {
+                                widget.onTapSettings();
+                              },
+                              icon: Icon(Icons.settings),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

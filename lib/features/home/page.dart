@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
+import 'package:geoink/data/inherited/inherited_map_controller.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/features/settings/page.dart';
@@ -22,6 +23,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   late DoableHistory history;
+  final MapController mapController = MapController();
 
   @override
   void initState() {
@@ -40,6 +42,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       drawer: MapDrawer(),
       extendBodyBehindAppBar: true,
       appBar: FloatingAppBar(
+        mapController: mapController,
         borderRadius: 16,
         drawer: MapDrawer(),
         onTapSettings: () {
@@ -49,6 +52,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       floatingActionButton: AddMapElementFab(),
       body: BaseShortcuts(
         child: FlutterMap(
+          mapController: mapController,
           options: const MapOptions(
             initialCenter: LatLng(51.5, -0.09),
             initialZoom: 5,

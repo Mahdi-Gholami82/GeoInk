@@ -1,4 +1,7 @@
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geoink/data/inherited/inherited_map_controller.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
+import 'package:geoink/data/models/freestyle_arguments.dart';
 import 'package:geoink/features/freestyle/page.dart';
 import 'package:flutter/material.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';
@@ -28,18 +31,30 @@ class _FreeStyleDropdownMenuState extends State<FreeStyleDropdownMenu> {
               MenuItemButton(
                 leadingIcon: Icon(MapIcons.marker),
                 onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).pushNamed(FreeStylePage.route, arguments: EntryType.marker);
+                  Navigator.of(context).pushNamed(
+                    FreeStylePage.route,
+                    arguments: FreestyleArguments(
+                      initSelectedType: EntryType.marker,
+                      mapCamera: InheritedMapController.of(
+                        context,
+                      ).mapController.camera,
+                    ),
+                  );
                 },
                 child: Text(EntryType.marker.name),
               ),
               MenuItemButton(
                 leadingIcon: Icon(MapIcons.circle),
                 onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).pushNamed(FreeStylePage.route, arguments: EntryType.circle);
+                  Navigator.of(context).pushNamed(
+                    FreeStylePage.route,
+                    arguments: FreestyleArguments(
+                      initSelectedType: EntryType.circle,
+                      mapCamera: InheritedMapController.of(
+                        context,
+                      ).mapController.camera,
+                    ),
+                  );
                 },
                 child: Text(EntryType.circle.name),
               ),
@@ -48,7 +63,12 @@ class _FreeStyleDropdownMenuState extends State<FreeStyleDropdownMenu> {
                 onPressed: () {
                   Navigator.of(context).pushNamed(
                     FreeStylePage.route,
-                    arguments: EntryType.polygon,
+                    arguments: FreestyleArguments(
+                      initSelectedType: EntryType.polygon,
+                      mapCamera: InheritedMapController.of(
+                        context,
+                      ).mapController.camera,
+                    ),
                   );
                 },
                 child: Text(EntryType.polygon.name),
@@ -58,7 +78,12 @@ class _FreeStyleDropdownMenuState extends State<FreeStyleDropdownMenu> {
                 onPressed: () {
                   Navigator.of(context).pushNamed(
                     FreeStylePage.route,
-                    arguments: EntryType.polyline,
+                    arguments: FreestyleArguments(
+                      initSelectedType: EntryType.polyline,
+                      mapCamera: InheritedMapController.of(
+                        context,
+                      ).mapController.camera,
+                    ),
                   );
                 },
                 child: Text(EntryType.polyline.name),

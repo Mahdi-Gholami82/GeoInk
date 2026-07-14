@@ -1,9 +1,11 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geoink/core/utils/show_simple_snackbar.dart';
 import 'package:geoink/core/utils/standard_name_regex.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/input_list_coordinates.dart';
-import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/data/providers/map_layer_list.dart';
 
 class MapLayerPicker extends ConsumerStatefulWidget {
   const MapLayerPicker({super.key, required this.entryType});
@@ -16,12 +18,12 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
   late TextEditingController controller;
   late InputListCoordinatesNotifier inputListCoordinatesNotifier;
   late InputListCoordinatesState inputListState;
-  late MapLayer initialSelection;
+  late MapLayer? initialSelection;
   late List<MapLayer> layers;
   late int filteredEntryLenght;
 
-  List<DropdownMenuEntry<MapLayer>> filterCallback(
-    List<DropdownMenuEntry<MapLayer>> entries,
+  List<DropdownMenuEntry<MapLayer?>> filterCallback(
+    List<DropdownMenuEntry<MapLayer?>> entries,
     String filter,
   ) {
     final String trimmedFilter = filter.trim().toLowerCase();
@@ -29,9 +31,9 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
       return entries;
     }
 
-    List<DropdownMenuEntry<MapLayer>> filtered = entries
+    List<DropdownMenuEntry<MapLayer?>> filtered = entries
         .where(
-          (DropdownMenuEntry<MapLayer> entry) =>
+          (DropdownMenuEntry<MapLayer?> entry) =>
               entry.label.toLowerCase().contains(trimmedFilter),
         )
         .toList();
@@ -67,9 +69,9 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
     controller = TextEditingController();
     controller.addListener(_handleTextChange);
     inputListState = ref.read(inputListCoordinatesProvider);
-    layers = ref.read(tileEntriesProvider).items;
-    initialSelection = layers.firstWhere(
-      (e) => e.isDefault && e.entryType == widget.entryType,
+    layers = ref.read(mapLayerListProvider).items;
+    initialSelection = layers.firstWhereOrNull(
+      (e) => e.isMain && e.entryType == widget.entryType,
     );
     filteredEntryLenght = layers.length;
   }
@@ -90,7 +92,7 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
         DropdownMenu(
           filterCallback: filterCallback,
           width: 180,
-          hintText: initialSelection.name,
+          hintText: initialSelection?.name ?? widget.entryType.mainLayerName,
           onSelected: (value) {
             if (value == null) {
               inputListState.layer = initialSelection;
@@ -99,12 +101,9 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
             var match = standardNameRegex.firstMatch(value.name);
             String? name = match?.group(1);
             if (match == null || name == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "Invalid name / Must be shorter than $maxCharInName",
-                  ),
-                ),
+              showSimpleSnackBar(
+                context,
+                message: "Invalid name / Must be shorter than $maxCharInName",
               );
               return;
             }
@@ -112,10 +111,17 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
           },
           controller: controller,
           enableFilter: true,
-          dropdownMenuEntries: layers
-              .where((e) => e.entryType == widget.entryType)
-              .map((e) => DropdownMenuEntry(value: e, label: e.name))
-              .toList(),
+          dropdownMenuEntries: [
+            if (initialSelection == null)
+              DropdownMenuEntry(
+                value: null,
+                label: widget.entryType.mainLayerName,
+              ),
+            ...layers
+                .where((e) => e.entryType == widget.entryType)
+                .map((e) => DropdownMenuEntry(value: e, label: e.name))
+                .toList(),
+          ],
         ),
         Text(
           "Layer",

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,7 +28,7 @@ class _SaveToImageButtomSheetState
   @override
   void initState() {
     super.initState();
-    mapChildren = ref.read(tileEntriesProvider).getMapChildren().toList();
+    mapChildren = ref.read(mapLayerListProvider).getMapChildren().toList();
   }
 
   @override

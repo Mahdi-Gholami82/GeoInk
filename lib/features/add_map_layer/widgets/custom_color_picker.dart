@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geoink/core/utils/color_tools.dart';
-import 'package:geoink/core/utils/show_color_picker.dart';
+import 'package:geoink/core/ui/show_color_picker.dart';
 
 class CustomColorPicker extends StatefulWidget {
   const CustomColorPicker({

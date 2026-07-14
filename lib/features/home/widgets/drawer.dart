@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
-import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/home/widgets/new_layer_dialogue.dart';
 
 class MapDrawer extends ConsumerStatefulWidget {
@@ -14,7 +14,7 @@ class MapDrawer extends ConsumerStatefulWidget {
 }
 
 class _MapDrawerState extends ConsumerState<MapDrawer> {
-  late TileEntriesNotifier tileEntriesNotifier;
+  late MapLayerListNotifier tileEntriesNotifier;
   late List<MapLayer> layers;
   Map<MapLayer, ExpansibleController> controllers = {};
 
@@ -33,14 +33,14 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
 
   @override
   void initState() {
-    tileEntriesNotifier = ref.read(tileEntriesProvider.notifier);
+    tileEntriesNotifier = ref.read(mapLayerListProvider.notifier);
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    for (var layer in ref.read(tileEntriesProvider).items) {
+    for (var layer in ref.read(mapLayerListProvider).items) {
       if (!controllers.containsKey(layer)) {
         controllers[layer] = ExpansibleController();
       }
@@ -51,9 +51,9 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     layers = ref
-        .watch(tileEntriesProvider)
+        .watch(mapLayerListProvider)
         .items
-        .where((element) => !(element.isDefault && element.isEmpty))
+        // .where((element) => !(element.isMain && element.isEmpty))
         .toList();
     ref.watch(historyProvider);
     HistoryNotifier historyNotifier = ref.read(historyProvider.notifier);

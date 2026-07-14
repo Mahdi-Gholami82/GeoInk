@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:geoink/core/theme/theme.dart';
 import 'package:geoink/data/models/prefs_state.dart';
+import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/features/freestyle/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +18,7 @@ final httpClient = RetryClient(Client());
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PrefsState.init();
+  await PrefsState.instance.clear();
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = WindowOptions(
@@ -46,6 +48,7 @@ class GeoInkApp extends ConsumerStatefulWidget {
 class _GeoInkAppState extends ConsumerState<GeoInkApp> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(projectProvider);
     return MaterialApp(
       home: HomePage(),
       darkTheme: darkMode,

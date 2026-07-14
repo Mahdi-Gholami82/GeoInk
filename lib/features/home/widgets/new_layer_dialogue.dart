@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/utils/standard_name_regex.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
-import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/data/providers/map_layer_list.dart';
 
 class NewLayerDialogue extends ConsumerStatefulWidget {
   @override
@@ -19,7 +19,7 @@ class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
   @override
   void initState() {
     super.initState();
-    mapLayerList = ref.read(tileEntriesProvider);
+    mapLayerList = ref.read(mapLayerListProvider);
   }
 
   void validateAndPop() {

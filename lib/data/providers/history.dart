@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/models/map_actions.dart';
-import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history.g.dart';
 
-extension <T> on List<T> {
+extension<T> on List<T> {
   void swapByIndex(int oldIndex, int newIndex) {
     this.insert(newIndex, this.removeAt(oldIndex));
   }
-} 
+}
 
 @Riverpod(keepAlive: true)
 class HistoryNotifier extends _$HistoryNotifier {
@@ -21,7 +21,7 @@ class HistoryNotifier extends _$HistoryNotifier {
     return MapHistory();
   }
 
-  MapLayerList get _mapLayerList => ref.read(tileEntriesProvider);
+  MapLayerList get _mapLayerList => ref.read(mapLayerListProvider);
 
   void setRestorePoint() {
     state.setRestorePoint();
@@ -104,11 +104,16 @@ class HistoryNotifier extends _$HistoryNotifier {
   }
 
   void actionAddPointToPolyline(PolylineEntry polyline, LatLng point) {
-    addAndDo(ManualDoable(executeBase: () {
-      polyline.points.add(point);
-    }, undoBase: () {
-      polyline.points.removeLast();
-    }));
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          polyline.points.add(point);
+        },
+        undoBase: () {
+          polyline.points.removeLast();
+        },
+      ),
+    );
   }
 
   void actionAddAllToLayer(
@@ -208,69 +213,104 @@ class HistoryNotifier extends _$HistoryNotifier {
     );
   }
 
-  void actionReorderEntry(MapLayer layer,int oldIndex, int newIndex) {
-    addAndDo(ManualDoable(executeBase: () {
-      layer.items.swapByIndex(oldIndex, newIndex);
-    }, undoBase: () {
-      layer.items.swapByIndex(newIndex, oldIndex);
-    }));
+  void actionReorderEntry(MapLayer layer, int oldIndex, int newIndex) {
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          layer.items.swapByIndex(oldIndex, newIndex);
+        },
+        undoBase: () {
+          layer.items.swapByIndex(newIndex, oldIndex);
+        },
+      ),
+    );
   }
 
   void actionToggleEntryVisibility(FlutterMapEntry entry) {
-    addAndDo(ManualDoable(executeBase: entry.toggleVisiblity, undoBase: entry.toggleVisiblity));
+    addAndDo(
+      ManualDoable(
+        executeBase: entry.toggleVisiblity,
+        undoBase: entry.toggleVisiblity,
+      ),
+    );
   }
 
   void actionRemoveLayer(MapLayer layer) {
     MapLayer? data;
-    addAndDo(ManualDoable(executeBase: () {
-      data = layer;
-      _mapLayerList.items.remove(layer);
-    }, undoBase: () {
-      _mapLayerList.items.add(data!);
-    }));
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          data = layer;
+          _mapLayerList.items.remove(layer);
+        },
+        undoBase: () {
+          _mapLayerList.items.add(data!);
+        },
+      ),
+    );
   }
 
-  void actionRemoveEntryFromLayer(FlutterMapEntry entry,MapLayer layer) {
+  void actionRemoveEntryFromLayer(FlutterMapEntry entry, MapLayer layer) {
     FlutterMapEntry? data;
     int? index;
-    addAndDo(ManualDoable(executeBase: () {
-      data = entry;
-      index = layer.items.indexOf(entry);
-      layer.items.removeAt(index!);
-    }, undoBase: () {
-      layer.items.insert(index!,data!);
-    }));
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          data = entry;
+          index = layer.items.indexOf(entry);
+          layer.items.removeAt(index!);
+        },
+        undoBase: () {
+          layer.items.insert(index!, data!);
+        },
+      ),
+    );
   }
 
-  void actionMoveEntryToBottom(FlutterMapEntry entry,MapLayer layer) {
+  void actionMoveEntryToBottom(FlutterMapEntry entry, MapLayer layer) {
     int? index;
-    addAndDo(ManualDoable(executeBase: () {
-      index = layer.items.indexOf(entry);
-      layer.items.removeAt(index!);
-      layer.items.add(entry);
-    }, undoBase: () {
-      layer.items.insert(index!, layer.items.removeLast());
-    }));
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          index = layer.items.indexOf(entry);
+          layer.items.removeAt(index!);
+          layer.items.add(entry);
+        },
+        undoBase: () {
+          layer.items.insert(index!, layer.items.removeLast());
+        },
+      ),
+    );
   }
 
-  void actionMoveEntryToTop(FlutterMapEntry entry,MapLayer layer) {
+  void actionMoveEntryToTop(FlutterMapEntry entry, MapLayer layer) {
     int? index;
-    addAndDo(ManualDoable(executeBase: () {
-      index = layer.items.indexOf(entry);
-      layer.items.removeAt(index!);
-      layer.items.insert(0, entry);
-    }, undoBase: () {
-      layer.items.insert(index!, layer.items.removeAt(0));
-    }));
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          index = layer.items.indexOf(entry);
+          layer.items.removeAt(index!);
+          layer.items.insert(0, entry);
+        },
+        undoBase: () {
+          layer.items.insert(index!, layer.items.removeAt(0));
+        },
+      ),
+    );
   }
 
   void actionAddLayer(MapLayer layer) {
-    addAndDo(ManualDoable(executeBase: () {
-      _mapLayerList.items.add(layer);
-    }, undoBase: () {
-      _mapLayerList.items.removeLast();
-    }));
-  } 
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          _mapLayerList.items.add(layer);
+        },
+        undoBase: () {
+          _mapLayerList.items.removeLast();
+        },
+      ),
+    );
+  }
 
   void restoreFromPoints() {
     state.restore();

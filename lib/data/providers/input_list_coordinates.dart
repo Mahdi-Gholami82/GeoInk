@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geoink/core/utils/map_colors.dart';
 import 'package:geoink/data/models/coordinates_sheet_data.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'input_list_coordinates.g.dart';
@@ -171,7 +171,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     final String name = state.name.trim();
     MapLayer layer =
         state.layer ??
-        ref.read(tileEntriesProvider).getDefaultLayerEntry(state.type);
+        ref.read(mapLayerListProvider).getDefaultLayerEntry(state.type);
     return InputCoordinatesResult(
       name: name.isNotEmpty ? name : null,
       coordinates: state.coordinates,

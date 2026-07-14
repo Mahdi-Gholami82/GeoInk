@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/add_map_layer/utils/show_coordinates_bottom_sheet.dart';
 
 class AddMapElementFab extends ConsumerWidget {
@@ -10,8 +10,8 @@ class AddMapElementFab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    TileEntriesNotifier tileEntriesNotifier = ref.read(
-      tileEntriesProvider.notifier,
+    MapLayerListNotifier tileEntriesNotifier = ref.read(
+      mapLayerListProvider.notifier,
     );
 
     return SpeedDial(

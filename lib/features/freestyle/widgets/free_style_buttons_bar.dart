@@ -99,7 +99,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(15),
                       boxShadow: [FloatingShadow()],
                     ),
                     child: Row(

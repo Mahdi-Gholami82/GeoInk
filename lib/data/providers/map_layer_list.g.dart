@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'map_tiles.dart';
+part of 'map_layer_list.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,28 +9,28 @@ part of 'map_tiles.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(TileEntriesNotifier)
-const tileEntriesProvider = TileEntriesNotifierProvider._();
+@ProviderFor(MapLayerListNotifier)
+const mapLayerListProvider = MapLayerListNotifierProvider._();
 
-final class TileEntriesNotifierProvider
-    extends $NotifierProvider<TileEntriesNotifier, MapLayerList> {
-  const TileEntriesNotifierProvider._()
+final class MapLayerListNotifierProvider
+    extends $NotifierProvider<MapLayerListNotifier, MapLayerList> {
+  const MapLayerListNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'tileEntriesProvider',
+        name: r'mapLayerListProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$tileEntriesNotifierHash();
+  String debugGetCreateSourceHash() => _$mapLayerListNotifierHash();
 
   @$internal
   @override
-  TileEntriesNotifier create() => TileEntriesNotifier();
+  MapLayerListNotifier create() => MapLayerListNotifier();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(MapLayerList value) {
@@ -41,10 +41,10 @@ final class TileEntriesNotifierProvider
   }
 }
 
-String _$tileEntriesNotifierHash() =>
-    r'49fe27065df5760e17e6492ac79609a82f747f2a';
+String _$mapLayerListNotifierHash() =>
+    r'492027e95206dda9d139594dd9f7977c83607546';
 
-abstract class _$TileEntriesNotifier extends $Notifier<MapLayerList> {
+abstract class _$MapLayerListNotifier extends $Notifier<MapLayerList> {
   MapLayerList build();
   @$mustCallSuper
   @override

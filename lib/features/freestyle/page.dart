@@ -2,12 +2,12 @@ import 'package:geoink/core/services/tile_providers.dart';
 import 'package:geoink/core/ui/floating_decoration.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
 import 'package:geoink/core/utils/map_colors.dart';
-import 'package:geoink/core/utils/show_color_picker.dart';
+import 'package:geoink/core/ui/show_color_picker.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/models/freestyle_arguments.dart';
 import 'package:geoink/data/providers/history.dart';
-import 'package:geoink/data/providers/map_tiles.dart';
+import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/data/providers/theme.dart';
 import 'package:geoink/features/freestyle/widgets/floating_container.dart';
 import 'package:geoink/features/freestyle/widgets/floating_tool_bar.dart';
@@ -30,7 +30,7 @@ class FreeStylePage extends ConsumerStatefulWidget {
 class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   bool _isInitialized = false;
   late MapLayerList mapLayerList;
-  late TileEntriesNotifier mapLayerListNotifier;
+  late MapLayerListNotifier mapLayerListNotifier;
   late EntryType selectedType;
   bool finishedDrawing = true;
   bool finishedMouseTrackDraw = true;
@@ -39,23 +39,29 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   var _mousePosition = Offset.zero;
   late LatLng lastMouseClickPoint;
   late MapCamera homeMapCamera;
-  MapLayer get currentLayer => chosenLayers[selectedType]!;
-  late Map<EntryType, MapLayer> chosenLayers;
+  MapLayer? get currentLayer => chosenLayers[selectedType];
+  set currentLayer(MapLayer? newLayer) {
+    chosenLayers[selectedType] = newLayer;
+  }
+
+  late Map<EntryType, MapLayer?> chosenLayers;
   late Map<MapLayer, int> oldLayerLenghts;
   late HistoryNotifier historyNotifier;
   Map<EntryType, Color> chosenColors = Map.fromEntries(
     EntryType.values.map((e) => MapEntry(e, MapDefaultColors.fromType(e))),
   );
   Color get currentColor => chosenColors[selectedType]!;
+  bool get canAddNewFlutterMapEntry =>
+      finishedDrawing || currentLayer == null || currentLayer!.isEmpty;
 
   @override
   void initState() {
     super.initState();
-    mapLayerList = ref.read(tileEntriesProvider);
-    mapLayerListNotifier = ref.read(tileEntriesProvider.notifier);
+    mapLayerList = ref.read(mapLayerListProvider);
+    mapLayerListNotifier = ref.read(mapLayerListProvider.notifier);
     chosenLayers = Map.fromEntries(
       EntryType.values.map(
-        (e) => MapEntry(e, mapLayerList.getDefaultLayerEntry(e)),
+        (e) => MapEntry(e, mapLayerList.getDefaultLayerEntryOrNull(e)),
       ),
     );
     oldLayerLenghts = Map.fromEntries(
@@ -90,10 +96,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   }
 
   void confirmDrawing() {
-    print(finishedDrawing);
-    print(finishedMouseTrackDraw);
     if (addedTempPoint) {
-      switch (currentLayer.entryType) {
+      switch (currentLayer!.entryType) {
         case EntryType.polygon:
           (currentEntry as PolygonEntry).points.removeLast();
         case EntryType.polyline:
@@ -107,16 +111,26 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   }
 
   void cancelDrawing() {
-    currentLayer.items.removeLast();
+    historyNotifier.restoreFromPoints();
+    historyNotifier.undo();
     endDrawing();
   }
 
   void _addToLayerWithHistory(FlutterMapEntry entry) {
-    var layer = currentLayer;
+    bool createdLayer = false;
+
+    MapLayer? layer = currentLayer;
+    EntryType type = selectedType;
     historyNotifier.addAndDo(
       ManualDoable(
         executeBase: () {
-          layer.addUnique(entry);
+          // if no layer is selected or layer is invalid (deleted) default to main layer
+          if (layer == null || layer!.isInvalid) {
+            currentLayer = mapLayerList.getDefaultLayerEntry(type);
+            layer = currentLayer;
+            createdLayer = true;
+          }
+          layer!.addUnique(entry);
         },
         undoBase: () {
           // If undo has reached a point when the shape isnt being drawn anymore
@@ -125,21 +139,31 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
             historyNotifier.setClearRedoAfterRedo();
             endDrawing();
           }
-          layer.items.removeLast();
+          if (createdLayer) {
+            mapLayerList.items.remove(layer);
+            if (currentLayer != null && currentLayer!.isMain) {
+              currentLayer = null;
+            }
+            // Mark invalid to notify other entries on redo
+            layer!.isInvalid = true;
+            layer = null;
+          } else {
+            layer!.items.removeLast();
+          }
         },
       ),
     );
   }
 
-  FlutterMapEntry get currentEntry => currentLayer.items.last;
+  FlutterMapEntry get currentEntry => currentLayer!.items.last;
 
   LatLng mousePositionToCoords(Offset mousePosition) =>
       homeMapCamera.screenOffsetToLatLng(mousePosition);
 
   void updateOnMousePosition(LatLng mouseCoords) {
     setState(() {
-      if (!currentLayer.isEmpty) {
-        switch (currentLayer.entryType) {
+      if (!currentLayer!.isEmpty) {
+        switch (currentLayer!.entryType) {
           case EntryType.marker:
             break;
           case EntryType.polygon:
@@ -262,7 +286,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             }
                           case EntryType.polygon:
                             {
-                              if (finishedDrawing || currentLayer.isEmpty) {
+                              if (canAddNewFlutterMapEntry) {
                                 _addToLayerWithHistory(
                                   PolygonEntry.withDefaults(
                                     borderColor: currentColor,
@@ -272,7 +296,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                 beginDrawing();
                               } else {
                                 var polygon =
-                                    (currentLayer.items.last as PolygonEntry);
+                                    (currentLayer!.items.last as PolygonEntry);
                                 historyNotifier.addAndDo(
                                   ManualDoable(
                                     executeBase: () {
@@ -290,7 +314,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             }
                           case EntryType.polyline:
                             {
-                              if (finishedDrawing || currentLayer.isEmpty) {
+                              if (canAddNewFlutterMapEntry) {
                                 _addToLayerWithHistory(
                                   PolylineEntry.withDefaults(
                                     color: currentColor,
@@ -300,7 +324,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                 beginDrawing();
                               } else {
                                 var polyline =
-                                    (currentLayer.items.last as PolylineEntry);
+                                    (currentLayer!.items.last as PolylineEntry);
                                 historyNotifier.addAndDo(
                                   ManualDoable(
                                     executeBase: () {
@@ -318,7 +342,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             }
                           case EntryType.circle:
                             {
-                              if (finishedDrawing || currentLayer.isEmpty) {
+                              if (canAddNewFlutterMapEntry) {
                                 _addToLayerWithHistory(
                                   CircleEntry.withDefaults(
                                     borderColor: currentColor,
@@ -402,9 +426,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                           builder: (context) => LayerSelector(
                                             entryType: selectedType,
                                             initialLayer: currentLayer,
-                                            onConfirm: (MapLayer selection) {
-                                              chosenLayers[selectedType] =
-                                                  selection;
+                                            onConfirm: (MapLayer? selection) {
+                                              currentLayer = selection;
                                             },
                                           ),
                                         );
@@ -420,7 +443,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                           child: Text(
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            currentLayer.name,
+                                            currentLayer?.name ??
+                                                selectedType.mainLayerName,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                             ),

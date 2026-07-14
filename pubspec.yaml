@@ -51,7 +51,7 @@ dependencies:
   flutter_map_math: ^0.2.4
   unique_list: ^1.0.1
   shared_preferences: ^2.5.5
-
+  auto_size_text: ^3.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,9 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geoink/core/utils/unique_name_in_list.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/core/utils/map_colors.dart';
@@ -12,7 +11,7 @@ import 'package:uuid/uuid.dart';
 
 const uuid = Uuid();
 
-typedef LayerEntryMap = Map<MapLayer,List<FlutterMapEntry>>;
+typedef LayerEntryMap = Map<MapLayer, List<FlutterMapEntry>>;
 
 /// Data models to keep track of map features or layers.
 
@@ -25,7 +24,7 @@ abstract class FlutterMapEntry {
   /// will be overridden in each entry subclass.
   get flutterMapFeature;
   GeoJSONGeometry get geoJasonObject;
-  GeoJSONFeature toGeoJsonFeature(String layerName, String layerId);
+  GeoJSONFeature toGeoJsonFeature(String layerName);
 
   void toggleVisiblity() {
     visible = !visible;
@@ -39,7 +38,9 @@ abstract class FlutterMapEntry {
 
   @override
   bool operator ==(Object other) {
-    return other is FlutterMapEntry ? this.name.trim() == other.name.trim()  : super == other; 
+    return other is FlutterMapEntry
+        ? this.name.trim() == other.name.trim()
+        : super == other;
   }
 }
 
@@ -71,7 +72,10 @@ class MarkerEntry extends FlutterMapEntry {
     point: point,
     width: 64,
     height: 64,
-    child: Align(alignment: AlignmentGeometry.topCenter,child: Icon(Icons.location_pin, size: 40, color: color)),
+    child: Align(
+      alignment: AlignmentGeometry.topCenter,
+      child: Icon(Icons.location_pin, size: 40, color: color),
+    ),
   );
 
   @override
@@ -79,18 +83,16 @@ class MarkerEntry extends FlutterMapEntry {
       GeoJSONPoint([point.longitude, point.latitude]);
 
   @override
-  GeoJSONFeature toGeoJsonFeature(String layerName, String layerId) =>
-      GeoJSONFeature(
-        geoJasonObject,
-        properties: {
-          "name": name,
-          "color": color.toHexString(),
-          "visible": visible,
-          "layer-id": layerId,
-          "layer-name": layerName,
-          "description": description,
-        },
-      );
+  GeoJSONFeature toGeoJsonFeature(String layerName) => GeoJSONFeature(
+    geoJasonObject,
+    properties: {
+      "name": name,
+      "color": color.toHexString(),
+      "visible": visible,
+      "layer-name": layerName,
+      "description": description,
+    },
+  );
 
   @override
   String toString() {
@@ -138,7 +140,7 @@ class PolygonEntry extends FlutterMapEntry {
     borderColor: borderColor,
     borderStrokeWidth: borderWidth,
     color: fillColor,
-    hitValue: HitReference(this)
+    hitValue: HitReference(this),
   );
 
   @override
@@ -149,20 +151,18 @@ class PolygonEntry extends FlutterMapEntry {
   }
 
   @override
-  GeoJSONFeature toGeoJsonFeature(String layerName, String layerId) =>
-      GeoJSONFeature(
-        geoJasonObject,
-        properties: {
-          "name": name,
-          "fill": fillColor.toHexString(),
-          "stroke": borderColor.toHexString(),
-          "stroke-width": borderWidth,
-          "visible": visible,
-          "layer-id": layerId,
-          "layer-name": layerName,
-          "description": description,
-        },
-      );
+  GeoJSONFeature toGeoJsonFeature(String layerName) => GeoJSONFeature(
+    geoJasonObject,
+    properties: {
+      "name": name,
+      "fill": fillColor.toHexString(),
+      "stroke": borderColor.toHexString(),
+      "stroke-width": borderWidth,
+      "visible": visible,
+      "layer-name": layerName,
+      "description": description,
+    },
+  );
 
   @override
   String toString() {
@@ -198,28 +198,29 @@ class PolylineEntry extends FlutterMapEntry {
 
   /// Generates a [Polyline] from a [PolylineEntry] to be used in a [PolylineLayer].
   @override
-  Polyline get flutterMapFeature =>
-      Polyline(points: points, strokeWidth: strokeWidth, color: color,hitValue: HitReference(this));
-
-  @override
-  GeoJSONLineString get geoJasonObject => GeoJSONLineString(
-    points.map((p) => [p.longitude, p.latitude]).toList(),
+  Polyline get flutterMapFeature => Polyline(
+    points: points,
+    strokeWidth: strokeWidth,
+    color: color,
+    hitValue: HitReference(this),
   );
 
   @override
-  GeoJSONFeature toGeoJsonFeature(String layerName, String layerId) =>
-      GeoJSONFeature(
-        geoJasonObject,
-        properties: {
-          "name": name,
-          "stroke": color.toHexString(),
-          "stroke-width": strokeWidth,
-          "visible": visible,
-          "layer-id": layerId,
-          "layer-name": layerName,
-          "description": description,
-        },
-      );
+  GeoJSONLineString get geoJasonObject =>
+      GeoJSONLineString(points.map((p) => [p.longitude, p.latitude]).toList());
+
+  @override
+  GeoJSONFeature toGeoJsonFeature(String layerName) => GeoJSONFeature(
+    geoJasonObject,
+    properties: {
+      "name": name,
+      "stroke": color.toHexString(),
+      "stroke-width": strokeWidth,
+      "visible": visible,
+      "layer-name": layerName,
+      "description": description,
+    },
+  );
 
   @override
   String toString() {
@@ -270,7 +271,7 @@ class CircleEntry extends FlutterMapEntry {
     borderColor: borderColor,
     borderStrokeWidth: borderWidth,
     color: fillColor.withAlpha(128),
-    hitValue: HitReference(this)
+    hitValue: HitReference(this),
   );
 
   @override
@@ -278,22 +279,20 @@ class CircleEntry extends FlutterMapEntry {
       GeoJSONPoint([center.longitude, center.latitude]);
 
   @override
-  GeoJSONFeature toGeoJsonFeature(String layerName, String layerId) =>
-      GeoJSONFeature(
-        geoJasonObject,
-        properties: {
-          "name": name,
-          "radius": radius,
-          "fill": fillColor.toHexString(),
-          "stroke": borderColor.toHexString(),
-          "stroke-width": borderWidth,
-          "visible": visible,
-          "layer-id": layerId,
-          "layer-name": layerName,
-          "description": description,
-          "subtype": "circle",
-        },
-      );
+  GeoJSONFeature toGeoJsonFeature(String layerName) => GeoJSONFeature(
+    geoJasonObject,
+    properties: {
+      "name": name,
+      "radius": radius,
+      "fill": fillColor.toHexString(),
+      "stroke": borderColor.toHexString(),
+      "stroke-width": borderWidth,
+      "visible": visible,
+      "layer-name": layerName,
+      "description": description,
+      "subtype": "circle",
+    },
+  );
 
   @override
   String toString() {
@@ -308,69 +307,45 @@ enum EntryType {
   circle("Circle", CircleEntry),
   marker("Marker", MarkerEntry);
 
-  const EntryType(this.name, this.type);
+  const EntryType(this.name, this.type) : mainLayerName = "${name} main";
   final String name;
+  final String mainLayerName;
   final Type type;
 
   static EntryType fromType(Type type) {
-  return EntryType.values.firstWhere(
-    (e) => e.type == type,
-    orElse: () => throw ArgumentError("Invalid type: $type for FlutterMapEntry"),
-  );
-}
+    return EntryType.values.firstWhere(
+      (e) => e.type == type,
+      orElse: () =>
+          throw ArgumentError("Invalid type: $type for FlutterMapEntry"),
+    );
+  }
 }
 
 /// Collection of [FlutterMapEntry] sub classes, which have the same type.
 class MapLayer {
   String name;
   final UniqueList<FlutterMapEntry> items = UniqueList.strict();
-  final bool isDefault;
-  final String id;
+  final bool isMain;
   final EntryType entryType;
-  
+  bool isInvalid = false;
 
-  static RegExp uniquePattern = RegExp(r"^(.*?)(?:\s\((\d+)\))?$");
-
-  static RegExp getUniqueNamePattern(String name) {
-    return RegExp(r"^(" + RegExp.escape(name) + r")(?:\s\((\d+)\))?");
-  }
-
-  MapLayer({
-    required this.name,
-    required this.entryType,
-    this.isDefault = false,
-  }) : id = uuid.v4();
+  MapLayer({required this.name, required this.entryType, this.isMain = false});
 
   bool get isEmpty => items.isEmpty;
   int get length => items.length;
+  List<String> get namesList => items.map((e) => e.name).toList();
 
   @override
-  bool operator ==(Object other) => other is MapLayer ? (this.name.trim() == other.name.trim()) : super == other;
+  bool operator ==(Object other) => other is MapLayer
+      ? (this.name.trim() == other.name.trim())
+      : super == other;
 
-  MapLayer copy() => MapLayer(name: name, entryType: entryType,isDefault: isDefault)..items.addAll(items);
-
-  int getUniqueMaxNum(String name) {
-    List<String> namesList = items.map((e) => e.name).toList();
-    var uniqueNamePattern = getUniqueNamePattern(name);
-    List<int> nums = namesList
-          .map((e) {
-            var match = uniqueNamePattern.firstMatch(e);
-            if (match != null) {
-              return int.parse(match.group(2) ?? "1");
-            }
-            return 0;
-          })
-          .toList();
-    nums.add(0);
-    return nums.reduce(math.max);
-  }
+  MapLayer copy() =>
+      MapLayer(name: name, entryType: entryType, isMain: isMain)
+        ..items.addAll(items);
 
   String getUniqueName(String name) {
-    int maxNum = getUniqueMaxNum(name);
-    if (maxNum == 0) {
-      return name;
-    }
-    return "$name (${maxNum + 1})";
+    return getUniqueNameFromTargets(name, namesList);
   }
 
   void add(FlutterMapEntry entry) {
@@ -395,11 +370,12 @@ class MapLayer {
 
   void addAllUnique(List<FlutterMapEntry> entries) {
     Map<String, int> preNamesMax = {};
+    List<String> names = namesList;
     for (var entry in entries) {
       int? preMax = preNamesMax[entry.name];
       int maxNum = 0;
       if (preMax == null) {
-        maxNum = getUniqueMaxNum(entry.name);
+        maxNum = getUniqueMaxNum(entry.name, names);
         if (maxNum == 0) {
           items.add(entry);
           continue;
@@ -452,12 +428,9 @@ class MapLayer {
 
   GeoJSONFeatureCollection toGeoJsonFeatureCollection() =>
       GeoJSONFeatureCollection(
-        items.map((e) => e.toGeoJsonFeature(name, id)).toList(),
+        items.map((e) => e.toGeoJsonFeature(name)).toList(),
       );
 }
-
-
-
 
 class MapLayerList {
   final UniqueList<MapLayer> items = UniqueList(strict: true);
@@ -467,17 +440,16 @@ class MapLayerList {
   MapLayerList.withMainLayers() {
     items.addAll(
       EntryType.values.map(
-        (type) => MapLayer(
-          name: "${type.name} main",
-          isDefault: true,
-          entryType: type,
-        ),
+        (type) =>
+            MapLayer(name: type.mainLayerName, isMain: true, entryType: type),
       ),
     );
   }
 
-  MapLayerList copy({List<MapLayer>? newItems}) => MapLayerList()..items.addAll([...newItems ?? items]);
-  MapLayerList deepCopy({List<MapLayer>? newItems}) => MapLayerList()..items.addAll([...newItems ?? items].map((e)=>e.copy()));
+  MapLayerList copy({List<MapLayer>? newItems}) =>
+      MapLayerList()..items.addAll([...newItems ?? items]);
+  MapLayerList deepCopy({List<MapLayer>? newItems}) =>
+      MapLayerList()..items.addAll([...newItems ?? items].map((e) => e.copy()));
 
   GeoJSONFeatureCollection toGeoJsonFeatureCollection() {
     final allFeatures = items
@@ -486,15 +458,17 @@ class MapLayerList {
     return GeoJSONFeatureCollection(allFeatures.nonNulls.toList());
   }
 
-  MapLayer? getDefaultLayerEntryOrNull(EntryType type) => items.firstWhereOrNull(
-      (element) => element.isDefault && element.entryType == type,
-    );
+  MapLayer? getDefaultLayerEntryOrNull(EntryType type) =>
+      items.firstWhereOrNull(
+        (element) => element.isMain && element.entryType == type,
+      );
 
   MapLayer createNewDefaultLayer(EntryType type) {
     var newLayer = MapLayer(
-          name: "${type.name} main layer",
-          isDefault: true, entryType: type,
-        );
+      name: type.mainLayerName,
+      isMain: true,
+      entryType: type,
+    );
     items.add(newLayer);
     return newLayer;
   }
@@ -509,8 +483,7 @@ class MapLayerList {
     return getDefaultLayerEntry(type);
   }
 
-
-  void addLayer(MapLayer layerEntry,) {
+  void addLayer(MapLayer layerEntry) {
     try {
       items.add(layerEntry);
     } on DuplicateValueError {}
@@ -524,11 +497,10 @@ class MapLayerList {
   Iterable<Widget> getMapChildren() {
     return items.map((e) => e.toFlutterMapObject());
   }
-} 
-
+}
 
 class HitReference {
-  HitReference(this.entry,{this.layer}) {}
+  HitReference(this.entry, {this.layer}) {}
   MapLayer? layer;
   FlutterMapEntry entry;
 }

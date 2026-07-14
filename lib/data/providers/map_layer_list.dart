@@ -8,34 +8,36 @@ import 'package:geojson_vi/geojson_vi.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:unique_list/unique_list.dart';
 
-part 'map_tiles.g.dart';
-
-
+part 'map_layer_list.g.dart';
 
 @Riverpod(keepAlive: true)
-class TileEntriesNotifier extends _$TileEntriesNotifier {
+class MapLayerListNotifier extends _$MapLayerListNotifier {
   @override
   MapLayerList build() {
-    return MapLayerList.withMainLayers();
+    return MapLayerList();
   }
 
   MapHistory get history => ref.read(historyProvider);
   HistoryNotifier get historyNotifier => ref.read(historyProvider.notifier);
+
+  void reset() {
+    state = MapLayerList();
+  }
 
   void forceRebuild() {
     state = state.copy();
   }
 
   void updateState(MapLayerList mapLayer) {
-    state = state.copy(newItems : mapLayer.items);
+    state = state.copy(newItems: mapLayer.items);
   }
 
   void updateStateByItems(List<MapLayer> newItems) {
-    state = state.copy(newItems : newItems);
+    state = state.copy(newItems: newItems);
   }
 
   void addLayerOrElse(MapLayer layer, {void Function()? orElse}) {
-    try{
+    try {
       state.items.add(layer);
     } on DuplicateValueError {
       orElse?.call();
@@ -51,41 +53,49 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     forceRebuild();
   }
 
-
   void addMarker(InputCoordinatesResult result) {
     addLayerIfNotExist(result.layer);
-    historyNotifier.actionAddToLayer(result.layer,entry: result.toMarker());
+    historyNotifier.actionAddToLayer(result.layer, entry: result.toMarker());
     forceRebuild();
   }
 
   void addPolyLine(InputCoordinatesResult result) {
     addLayerIfNotExist(result.layer);
-    historyNotifier.actionAddToLayer(result.layer,entry: result.toPolyline());
+    historyNotifier.actionAddToLayer(result.layer, entry: result.toPolyline());
     forceRebuild();
   }
 
   void addPolygon(InputCoordinatesResult result) {
     addLayerIfNotExist(result.layer);
-    historyNotifier.actionAddToLayer(result.layer,entry: result.toPolygon());
+    historyNotifier.actionAddToLayer(result.layer, entry: result.toPolygon());
     forceRebuild();
   }
 
   void addCircle(InputCoordinatesResult result) {
     addLayerIfNotExist(result.layer);
-    historyNotifier.actionAddToLayer( result.layer,entry: result.toCircle());
+    historyNotifier.actionAddToLayer(result.layer, entry: result.toCircle());
     forceRebuild();
   }
 
-  LayerEntryMap fromGeoJSONGeometries(List<GeoJSONGeometry> geometries,{required Map<String, dynamic> properties,}) {
+  LayerEntryMap fromGeoJSONGeometries(
+    List<GeoJSONGeometry> geometries, {
+    required Map<String, dynamic> properties,
+  }) {
     LayerEntryMap layerEntryMap = {};
     for (var geometry in geometries) {
       if (geometry.type == GeoJSONType.geometryCollection) {
-        fromGeoJSONGeometries((geometry as GeoJSONGeometryCollection).geometries, properties: properties);
+        fromGeoJSONGeometries(
+          (geometry as GeoJSONGeometryCollection).geometries,
+          properties: properties,
+        );
         continue;
       }
-      List<FlutterMapEntry> entries = mapEntriesFromGeoJsonObject(geometry, properties: properties);
+      List<FlutterMapEntry> entries = mapEntriesFromGeoJsonObject(
+        geometry,
+        properties: properties,
+      );
       if (entries.isEmpty) continue;
-      assert(entries.every((e)=>e.runtimeType == entries.first.runtimeType));
+      assert(entries.every((e) => e.runtimeType == entries.first.runtimeType));
       String? name = properties["name"];
       MapLayer layer =
           (name == null
@@ -93,27 +103,28 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
               : state.items.toList().firstWhereOrNull(
                   (e) => e.name.trim() == name,
                 )) ??
-          state.getDefaultLayerEntry(EntryType.fromType(entries.first.runtimeType));
+          state.getDefaultLayerEntry(
+            EntryType.fromType(entries.first.runtimeType),
+          );
       layerEntryMap[layer] = entries;
     }
     return layerEntryMap;
   }
 
-  List<LayerEntryMap> fromGeoJSONFeatureCollection(GeoJSONFeatureCollection featureCollection) {
+  List<LayerEntryMap> fromGeoJSONFeatureCollection(
+    GeoJSONFeatureCollection featureCollection,
+  ) {
     List<LayerEntryMap> results = [];
     for (var feature in featureCollection.features) {
       if (feature == null || feature.geometry == null) {
         continue;
       }
       GeoJSONGeometry geometry = feature.geometry!;
-      Map<String, dynamic> properties =
-          feature.properties ?? {};
+      Map<String, dynamic> properties = feature.properties ?? {};
       List<GeoJSONGeometry> geomatries = [geometry];
       while (geomatries.isNotEmpty) {
         results.add(fromGeoJSONGeometries(geomatries, properties: properties));
-        geomatries.removeWhere(
-          (e) => geomatries.contains(e),
-        );
+        geomatries.removeWhere((e) => geomatries.contains(e));
         geomatries = geomatries.expand((e) {
           return (e as GeoJSONGeometryCollection).geometries;
         }).toList();
@@ -121,5 +132,4 @@ class TileEntriesNotifier extends _$TileEntriesNotifier {
     }
     return results;
   }
-
 }

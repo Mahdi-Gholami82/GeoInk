@@ -30,8 +30,9 @@ class _CustomDraggableSheetState extends State<CustomDraggableSheet> {
   double get minMaxAverage =>
       (widget.initialChildSize + widget.maxChildSize) / 2;
   bool get needsMaxSizeForKeyboard =>
-      MediaQuery.sizeOf(context).height /
-          MediaQuery.of(context).viewInsets.bottom >
+      MediaQuery.of(context).viewInsets.bottom *
+          100 /
+          MediaQuery.sizeOf(context).height >
       0.10;
   late DraggableScrollableController controller;
 

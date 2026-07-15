@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
@@ -45,85 +46,85 @@ class _CustomAppBarState extends ConsumerState<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+
     return InheritedMapController(
       mapController: widget.mapController,
-      child: SafeArea(
-        child: IntrinsicHeight(
-          child: Container(
-            color: theme.colorScheme.surfaceContainer,
-            child: Align(
-              alignment: AlignmentGeometry.topStart,
-              child: Padding(
-                padding: const EdgeInsetsGeometry.only(
-                  top: 5,
-                  left: 15,
-                  right: 15,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      spacing: 3,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.menu),
-                          onPressed: () {
-                            Scaffold.of(context).openDrawer();
-                          },
-                          style: IconButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primaryContainer,
-                            fixedSize: Size.square(40),
-                            shape: BeveledRectangleBorder(
-                              borderRadius: BorderRadiusGeometry.circular(3),
-                            ),
+      child: IntrinsicHeight(
+        child: Container(
+          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+          color: theme.colorScheme.surfaceContainer,
+          child: Align(
+            alignment: AlignmentGeometry.topStart,
+            child: Padding(
+              padding: const EdgeInsetsGeometry.only(
+                top: 5,
+                left: 15,
+                right: 15,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    spacing: 3,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.menu),
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                        style: IconButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primaryContainer,
+                          fixedSize: Size.square(40),
+                          shape: BeveledRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(3),
                           ),
-                        ),
-                        Flexible(
-                          fit: FlexFit.loose,
-                          child: FittedBox(
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(maxWidth: 150),
-                              child: Text(
-                                ref.watch(projectProvider)?.title ?? "Untitled",
-                                style: Theme.of(context).textTheme.titleMedium,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          style: IconButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primaryContainer,
-                            fixedSize: Size.square(40),
-                            shape: BeveledRectangleBorder(
-                              borderRadius: BorderRadiusGeometry.circular(3),
-                            ),
-                          ),
-                          onPressed: () {
-                            widget.onTapSettings();
-                          },
-                          icon: Icon(Icons.settings),
-                        ),
-                      ],
-                    ),
-                    Divider(),
-                    FittedBox(
-                      child: Padding(
-                        padding: EdgeInsetsGeometry.only(bottom: 7),
-                        child: Row(
-                          children: [
-                            FileMenu(),
-                            MapDropdownMenu(),
-                            FreeStyleDropdownMenu(),
-                            EditDropdownManu(),
-                          ],
                         ),
                       ),
+                      Flexible(
+                        fit: FlexFit.loose,
+                        child: FittedBox(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 150),
+                            child: Text(
+                              ref.watch(projectProvider)?.title ?? "Untitled",
+                              style: Theme.of(context).textTheme.titleMedium,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        style: IconButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primaryContainer,
+                          fixedSize: Size.square(40),
+                          shape: BeveledRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(3),
+                          ),
+                        ),
+                        onPressed: () {
+                          widget.onTapSettings();
+                        },
+                        icon: Icon(Icons.settings),
+                      ),
+                    ],
+                  ),
+                  Divider(),
+                  FittedBox(
+                    child: Padding(
+                      padding: EdgeInsetsGeometry.only(bottom: 7),
+                      child: Row(
+                        children: [
+                          FileMenu(),
+                          MapDropdownMenu(),
+                          FreeStyleDropdownMenu(),
+                          EditDropdownManu(),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

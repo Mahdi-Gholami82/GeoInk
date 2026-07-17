@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geoink/core/ui/icon_with_strok.dart';
 import 'package:geoink/core/utils/unique_name_in_list.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
@@ -74,7 +75,13 @@ class MarkerEntry extends FlutterMapEntry {
     height: 64,
     child: Align(
       alignment: AlignmentGeometry.topCenter,
-      child: Icon(Icons.location_pin, size: 40, color: color),
+      child: IconWithStrok(
+        Icons.location_pin,
+        size: 40,
+        color: color,
+        strokColor: Colors.white70,
+        strokWidth: 2,
+      ),
     ),
   );
 

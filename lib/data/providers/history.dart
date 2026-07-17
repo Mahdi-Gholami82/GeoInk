@@ -46,15 +46,15 @@ class HistoryNotifier extends _$HistoryNotifier {
   }
 
   void undo() {
-    state.undo();
     debugPrint("Job : Undo");
+    state.undo();
     debugPrint("Undo stack lenght : ${state.undoStack.length} ");
     forceRebuild();
   }
 
   void redo() {
-    state.redo();
     debugPrint("Job : Redo");
+    state.redo();
     debugPrint("Redo stack lenght : ${state.redoStack.length} ");
     forceRebuild();
   }

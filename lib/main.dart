@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:geoink/core/theme/theme.dart';
 import 'package:geoink/data/models/prefs_state.dart';
 import 'package:geoink/data/providers/projects.dart';
@@ -18,7 +19,12 @@ final httpClient = RetryClient(Client());
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PrefsState.init();
-  await PrefsState.instance.clear();
+
+  // Clear preferences on start if in debug mode
+  if (kDebugMode) {
+    await PrefsState.instance.clear();
+  }
+
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = WindowOptions(

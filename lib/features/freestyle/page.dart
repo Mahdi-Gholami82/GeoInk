@@ -40,6 +40,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   late LatLng lastMouseClickPoint;
   late MapCamera homeMapCamera;
   MapLayer? get currentLayer => chosenLayers[selectedType];
+  bool mouseEntered = false;
   set currentLayer(MapLayer? newLayer) {
     chosenLayers[selectedType] = newLayer;
   }
@@ -124,15 +125,24 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     historyNotifier.addAndDo(
       ManualDoable(
         executeBase: () {
+          debugPrint(
+            "Executing _addToLayerWithHistory with {\nentry : ${entry.name}, type : $type\n}",
+          );
           // if no layer is selected or layer is invalid (deleted) default to main layer
-          if (layer == null || layer!.isInvalid) {
-            currentLayer = mapLayerList.getDefaultLayerEntry(type);
+          if (layer == null) {
+            currentLayer = mapLayerList.createNewDefaultLayer(type);
             layer = currentLayer;
             createdLayer = true;
+          } else if (layer!.isInvalid) {
+            currentLayer = mapLayerList.getDefaultLayerEntryOrNull(type)!;
+            layer = currentLayer;
           }
           layer!.addUnique(entry);
         },
         undoBase: () {
+          debugPrint(
+            "Undoing _addToLayerWithHistory with {\nentry : ${entry.name}, type : $type}",
+          );
           // If undo has reached a point when the shape isnt being drawn anymore
           // Happens in the middle of drawing
           if (!finishedDrawing && !finishedMouseTrackDraw) {
@@ -208,8 +218,14 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   Widget build(BuildContext context) {
     ref.watch(historyProvider);
 
-    return Listener(
-      onPointerHover: (event) {
+    return MouseRegion(
+      onEnter: (event) {
+        mouseEntered = true;
+      },
+      onExit: (event) {
+        mouseEntered = false;
+      },
+      onHover: (event) {
         _mousePosition = event.position;
         if (!finishedDrawing) {
           updateOnMousePosition(mousePositionToCoords(_mousePosition));
@@ -228,7 +244,11 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           },
           onCancel: () {
             for (var layer in mapLayerList.items) {
-              int start = oldLayerLenghts[layer]!;
+              int? start = oldLayerLenghts[layer];
+              if (start == null) {
+                mapLayerList.items.remove(layer);
+                return;
+              }
               int end = layer.items.length;
               layer.items.removeRange(start, end);
             }
@@ -304,9 +324,11 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                     },
                                     undoBase: () {
                                       polygon.points.removeLast();
-                                      updateOnMousePosition(
-                                        mousePositionToCoords(_mousePosition),
-                                      );
+                                      if (mouseEntered) {
+                                        updateOnMousePosition(
+                                          mousePositionToCoords(_mousePosition),
+                                        );
+                                      }
                                     },
                                   ),
                                 );
@@ -332,9 +354,11 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                     },
                                     undoBase: () {
                                       polyline.points.removeLast();
-                                      updateOnMousePosition(
-                                        mousePositionToCoords(_mousePosition),
-                                      );
+                                      if (mouseEntered) {
+                                        updateOnMousePosition(
+                                          mousePositionToCoords(_mousePosition),
+                                        );
+                                      }
                                     },
                                   ),
                                 );

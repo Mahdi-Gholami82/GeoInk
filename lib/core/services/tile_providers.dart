@@ -12,7 +12,8 @@ TileLayer getOpenStreetMapTileLayer({
   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   tileBuilder: darkMode ? darkModeTileBuilder : null,
   keepBuffer: 0,
-  userAgentPackageName: "com.example.geoink",
+  userAgentPackageName:
+      "com.example.geoink (contact: mahdigholamigodarzi@gmail.com)",
   tileProvider: networkTileProvider,
   tileDisplay: instantLoad
       ? const TileDisplay.fadeIn()

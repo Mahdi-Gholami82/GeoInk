@@ -17,6 +17,7 @@ import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/add_map_layer/widgets/speed_dial_fab.dart';
 import 'package:geoink/features/home/widgets/drawer.dart';
 import 'package:geoink/features/appbar/custom_appbar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   static const String route = "/";
@@ -31,6 +32,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   final MapController mapController = MapController();
   late Future<GeoinkProject?> loadProjectFuture;
   late ProjectNotifier projectNotifier;
+  late Function openRichAttributionWidget;
 
   bool loading = false;
 
@@ -42,7 +44,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     loading = true;
     loadProjectFuture = PrefsState.loadSelectedProject().then((value) {
       if (value == null) {
-        showProjectsSheet(context);
+        showProjectsSheet(context).then((_) async {
+          await Future.delayed(Duration(milliseconds: 200));
+          openRichAttributionWidget();
+        });
       } else {
         ref.watch(projectProvider.notifier).update(value);
       }
@@ -95,6 +100,36 @@ class _HomePageState extends ConsumerState<HomePage> {
                           .isDark(context),
                     ),
                     ...mapChildren,
+                    RichAttributionWidget(
+                      openButton: (context, open) {
+                        openRichAttributionWidget = open;
+                        return IconButton(
+                          onPressed: open,
+                          tooltip: 'Attributions',
+                          icon: Icon(
+                            Icons.info_outlined,
+                            color: Colors.black,
+                            size: 24,
+                          ),
+                        );
+                      },
+                      alignment: AttributionAlignment.bottomLeft,
+                      showFlutterMapAttribution: false,
+                      attributions: [
+                        TextSourceAttribution(
+                          "OSM Contributors",
+                          onTap: () => launchUrl(
+                            Uri.parse("https://www.openstreetmap.org/about/"),
+                          ),
+                          prependCopyright: true,
+                        ),
+
+                        TextSourceAttribution(
+                          "This attribution is the same throughout this app, except where otherwise specified",
+                          prependCopyright: false,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

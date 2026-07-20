@@ -25,7 +25,7 @@ class FileMenu extends ConsumerWidget {
             if (result != null) {
               var file = File(result.files.single.path!);
               try {
-                projectNotifier.import(file.readAsStringSync());
+                projectNotifier.importProjectFromFile(file);
               } on Exception {
                 // TODO: message to user
               }

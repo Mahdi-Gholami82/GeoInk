@@ -53,6 +53,10 @@ class ProjectNotifier extends _$ProjectNotifier {
         .actionListAddAllToAllLayer(layerEntryMaps);
   }
 
+  Future<void> importProjectFromFile(File projectFile) async {
+    importFromProject(await GeoinkProject.fromFile(projectFile));
+  }
+
   void importFromProject(GeoinkProject project) {
     if (!File(project.path!).existsSync()) {
       throw PathNotFoundException;

@@ -82,7 +82,7 @@ class GeoinkProject {
     String? title = properties["title"];
     return GeoinkProject(
       file.path,
-      title: title == null || title.isEmpty
+      title: title == null || title.trim().isEmpty
           ? getNameFromPath(file.path)
           : title,
       description: properties["description"] ?? "",

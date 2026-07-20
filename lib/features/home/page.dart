@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
@@ -17,6 +16,7 @@ import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/add_map_layer/widgets/speed_dial_fab.dart';
 import 'package:geoink/features/home/widgets/drawer.dart';
 import 'package:geoink/features/appbar/custom_appbar.dart';
+import 'package:responsive_sliding_drawer/responsive_sliding_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -33,6 +33,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   late Future<GeoinkProject?> loadProjectFuture;
   late ProjectNotifier projectNotifier;
   late Function openRichAttributionWidget;
+  late ThemeNotifier themeNotifier;
+  ResponsiveSlidingDrawerController responsiveSlidingDrawerController =
+      ResponsiveSlidingDrawerController();
 
   bool loading = false;
 
@@ -41,6 +44,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
     history = ref.read(historyProvider);
     projectNotifier = ref.read(projectProvider.notifier);
+    themeNotifier = ref.read(themeProvider.notifier);
     loading = true;
     loadProjectFuture = PrefsState.loadSelectedProject().then((value) {
       if (value == null) {
@@ -67,87 +71,93 @@ class _HomePageState extends ConsumerState<HomePage> {
         .getMapChildren();
     ref.watch(historyProvider);
     ref.watch(projectProvider);
+    ref.watch(themeProvider);
 
-    return FutureBuilder(
-      future: loadProjectFuture,
-      builder: (context, asyncSnapshot) {
-        return Stack(
-          children: [
-            Scaffold(
-              drawer: MapDrawer(),
-              extendBodyBehindAppBar: true,
-              resizeToAvoidBottomInset: false,
-              appBar: CustomAppBar(
-                mapController: mapController,
-                borderRadius: 16,
-                drawer: MapDrawer(),
-                onTapSettings: () {
-                  Navigator.of(context).pushNamed(SettingsPage.route);
-                },
-              ),
-              floatingActionButton: AddMapElementFab(),
-              body: BaseShortcuts(
-                child: FlutterMap(
+    return ResponsiveSlidingDrawer(
+      controller: responsiveSlidingDrawerController,
+      isDarkMode: themeNotifier.isDark(context),
+      drawer: MapDrawer(),
+      body: FutureBuilder(
+        future: loadProjectFuture,
+        builder: (context, asyncSnapshot) {
+          return Stack(
+            children: [
+              Scaffold(
+                extendBodyBehindAppBar: true,
+                resizeToAvoidBottomInset: false,
+                appBar: CustomAppBar(
                   mapController: mapController,
-                  options: const MapOptions(
-                    initialCenter: LatLng(51.5, -0.09),
-                    initialZoom: 5,
-                  ),
-                  children: [
-                    getOpenStreetMapTileLayer(
-                      darkMode: ref
-                          .watch(themeProvider.notifier)
-                          .isDark(context),
+                  borderRadius: 16,
+                  drawer: MapDrawer(),
+                  onTapSettings: () {
+                    Navigator.of(context).pushNamed(SettingsPage.route);
+                  },
+                  onTapDrawer: () {
+                    responsiveSlidingDrawerController.toggle();
+                  },
+                ),
+                floatingActionButton: AddMapElementFab(),
+                body: BaseShortcuts(
+                  child: FlutterMap(
+                    mapController: mapController,
+                    options: const MapOptions(
+                      initialCenter: LatLng(51.5, -0.09),
+                      initialZoom: 5,
                     ),
-                    ...mapChildren,
-                    RichAttributionWidget(
-                      openButton: (context, open) {
-                        openRichAttributionWidget = open;
-                        return IconButton(
-                          onPressed: open,
-                          tooltip: 'Attributions',
-                          icon: Icon(
-                            Icons.info_outlined,
-                            color: Colors.black,
-                            size: 24,
+                    children: [
+                      getOpenStreetMapTileLayer(
+                        darkMode: themeNotifier.isDark(context),
+                      ),
+                      ...mapChildren,
+                      RichAttributionWidget(
+                        openButton: (context, open) {
+                          openRichAttributionWidget = open;
+                          return IconButton(
+                            onPressed: open,
+                            tooltip: 'Attributions',
+                            icon: Icon(
+                              Icons.info_outlined,
+                              color: Colors.black,
+                              size: 24,
+                            ),
+                          );
+                        },
+                        alignment: AttributionAlignment.bottomLeft,
+                        showFlutterMapAttribution: false,
+                        attributions: [
+                          TextSourceAttribution(
+                            "OSM Contributors",
+                            onTap: () => launchUrl(
+                              Uri.parse("https://www.openstreetmap.org/about/"),
+                            ),
+                            prependCopyright: true,
                           ),
-                        );
-                      },
-                      alignment: AttributionAlignment.bottomLeft,
-                      showFlutterMapAttribution: false,
-                      attributions: [
-                        TextSourceAttribution(
-                          "OSM Contributors",
-                          onTap: () => launchUrl(
-                            Uri.parse("https://www.openstreetmap.org/about/"),
-                          ),
-                          prependCopyright: true,
-                        ),
 
-                        TextSourceAttribution(
-                          "This attribution is the same throughout this app, except where otherwise specified",
-                          prependCopyright: false,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (asyncSnapshot.connectionState != ConnectionState.done)
-              Container(
-                color: Colors.black.withAlpha(40),
-                child: const Center(
-                  child: SizedBox(
-                    height: 40,
-                    width: 40,
-                    child: CircularProgressIndicator(),
+                          TextSourceAttribution(
+                            "This attribution is the same throughout this app, except where otherwise specified",
+                            prependCopyright: false,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-          ],
-        );
-      },
+              if (asyncSnapshot.connectionState != ConnectionState.done)
+                Container(
+                  color: Colors.black.withAlpha(40),
+                  child: const Center(
+                    child: SizedBox(
+                      height: 40,
+                      width: 40,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

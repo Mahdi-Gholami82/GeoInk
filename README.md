@@ -1,3 +1,3 @@
-# geoink
+# GeoInk 
 
-This is still in development
+A cross-platform geospatial intelligence application for visualizing geolocational data.

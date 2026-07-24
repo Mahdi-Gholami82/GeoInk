@@ -728,14 +728,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
-  responsive_sliding_drawer:
-    dependency: "direct main"
-    description:
-      name: responsive_sliding_drawer
-      sha256: ff79fe95362d109d837289ed7f12cc1d7b0c5b83616379f9eb404444e48d99c3
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.6.0"
   riverpod:
     dependency: transitive
     description:

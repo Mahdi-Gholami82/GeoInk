@@ -53,7 +53,6 @@ dependencies:
   shared_preferences: ^2.5.5
   auto_size_text: ^3.0.0
   url_launcher: ^6.3.2
-  responsive_sliding_drawer: ^1.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

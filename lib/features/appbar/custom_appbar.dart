@@ -13,7 +13,7 @@ class CustomAppBar extends ConsumerStatefulWidget
     implements PreferredSizeWidget {
   final Widget drawer;
   final Function onTapSettings;
-  final Function onTapDrawer;
+  final void Function(BuildContext context) onTapDrawer;
   final Color? backgroundColor;
   final double borderRadius;
   final double height;
@@ -73,7 +73,7 @@ class _CustomAppBarState extends ConsumerState<CustomAppBar> {
                       IconButton(
                         icon: Icon(Icons.menu),
                         onPressed: () {
-                          widget.onTapDrawer();
+                          widget.onTapDrawer(context);
                         },
                         style: IconButton.styleFrom(
                           backgroundColor: theme.colorScheme.primaryContainer,

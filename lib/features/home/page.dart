@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
+import 'package:geoink/core/ui/widgets/responsive_drawer.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/models/prefs_state.dart';
@@ -16,7 +19,6 @@ import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/add_map_layer/widgets/speed_dial_fab.dart';
 import 'package:geoink/features/home/widgets/drawer.dart';
 import 'package:geoink/features/appbar/custom_appbar.dart';
-import 'package:responsive_sliding_drawer/responsive_sliding_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -30,12 +32,12 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   late DoableHistory history;
   final MapController mapController = MapController();
+  final ResponsiveDrawerController drawerController =
+      ResponsiveDrawerController();
   late Future<GeoinkProject?> loadProjectFuture;
   late ProjectNotifier projectNotifier;
   late Function openRichAttributionWidget;
   late ThemeNotifier themeNotifier;
-  ResponsiveSlidingDrawerController responsiveSlidingDrawerController =
-      ResponsiveSlidingDrawerController();
 
   bool loading = false;
 
@@ -60,11 +62,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
     Iterable<Widget> mapChildren = ref
         .watch(mapLayerListProvider)
@@ -73,9 +70,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     ref.watch(projectProvider);
     ref.watch(themeProvider);
 
-    return ResponsiveSlidingDrawer(
-      controller: responsiveSlidingDrawerController,
-      isDarkMode: themeNotifier.isDark(context),
+    return ResponsiveDrawer(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      controller: drawerController,
       drawer: MapDrawer(),
       body: FutureBuilder(
         future: loadProjectFuture,
@@ -92,8 +89,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   onTapSettings: () {
                     Navigator.of(context).pushNamed(SettingsPage.route);
                   },
-                  onTapDrawer: () {
-                    responsiveSlidingDrawerController.toggle();
+                  onTapDrawer: (context) {
+                    drawerController.toggle();
                   },
                 ),
                 floatingActionButton: AddMapElementFab(),

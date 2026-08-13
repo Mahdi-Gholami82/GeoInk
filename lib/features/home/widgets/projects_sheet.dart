@@ -94,13 +94,9 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
 
     return Stack(
       children: [
-        Padding(
-          padding: EdgeInsetsGeometry.only(left: 20, top: 10),
-          child: Text("Projects", style: TextStyle(fontSize: 25)),
-        ),
         Positioned(
           top: 10,
-          right: 10,
+          left: 10,
           child: IconButton(
             onPressed: () {
               if (openProject == null) {

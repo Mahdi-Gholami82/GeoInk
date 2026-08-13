@@ -53,7 +53,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               onPressed: () async {
                 await lockScreenOnFuture(
                   context,
-                  future: () async {
+                  job: () async {
                     FilePickerResult? result = await FilePicker.platform
                         .pickFiles(dialogTitle: "Import From GeoJSON");
                     if (result != null) {
@@ -61,7 +61,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                         File(result.files.single.path!).readAsStringSync(),
                       );
                     }
-                  }(),
+                  },
                   onError: () {
                     showSimpleSnackBar(context, message: "Error on import");
                   },
@@ -74,7 +74,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               onPressed: () async {
                 await lockScreenOnFuture(
                   context,
-                  future: FilePicker.platform.saveFile(
+                  job: () async => FilePicker.platform.saveFile(
                     dialogTitle: "Export As GeoJSON",
                     bytes: utf8.encode(projectNotifier.export()),
                   ),

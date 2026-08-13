@@ -34,7 +34,7 @@ Future<void> _doHandleSaveAs(WidgetRef ref) async {
 }
 
 Future<void> handleSaveAs(BuildContext context, WidgetRef ref) async {
-  return lockScreenOnFuture(context, _doHandleSaveAs(ref));
+  return lockScreenOnFuture(context, future: _doHandleSaveAs(ref));
 }
 
 Future<void> handleSave(BuildContext context, WidgetRef ref) async {

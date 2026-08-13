@@ -1,3 +1,6 @@
+import 'package:geoink/core/ui/exiver/etc.dart';
+import 'package:geoink/core/ui/exiver/exiver.dart';
+import 'package:geoink/core/ui/exiver/nested_child.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +8,16 @@ import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/home/widgets/new_layer_dialogue.dart';
+
+extension Drawer on MenuController {
+  void toggle([Offset? position]) {
+    if (!isOpen) {
+      open(position: position);
+    } else {
+      close();
+    }
+  }
+}
 
 class MapDrawer extends ConsumerStatefulWidget {
   const MapDrawer({super.key});
@@ -40,23 +53,169 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    for (var layer in ref.read(mapLayerListProvider).items) {
-      if (!controllers.containsKey(layer)) {
-        controllers[layer] = ExpansibleController();
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    layers = ref
-        .watch(mapLayerListProvider)
-        .items
-        // .where((element) => !(element.isMain && element.isEmpty))
-        .toList();
+    layers = ref.watch(mapLayerListProvider).items;
     ref.watch(historyProvider);
     HistoryNotifier historyNotifier = ref.read(historyProvider.notifier);
+
+    var children = List.generate(layers.length, (index) {
+      var currentLayer = layers[index];
+      return NestedChild(
+        (context, childIndex) {
+          FlutterMapEntry entry = currentLayer.items[childIndex];
+          var menuController = MenuController();
+
+          List<Widget> menu = [
+            MenuItemButton(
+              leadingIcon: Icon(
+                entry.visible ? Icons.visibility : Icons.visibility_off,
+              ),
+              child: Text("Visibility"),
+              onPressed: () {
+                historyNotifier.actionToggleEntryVisibility(entry);
+              },
+            ),
+            MenuItemButton(
+              leadingIcon: Icon(Icons.delete),
+              child: Text("Remove"),
+              onPressed: () {
+                showDialog<bool>(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Text("Remove \"${entry.name}\"?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          },
+                          child: Text("cancel"),
+                        ),
+
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          },
+                          child: Text("ok"),
+                        ),
+                      ],
+                    );
+                  },
+                ).then((value) {
+                  if (value!) {
+                    historyNotifier.actionRemoveEntryFromLayer(
+                      entry,
+                      currentLayer,
+                    );
+                  }
+                });
+              },
+            ),
+            MenuItemButton(
+              leadingIcon: Icon(Icons.arrow_upward),
+              child: Text("Move to top"),
+              onPressed: () {
+                historyNotifier.actionMoveEntryToTop(entry, currentLayer);
+              },
+            ),
+            MenuItemButton(
+              leadingIcon: Icon(Icons.arrow_downward),
+              child: Text("Move to bottom"),
+              onPressed: () {
+                historyNotifier.actionMoveEntryToBottom(entry, currentLayer);
+              },
+            ),
+            // TODO: Change properties impl in menu
+            // MenuItemButton(
+            //   leadingIcon: Icon(Icons.settings_applications),
+            //   child: Text("Change properties"),
+            //   onPressed: () {},
+            // ),
+          ];
+
+          return MenuAnchor(
+            controller: menuController,
+            menuChildren: menu,
+            child: GestureDetector(
+              onSecondaryTapDown: (details) {
+                menuController.toggle(details.localPosition);
+              },
+              onTap: () {
+                menuController.close();
+              },
+              child: ListTile(
+                contentPadding: EdgeInsets.all(0),
+                leading: SizedBox(
+                  height: 40,
+                  child: VerticalDivider(
+                    thickness: 3,
+                    color: _colorFromEntry(entry),
+                    radius: BorderRadius.circular(3),
+                  ),
+                ),
+                title: Text(entry.name),
+                key: ValueKey(entry.name),
+                trailing: Builder(
+                  builder: (context) {
+                    var iconMenuController = MenuController();
+                    return MenuAnchor(
+                      controller: iconMenuController,
+                      menuChildren: menu,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              historyNotifier.actionToggleEntryVisibility(
+                                entry,
+                              );
+                            },
+                            icon: Icon(
+                              entry.visible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              iconMenuController.toggle();
+                            },
+                            icon: Icon(Icons.more_vert),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          );
+        },
+        headerBuilder: () => Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Icon(MapIcons.fromType(currentLayer.entryType)),
+            ),
+            Text(currentLayer.name),
+          ],
+        ),
+
+        childCount: currentLayer.length,
+        index: index,
+        onReorder: (fromIndex, toIndex, isUpperHalf) {
+          historyNotifier.actionReorderEntry(
+            currentLayer,
+            fromIndex,
+            getInsertInIndex(fromIndex, toIndex, isUpperHalf),
+          );
+        },
+      );
+    });
 
     return Column(
       children: [
@@ -119,210 +278,26 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
             ),
           ),
         ),
+
         Expanded(
-          child: ReorderableListView.builder(
-            onReorderItem: (oldIndex, newIndex) {
-              historyNotifier.actionReorderLayer(oldIndex, newIndex);
-            },
-            buildDefaultDragHandles: false,
-            itemBuilder: (BuildContext context, int layerIndex) {
-              MapLayer layer = layers[layerIndex];
-              var controller = controllers[layer];
-              return ReorderableDragStartListener(
-                key: ValueKey(layer.name),
-                index: layerIndex,
-                child: Material(
-                  color: theme.colorScheme.surfaceContainer,
-                  child: ExpansionTile(
-                    key: ValueKey(layer.name),
-                    leading: Icon(MapIcons.fromType(layer.entryType)),
-                    title: Text(layer.name),
-                    controller: controller,
-                    expansionAnimationStyle: AnimationStyle.noAnimation,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsGeometry.only(left: 25),
-                        child: Material(
-                          color: theme.colorScheme.surfaceContainer,
-                          child: ReorderableListView.builder(
-                            key: PageStorageKey('inner-${layer.name}'),
-                            buildDefaultDragHandles: false,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            onReorderItem: (int oldIndex, int newIndex) {
-                              historyNotifier.actionReorderEntry(
-                                layer,
-                                oldIndex,
-                                newIndex,
-                              );
-                            },
-                            itemCount: layer.items.length,
-                            itemBuilder: (context, itemIndex) {
-                              FlutterMapEntry entry = layer.items[itemIndex];
-                              var menuController = MenuController();
-
-                              List<Widget> menu = [
-                                MenuItemButton(
-                                  leadingIcon: Icon(
-                                    entry.visible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                  child: Text("Visibility"),
-                                  onPressed: () {
-                                    historyNotifier.actionToggleEntryVisibility(
-                                      entry,
-                                    );
-                                  },
-                                ),
-                                MenuItemButton(
-                                  leadingIcon: Icon(Icons.delete),
-                                  child: Text("Remove"),
-                                  onPressed: () {
-                                    showDialog<bool>(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          content: Text(
-                                            "Remove \"${entry.name}\"?",
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(
-                                                  context,
-                                                ).pop(false);
-                                              },
-                                              child: Text("cancel"),
-                                            ),
-
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(true);
-                                              },
-                                              child: Text("ok"),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ).then((value) {
-                                      if (value!) {
-                                        historyNotifier
-                                            .actionRemoveEntryFromLayer(
-                                              entry,
-                                              layer,
-                                            );
-                                      }
-                                    });
-                                  },
-                                ),
-                                MenuItemButton(
-                                  leadingIcon: Icon(Icons.arrow_upward),
-                                  child: Text("Move to top"),
-                                  onPressed: () {
-                                    historyNotifier.actionMoveEntryToTop(
-                                      entry,
-                                      layer,
-                                    );
-                                  },
-                                ),
-                                MenuItemButton(
-                                  leadingIcon: Icon(Icons.arrow_downward),
-                                  child: Text("Move to bottom"),
-                                  onPressed: () {
-                                    historyNotifier.actionMoveEntryToBottom(
-                                      entry,
-                                      layer,
-                                    );
-                                  },
-                                ),
-                                // TODO: Change properties impl in menu
-                                // MenuItemButton(
-                                //   leadingIcon: Icon(Icons.settings_applications),
-                                //   child: Text("Change properties"),
-                                //   onPressed: () {},
-                                // ),
-                              ];
-
-                              void toggleMenu([Offset? position]) {
-                                if (!menuController.isOpen) {
-                                  menuController.open(position: position);
-                                } else {
-                                  menuController.close();
-                                }
-                              }
-
-                              return ReorderableDragStartListener(
-                                key: ValueKey('${entry.name}-padding'),
-                                index: itemIndex,
-                                child: MenuAnchor(
-                                  controller: menuController,
-                                  menuChildren: menu,
-                                  child: GestureDetector(
-                                    onSecondaryTapDown: (details) {
-                                      toggleMenu(details.localPosition);
-                                    },
-                                    onTap: () {
-                                      menuController.close();
-                                    },
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.all(0),
-                                      leading: SizedBox(
-                                        height: 40,
-                                        child: VerticalDivider(
-                                          thickness: 3,
-                                          color: _colorFromEntry(entry),
-                                          radius: BorderRadius.circular(3),
-                                        ),
-                                      ),
-                                      title: Text(entry.name),
-                                      key: ValueKey(entry.name),
-                                      trailing: MenuAnchor(
-                                        menuChildren: menu,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  historyNotifier
-                                                      .actionToggleEntryVisibility(
-                                                        entry,
-                                                      );
-                                                },
-                                                icon: Icon(
-                                                  entry.visible
-                                                      ? Icons.visibility
-                                                      : Icons.visibility_off,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () {
-                                                  toggleMenu();
-                                                },
-                                                icon: Icon(Icons.more_vert),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          child: ExiverList(
+            headerColor: Theme.of(context).colorScheme.primaryContainer,
+            childDraggingColor: theme.colorScheme.surface,
+            headerPadding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 3,
+            ),
+            headerShape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(10),
+            ),
+            childPadding: EdgeInsetsGeometry.symmetric(horizontal: 10),
+            onReorder: (fromIndex, toIndex, isUpperHalf) {
+              historyNotifier.actionReorderLayer(
+                fromIndex,
+                getInsertInIndex(fromIndex, toIndex, isUpperHalf),
               );
             },
-            itemCount: layers.length,
+            children: children,
           ),
         ),
       ],

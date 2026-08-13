@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/lock_screen_on_future.dart';
+import 'package:geoink/core/utils/show_simple_snackbar.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/features/appbar/widgets/appbar_menu.dart';
@@ -50,27 +51,21 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
             MenuItemButton(
               leadingIcon: Icon(Icons.file_download),
               onPressed: () async {
-                var result = await lockScreenOnFuture(
+                await lockScreenOnFuture(
                   context,
-                  FilePicker.platform.pickFiles(
-                    dialogTitle: "Import From GeoJSON",
-                  ),
+                  future: () async {
+                    FilePickerResult? result = await FilePicker.platform
+                        .pickFiles(dialogTitle: "Import From GeoJSON");
+                    if (result != null) {
+                      projectNotifier.import(
+                        File(result.files.single.path!).readAsStringSync(),
+                      );
+                    }
+                  }(),
+                  onError: () {
+                    showSimpleSnackBar(context, message: "Error on import");
+                  },
                 );
-                if (result != null) {
-                  GeoinkProject? project = null;
-                  try {
-                    project = await GeoinkProject.fromFile(
-                      File(result.files.single.path!),
-                    );
-                  } on Exception {
-                    return;
-                  }
-                  try {
-                    projectNotifier.import(project.path!);
-                  } on Exception {
-                    // TODO: message to user
-                  }
-                }
               },
               child: const Text("Import"),
             ),
@@ -79,7 +74,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               onPressed: () async {
                 await lockScreenOnFuture(
                   context,
-                  FilePicker.platform.saveFile(
+                  future: FilePicker.platform.saveFile(
                     dialogTitle: "Export As GeoJSON",
                     bytes: utf8.encode(projectNotifier.export()),
                   ),
@@ -87,13 +82,14 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               },
               child: const Text("Export"),
             ),
-            MenuItemButton(
-              leadingIcon: Icon(Icons.image_outlined),
-              onPressed: () {
-                showSaveToImageBottomSheet(context);
-              },
-              child: const Text("To Image"),
-            ),
+            // Open Street Map policy doesnt allow prefetching tiles
+            // MenuItemButton(
+            //   leadingIcon: Icon(Icons.image_outlined),
+            //   onPressed: () {
+            //     showSaveToImageBottomSheet(context);
+            //   },
+            //   child: const Text("To Image"),
+            // ),
 
             // TODO: Implement parser tool.
             // MenuItemButton(

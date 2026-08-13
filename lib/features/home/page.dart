@@ -70,32 +70,32 @@ class _HomePageState extends ConsumerState<HomePage> {
     ref.watch(projectProvider);
     ref.watch(themeProvider);
 
-    return ResponsiveDrawer(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      controller: drawerController,
-      drawer: MapDrawer(),
-      body: FutureBuilder(
-        future: loadProjectFuture,
-        builder: (context, asyncSnapshot) {
-          return Stack(
-            children: [
-              Scaffold(
-                extendBodyBehindAppBar: true,
-                resizeToAvoidBottomInset: false,
-                appBar: CustomAppBar(
-                  mapController: mapController,
-                  borderRadius: 16,
-                  drawer: MapDrawer(),
-                  onTapSettings: () {
-                    Navigator.of(context).pushNamed(SettingsPage.route);
-                  },
-                  onTapDrawer: (context) {
-                    drawerController.toggle();
-                  },
-                ),
-                floatingActionButton: AddMapElementFab(),
-                body: BaseShortcuts(
-                  child: FlutterMap(
+    return BaseShortcuts(
+      child: ResponsiveDrawer(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        controller: drawerController,
+        drawer: MapDrawer(),
+        body: FutureBuilder(
+          future: loadProjectFuture,
+          builder: (context, asyncSnapshot) {
+            return Stack(
+              children: [
+                Scaffold(
+                  extendBodyBehindAppBar: true,
+                  resizeToAvoidBottomInset: false,
+                  appBar: CustomAppBar(
+                    mapController: mapController,
+                    borderRadius: 16,
+                    drawer: MapDrawer(),
+                    onTapSettings: () {
+                      Navigator.of(context).pushNamed(SettingsPage.route);
+                    },
+                    onTapDrawer: (context) {
+                      drawerController.toggle();
+                    },
+                  ),
+                  floatingActionButton: AddMapElementFab(),
+                  body: FlutterMap(
                     mapController: mapController,
                     options: const MapOptions(
                       initialCenter: LatLng(51.5, -0.09),
@@ -139,21 +139,21 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ],
                   ),
                 ),
-              ),
-              if (asyncSnapshot.connectionState != ConnectionState.done)
-                Container(
-                  color: Colors.black.withAlpha(40),
-                  child: const Center(
-                    child: SizedBox(
-                      height: 40,
-                      width: 40,
-                      child: CircularProgressIndicator(),
+                if (asyncSnapshot.connectionState != ConnectionState.done)
+                  Container(
+                    color: Colors.black.withAlpha(40),
+                    child: const Center(
+                      child: SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
                   ),
-                ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

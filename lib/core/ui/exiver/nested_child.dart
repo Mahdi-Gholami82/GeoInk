@@ -137,8 +137,6 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                     _selectOffset = details.localPosition.dy;
                   }
                   return Positioned(
-                    left: 10,
-                    right: 10,
                     top: !isMoving
                         ? mousePositionY
                         : mousePositionY - _selectOffset,
@@ -151,7 +149,12 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                             ? _exiverListState.widget.childDraggingColor
                             : Colors.transparent,
                         elevation: 10,
-                        child: IntrinsicHeight(child: childWidget),
+                        child: IntrinsicHeight(
+                          child: SizedBox(
+                            width: renderObject.size.width,
+                            child: childWidget,
+                          ),
+                        ),
                       ),
                     ),
                   );

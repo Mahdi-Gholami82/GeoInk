@@ -211,7 +211,11 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
           historyNotifier.actionReorderEntry(
             currentLayer,
             fromIndex,
-            getInsertInIndex(fromIndex, toIndex, isUpperHalf),
+            getInsertInIndex(
+              fromIndex,
+              toIndex,
+              isUpperHalf,
+            ).clamp(0, currentLayer.length - 1),
           );
         },
       );
@@ -294,7 +298,11 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
             onReorder: (fromIndex, toIndex, isUpperHalf) {
               historyNotifier.actionReorderLayer(
                 fromIndex,
-                getInsertInIndex(fromIndex, toIndex, isUpperHalf),
+                getInsertInIndex(
+                  fromIndex,
+                  toIndex,
+                  isUpperHalf,
+                ).clamp(0, layers.length - 1),
               );
             },
             children: children,

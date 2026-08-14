@@ -51,9 +51,8 @@ class _SheetOptionsMenuState extends ConsumerState<SheetOptionsMenu> {
           onPressed: () async {
             String? clipboardText = await getTextFromClipboard();
             if (clipboardText != null) {
-              if (InputListCoordinatesState
-                      .minNumberOfCoordinatesFields[inputListState.type]! >
-                  1) {
+              if (inputListState.type.acceptsMultipleCoordinates ||
+                  inputListState.isBulk) {
                 Iterable<CoordinatesParseResult> results = parseAll(
                   clipboardText,
                 );

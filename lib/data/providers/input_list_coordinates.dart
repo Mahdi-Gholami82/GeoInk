@@ -12,6 +12,7 @@ class InputListCoordinatesState {
   MapLayer? layer;
   List<SheetListInput> fields;
   EntryType type;
+  bool isBulk = false;
 
   static const Map<EntryType, int> minNumberOfCoordinatesFields = {
     EntryType.circle: 1,
@@ -25,6 +26,7 @@ class InputListCoordinatesState {
     required this.layer,
     required this.type,
     required this.fields,
+    this.isBulk = false,
   });
 
   InputListCoordinatesState.empty()
@@ -38,12 +40,14 @@ class InputListCoordinatesState {
     MapLayer? layer,
     EntryType? type,
     List<SheetListInput>? fields,
+    bool? isBulk,
   }) {
     return InputListCoordinatesState(
       color: color ?? this.color,
       layer: layer ?? this.layer,
       type: type ?? this.type,
       fields: fields ?? this.fields,
+      isBulk: isBulk ?? this.isBulk,
     );
   }
 
@@ -78,7 +82,8 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
     state = state.copyWith();
   }
 
-  void initSheetListInput({required EntryType initType}) {
+  void initSheetListInput({required EntryType initType, required bool isBulk}) {
+    state.isBulk = isBulk;
     int numberOfCoordinatesFields;
     final fields = <SheetListInput>[];
     fields.add(SheetListInput.nameField());

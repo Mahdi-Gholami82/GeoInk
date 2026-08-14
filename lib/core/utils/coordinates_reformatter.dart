@@ -405,7 +405,7 @@ CoordinatesParseResult? tryParseSingle(
 }) {
   String fullPattern = seperatorPattern ?? defaultFullPattern;
   RegExpMatch? match = RegExp(
-    "^$fullPattern\$",
+    fullPattern,
     multiLine: true,
   ).firstMatch(_normalizeCoordinateString(text));
   if (match == null) {

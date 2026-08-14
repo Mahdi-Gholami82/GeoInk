@@ -25,28 +25,38 @@ class InputCoordinatesResult {
 
   MarkerEntry toMarker() => MarkerEntry(
     point: coordinates.first,
-    name: layer.getUniqueName(name ?? "marker"),
+    name: name ?? "marker",
     color: color,
   );
 
+  List<MarkerEntry> toBulkMarker() => coordinates
+      .map(
+        (e) => MarkerEntry(
+          point: e,
+          name: name ?? EntryType.marker.name,
+          color: color,
+        ),
+      )
+      .toList();
+
   PolylineEntry toPolyline() => PolylineEntry(
-        name: layer.getUniqueName(name ?? "polyline"),
-        points: coordinates,
-        color: color,
-      );
+    name: name ?? "polyline",
+    points: coordinates,
+    color: color,
+  );
   PolygonEntry toPolygon() => PolygonEntry(
-        name: name ?? "polygon",
-        points: processPolygonLatlngs(coordinates),
-        borderColor: color,
-        fillColor: color.withAlpha(128),
-      );
+    name: name ?? "polygon",
+    points: processPolygonLatlngs(coordinates),
+    borderColor: color,
+    fillColor: color.withAlpha(128),
+  );
   CircleEntry toCircle() => CircleEntry(
-        name: layer.getUniqueName(name ?? "circle"),
-        center: coordinates[0],
-        radius: radius!,
-        fillColor: color,
-        borderColor: color.withAlpha(128),
-      );
+    name: name ?? "circle",
+    center: coordinates[0],
+    radius: radius!,
+    fillColor: color,
+    borderColor: color.withAlpha(128),
+  );
 }
 
 enum SheetInputFieldType { name, coordinates, radius }

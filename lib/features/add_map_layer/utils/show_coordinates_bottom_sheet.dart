@@ -11,11 +11,12 @@ Future<InputCoordinatesResult?> showCoordinatesButtomSheet(
   WidgetRef ref, {
   required String title,
   required EntryType type,
+  bool isBulk = false,
 }) {
   InputListCoordinatesNotifier inputListNotifier = ref.read(
     inputListCoordinatesProvider.notifier,
   );
-  inputListNotifier.initSheetListInput(initType: type);
+  inputListNotifier.initSheetListInput(initType: type, isBulk: isBulk);
   ref.watch(inputListCoordinatesProvider);
   return showModalBottomSheet<InputCoordinatesResult>(
     isDismissible: false,

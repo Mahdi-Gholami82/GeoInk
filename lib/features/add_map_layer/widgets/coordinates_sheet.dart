@@ -100,7 +100,8 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           spacing: 20,
                           children: [
-                            if (inputListState.type == EntryType.polygon ||
+                            if (inputListState.isBulk ||
+                                inputListState.type == EntryType.polygon ||
                                 inputListState.type == EntryType.polyline)
                               OutlinedButton(
                                 style: TextButton.styleFrom(

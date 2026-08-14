@@ -5,9 +5,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/lock_screen_on_future.dart';
+import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:geoink/core/utils/show_simple_snackbar.dart';
 import 'package:geoink/data/models/geoink_project.dart';
+import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/projects.dart';
+import 'package:geoink/features/add_map_layer/utils/show_coordinates_bottom_sheet.dart';
 import 'package:geoink/features/appbar/widgets/appbar_menu.dart';
 import 'package:geoink/features/home/utils/show_projects_sheet.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
@@ -81,6 +84,28 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                 );
               },
               child: const Text("Export"),
+            ),
+            MenuItemButton(
+              leadingIcon: Icon(MapIcons.marker),
+              onPressed: () async {
+                showCoordinatesButtomSheet(
+                  context,
+                  ref,
+                  title: "Add Bulk Marker",
+                  type: EntryType.marker,
+                  isBulk: true,
+                ).then((value) {
+                  if (value != null) {
+                    ref
+                        .read(historyProvider.notifier)
+                        .actionAddAllToLayer(
+                          value.layer,
+                          entries: value.toBulkMarker(),
+                        );
+                  }
+                });
+              },
+              child: const Text("Bulk Marker"),
             ),
             // Open Street Map policy doesnt allow prefetching tiles
             // MenuItemButton(

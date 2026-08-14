@@ -309,15 +309,20 @@ class CircleEntry extends FlutterMapEntry {
 
 /// Differant types of [MapLayer]
 enum EntryType {
-  polygon("Polygon", PolygonEntry),
-  polyline("Polyline", PolylineEntry),
+  polygon("Polygon", PolygonEntry, true),
+  polyline("Polyline", PolylineEntry, true),
   circle("Circle", CircleEntry),
   marker("Marker", MarkerEntry);
 
-  const EntryType(this.name, this.type) : mainLayerName = "${name} main";
+  const EntryType(
+    this.name,
+    this.type, [
+    this.acceptsMultipleCoordinates = false,
+  ]) : mainLayerName = "${name} main";
   final String name;
   final String mainLayerName;
   final Type type;
+  final bool acceptsMultipleCoordinates;
 
   static EntryType fromType(Type type) {
     return EntryType.values.firstWhere(
@@ -385,6 +390,7 @@ class MapLayer {
         maxNum = getUniqueMaxNum(entry.name, names);
         if (maxNum == 0) {
           items.add(entry);
+          preNamesMax[entry.name] = maxNum;
           continue;
         }
       } else {

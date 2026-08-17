@@ -285,7 +285,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
 
         Expanded(
           child: ExiverList(
-            headerColor: Theme.of(context).colorScheme.primaryContainer,
+            headerColor: Theme.of(context).colorScheme.surfaceContainerHigh,
             childDraggingColor: theme.colorScheme.surface,
             headerPadding: const EdgeInsets.symmetric(
               horizontal: 8,

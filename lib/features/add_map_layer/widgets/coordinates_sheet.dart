@@ -116,12 +116,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                                 },
                                 child: Text(
                                   "Add Coordinates",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.secondary,
-                                  ),
+                                  style: Theme.of(context).textTheme.labelLarge,
                                 ),
                               ),
 

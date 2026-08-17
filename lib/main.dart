@@ -57,8 +57,8 @@ class _GeoInkAppState extends ConsumerState<GeoInkApp> {
     ref.watch(projectProvider);
     return MaterialApp(
       home: HomePage(),
-      darkTheme: darkMode,
-      theme: lightMode,
+      darkTheme: AppTheme.dark,
+      theme: AppTheme.light,
       themeMode: ref.watch(themeProvider),
       routes: {
         SettingsPage.route: (context) => SettingsPage(),

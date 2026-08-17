@@ -1,13 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/cupertino.dart';
 
-Color? themeColor = Colors.blue;
+abstract final class AppTheme {
+  static ThemeData light = FlexThemeData.light(
+    scheme: FlexScheme.shadOrange,
+    subThemesData: const FlexSubThemesData(
+      interactionEffects: true,
+      tintedDisabledControls: true,
+      useM2StyleDividerInM3: true,
+      inputDecoratorIsFilled: true,
+      inputDecoratorBorderType: FlexInputBorderType.outline,
+      alignedDropdown: true,
+      navigationRailUseIndicator: true,
+    ),
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+  );
 
-ThemeData lightMode = ThemeData(
-  brightness: Brightness.light,
-  colorSchemeSeed: themeColor,
-);
-
-ThemeData darkMode = ThemeData(
-  brightness: Brightness.dark,
-  colorSchemeSeed: themeColor,
-);
+  static ThemeData dark = FlexThemeData.dark(
+    scheme: FlexScheme.shadOrange,
+    subThemesData: const FlexSubThemesData(
+      interactionEffects: true,
+      tintedDisabledControls: true,
+      blendOnColors: true,
+      useM2StyleDividerInM3: true,
+      inputDecoratorIsFilled: true,
+      inputDecoratorBorderType: FlexInputBorderType.outline,
+      alignedDropdown: true,
+      navigationRailUseIndicator: true,
+    ),
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+  );
+}

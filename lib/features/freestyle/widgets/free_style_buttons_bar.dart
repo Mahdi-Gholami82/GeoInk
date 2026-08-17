@@ -1,32 +1,7 @@
 import 'package:geoink/core/ui/floating_shadow.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-
-class Togglebutton extends StatelessWidget {
-  const Togglebutton({super.key, required this.icon, required this.label});
-  final Icon icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class FreeStyleButtonsBar extends StatefulWidget
     implements PreferredSizeWidget {
@@ -50,35 +25,12 @@ class FreeStyleButtonsBar extends StatefulWidget
 }
 
 class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
-  late List<Togglebutton> buttons;
-  late List<bool> selected;
   late EntryType selectedType;
 
   @override
   void initState() {
     super.initState();
-    buttons = EntryType.values
-        .map(
-          (e) => Togglebutton(label: e.name, icon: Icon(MapIcons.fromType(e))),
-        )
-        .toList();
-    selected = List.filled(buttons.length, false);
     selectedType = widget.initSelectedType;
-    buttons.firstWhereIndexedOrNull((index, e) {
-      if (e.label == selectedType.name) {
-        updateSelectedType(index);
-        return true;
-      }
-      return false;
-    });
-  }
-
-  void updateSelectedType(int index) {
-    selected = List.filled(selected.length, false);
-    selected[index] = true;
-    selectedType = EntryType.values.firstWhere(
-      (element) => element.name == buttons[index].label,
-    );
   }
 
   @override
@@ -120,15 +72,51 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Center(
-                            child: ToggleButtons(
-                              children: buttons,
-                              isSelected: selected,
-                              onPressed: (index) {
+                            child: SegmentedButton<EntryType>(
+                              segments: EntryType.values.map((type) {
+                                return ButtonSegment<EntryType>(
+                                  value: type,
+                                  label: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 5,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(MapIcons.fromType(type)),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          type.name,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              selected: {selectedType},
+                              onSelectionChanged: (selection) {
+                                final type = selection.first;
+
                                 setState(() {
-                                  updateSelectedType(index);
-                                  widget.onTypeSwitch(selectedType);
+                                  selectedType = type;
                                 });
+
+                                widget.onTypeSwitch(type);
                               },
+                              showSelectedIcon: false,
+                              style: SegmentedButton.styleFrom(
+                                selectedBackgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerHigh,
+                                side: BorderSide.none,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero,
+                                ),
+                              ),
                             ),
                           ),
                         ),

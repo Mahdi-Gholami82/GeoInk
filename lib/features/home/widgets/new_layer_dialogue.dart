@@ -41,6 +41,7 @@ class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
       child: AlertDialog(
         title: Text("Add a layer"),
         content: Column(
+          spacing: 10,
           mainAxisSize: MainAxisSize.min,
           children: [
             SegmentedButton<EntryType>(

@@ -44,6 +44,20 @@ import 'package:geoink/core/utils/process_file_path.dart';
 //   return projects;
 // }
 
+String getDefaultFileNameWhenFileSaving(GeoinkProject? project) {
+  String fileName = "Untitled.geojson";
+  if (project != null) {
+    if (project.path != null) {
+      fileName = getFileNameFromPath(project.path!);
+    } else {
+      if (project.title != null) {
+        fileName = project.title! + ".geojson";
+      }
+    }
+  }
+  return fileName;
+}
+
 class GeoinkProject {
   GeoinkProject(
     this.path, {

@@ -8,10 +8,10 @@ import 'dart:io';
   return (name: fullName, ext: null);
 }
 
+String getFileNameFromPath(String path) {
+  return path.substring(path.lastIndexOf(Platform.pathSeparator) + 1);
+}
+
 String getNameFromPath(String path) {
-  var match = RegExp(
-    RegExp.escape(Platform.pathSeparator) + r"([^\/]*)$",
-  ).firstMatch(path);
-  String result = match!.group(1)!;
-  return getNameWithExtension(result).name;
+  return getNameWithExtension(getFileNameFromPath(path)).name;
 }

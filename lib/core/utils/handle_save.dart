@@ -17,6 +17,7 @@ Future<void> _doHandleSaveAs(WidgetRef ref) async {
   var savedPath = await FilePicker.platform.saveFile(
     lockParentWindow: true,
     dialogTitle: "Save Project",
+    fileName: getDefaultFileNameWhenFileSaving(project),
     bytes: utf8.encode(exportResult),
   );
   if (savedPath != null) {

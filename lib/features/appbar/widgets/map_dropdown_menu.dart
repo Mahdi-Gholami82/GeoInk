@@ -79,6 +79,9 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                   context,
                   job: () async => FilePicker.platform.saveFile(
                     dialogTitle: "Export As GeoJSON",
+                    fileName: getDefaultFileNameWhenFileSaving(
+                      ref.read(projectProvider),
+                    ),
                     bytes: utf8.encode(projectNotifier.export()),
                   ),
                 );

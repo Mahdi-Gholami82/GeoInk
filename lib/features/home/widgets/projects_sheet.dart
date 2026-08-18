@@ -25,6 +25,8 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
   late ProjectNotifier projectNotifier;
   late TextEditingController searchBarController;
   late final GeoinkProject? openProject;
+  late List<GeoinkProject> filteredProjects;
+  late List<GeoinkProject> projects;
 
   @override
   void initState() {
@@ -35,6 +37,7 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       recentProjectsFuture = PrefsState.loadRecentProjects().then((value) {
         setState(() {});
+        projects = filteredProjects = value;
         return value;
       });
     });
@@ -150,7 +153,24 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                                   child: Icon(Icons.search),
                                 ),
                                 hintText: "Search Projects...",
-                                onChanged: (value) {},
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value.isEmpty) {
+                                      filteredProjects = projects;
+                                    } else {
+                                      filteredProjects = projects
+                                          .where(
+                                            (e) => e.title!.contains(
+                                              RegExp(
+                                                value,
+                                                caseSensitive: false,
+                                              ),
+                                            ),
+                                          )
+                                          .toList();
+                                    }
+                                  });
+                                },
                               ),
                             ),
                           ],
@@ -164,15 +184,14 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                       future: recentProjectsFuture,
                       builder: (context, asyncSnapshot) {
                         if (asyncSnapshot.hasData) {
-                          List<GeoinkProject> projects = asyncSnapshot.data!;
-                          if (projects.isEmpty)
+                          if (filteredProjects.isEmpty)
                             return SliverToBoxAdapter(child: SizedBox.shrink());
                           return SliverFixedExtentList(
                             itemExtent: 50,
                             delegate: SliverChildBuilderDelegate(
-                              childCount: projects.length,
+                              childCount: filteredProjects.length,
                               (context, index) {
-                                var currentProject = projects[index];
+                                var currentProject = filteredProjects[index];
                                 return InkWell(
                                   onTap: () async {
                                     if (currentProject == openProject) {
@@ -201,8 +220,10 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                                       );
                                       navigator.pop();
                                     } on PathNotFoundException {
-                                      projects.remove(currentProject);
-                                      PrefsState.setRecentProjects(projects);
+                                      filteredProjects.remove(currentProject);
+                                      PrefsState.setRecentProjects(
+                                        filteredProjects,
+                                      );
                                       showSimpleSnackBar(
                                         context,
                                         message: "File not found",

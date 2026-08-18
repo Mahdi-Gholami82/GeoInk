@@ -23,9 +23,10 @@ class LayerSelector extends ConsumerStatefulWidget {
 }
 
 class _LayerSelectorState extends ConsumerState<LayerSelector> {
-  late Iterable<MapLayer> layers;
-  late Iterable<MapLayer> filteredLayers;
+  late List<MapLayer> layers;
+  late List<MapLayer> filteredLayers;
   late MapLayer? selectedLayer;
+  bool showMainLayer = true;
 
   @override
   void initState() {
@@ -33,7 +34,8 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
     layers = ref
         .read(mapLayerListProvider)
         .items
-        .where((layer) => layer.entryType == widget.entryType);
+        .where((layer) => layer.entryType == widget.entryType)
+        .toList();
     filteredLayers = layers;
     selectedLayer = widget.initialLayer;
   }
@@ -46,11 +48,19 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
         onChanged: (value) {
           setState(() {
             if (value.isNotEmpty) {
-              filteredLayers = layers.where(
-                (element) => element.name.contains(value),
+              filteredLayers = layers
+                  .where(
+                    (element) => element.name.contains(
+                      RegExp(value, caseSensitive: false),
+                    ),
+                  )
+                  .toList();
+              showMainLayer = widget.entryType.mainLayerName.contains(
+                RegExp(value, caseSensitive: false),
               );
             } else {
               filteredLayers = layers;
+              showMainLayer = true;
             }
           });
         },
@@ -60,7 +70,7 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
         width: 300,
         child: CustomScrollView(
           slivers: [
-            if (!layers.any((e) => e.isMain))
+            if (!layers.any((e) => e.isMain) && showMainLayer)
               SliverToBoxAdapter(
                 child: ListTile(
                   leading: Icon(Icons.layers_outlined),
@@ -77,7 +87,7 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
               delegate: SliverChildBuilderDelegate(
                 childCount: filteredLayers.length,
                 (context, index) {
-                  MapLayer currentLayer = filteredLayers.elementAt(index);
+                  MapLayer currentLayer = filteredLayers[index];
                   return ListTile(
                     leading: Icon(Icons.layers_outlined),
                     trailing: currentLayer == selectedLayer
@@ -88,7 +98,7 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
                         selectedLayer = currentLayer;
                       });
                     },
-                    title: Text(filteredLayers.elementAt(index).name),
+                    title: Text(filteredLayers[index].name),
                   );
                 },
               ),

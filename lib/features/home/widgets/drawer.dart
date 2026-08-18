@@ -4,6 +4,7 @@ import 'package:geoink/core/ui/exiver/nested_child.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geoink/core/ui/widgets/responsive_drawer.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
@@ -270,6 +271,12 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                           );
                         },
                         child: Text("New Layer"),
+                      ),
+                      MenuItemButton(
+                        onPressed: () {
+                          ResponsiveDrawer.of(context).controller.close();
+                        },
+                        child: Text("Close"),
                       ),
                     ],
                     child: IconButton(

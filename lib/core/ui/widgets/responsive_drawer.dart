@@ -35,6 +35,14 @@ class ResponsiveDrawer extends StatefulWidget {
   final ShapeBorder? shape;
   static const double _kWidth = 304.0;
 
+  static ResponsiveDrawer? maybeOf(BuildContext context) {
+    return context.findAncestorWidgetOfExactType<ResponsiveDrawer>();
+  }
+
+  static ResponsiveDrawer of(BuildContext context) {
+    return maybeOf(context)!;
+  }
+
   @override
   State<ResponsiveDrawer> createState() => _ResponsiveDrawerState();
 }

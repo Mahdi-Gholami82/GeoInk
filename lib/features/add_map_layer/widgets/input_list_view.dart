@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geoink/core/ui/widgets/ok_cancel_dialog.dart';
 import 'package:geoink/core/utils/coordinates_reformatter.dart';
 import 'package:geoink/data/models/coordinates_sheet_data.dart';
 import 'package:geoink/data/providers/input_list_coordinates.dart';
@@ -92,7 +93,22 @@ class _InputListViewState extends ConsumerState<InputListView> {
                 suffixIcon: input.type == SheetInputFieldType.coordinates
                     ? IconButton(
                         onPressed: () {
-                          inputListNotifier.removeField(input);
+                          inputListNotifier.removeField(
+                            input,
+                            onNotEmpty: (doRemove) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => OkCancelDialog(
+                                  title: "Warning",
+                                  message: "Remove non-empty field?",
+                                  onOk: () {
+                                    doRemove();
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              );
+                            },
+                          );
                         },
                         icon: Icon(Icons.delete_outline),
                       )

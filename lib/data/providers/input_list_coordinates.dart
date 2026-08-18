@@ -121,7 +121,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
 
   void _removeFieldUnlessEmpty(
     SheetListInput input, {
-    Function? onNotEmpty,
+    void Function(bool Function() doRemove)? onNotEmpty,
     Function? onLenghtLimit,
   }) {
     var fields = state.fields;
@@ -132,7 +132,7 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
       if (onLenghtLimit != null) onLenghtLimit;
       return;
     } else if (input.value.isNotEmpty) {
-      if (onNotEmpty != null) onNotEmpty();
+      if (onNotEmpty != null) onNotEmpty(() => fields.remove(input));
       return;
     }
     fields.remove(input);
@@ -140,18 +140,29 @@ class InputListCoordinatesNotifier extends _$InputListCoordinatesNotifier {
 
   void removeField(
     SheetListInput input, {
-    Function? onNotEmpty,
+    void Function(bool Function() doRemove)? onNotEmpty,
     Function? onLenghtLimit,
   }) {
     _removeFieldUnlessEmpty(
       input,
-      onNotEmpty: onNotEmpty,
+      onNotEmpty: onNotEmpty != null
+          ? (doRemove) {
+              onNotEmpty(() {
+                bool result = doRemove();
+                _forceRebuild();
+                return result;
+              });
+            }
+          : null,
       onLenghtLimit: onLenghtLimit,
     );
     _forceRebuild();
   }
 
-  void clearEmptyFields({Function? onNotEmpty, Function? onLenghtLimit}) {
+  void clearEmptyFields({
+    void Function(bool Function() doRemove)? onNotEmpty,
+    Function? onLenghtLimit,
+  }) {
     var fields = state.fields;
 
     for (int index = fields.length - 1; index > 0; index--) {

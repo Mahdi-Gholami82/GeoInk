@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefsState {
   static late final SharedPreferences instance;
+  static const recentProjectsCountLimit = 15;
 
   static Future<void> init() async {
     instance = await SharedPreferences.getInstance();
@@ -68,6 +69,13 @@ class PrefsState {
       "recentProjectsPaths",
     );
     recentProjectsPaths?.add(project.path!);
+    if (recentProjectsPaths != null &&
+        recentProjectsPaths.length > recentProjectsCountLimit) {
+      recentProjectsPaths.removeRange(
+        0,
+        recentProjectsPaths.length - recentProjectsCountLimit,
+      );
+    }
     instance.setStringList(
       "recentProjectsPaths",
       recentProjectsPaths ?? [project.path!],

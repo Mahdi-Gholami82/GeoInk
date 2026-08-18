@@ -11,7 +11,6 @@ import 'package:geoink/core/utils/show_simple_snackbar.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/models/prefs_state.dart';
 import 'package:geoink/data/providers/projects.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ProjectsSheet extends ConsumerStatefulWidget {
   ProjectsSheet({required this.scrollController}) {}
@@ -23,7 +22,6 @@ class ProjectsSheet extends ConsumerStatefulWidget {
 
 class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
   Future<List<GeoinkProject>>? recentProjectsFuture;
-  late final Directory projectsDirectory;
   late ProjectNotifier projectNotifier;
   late TextEditingController searchBarController;
   late final GeoinkProject? openProject;
@@ -35,7 +33,6 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
     openProject = ref.read(projectProvider);
     projectNotifier = ref.read(projectProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      projectsDirectory = await getApplicationDocumentsDirectory();
       recentProjectsFuture = PrefsState.loadRecentProjects().then((value) {
         setState(() {});
         return value;
@@ -179,7 +176,11 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                                 return InkWell(
                                   onTap: () async {
                                     if (currentProject == openProject) {
-                                      debugPrint("selected same project");
+                                      navigator.pop();
+                                      showSimpleSnackBar(
+                                        context,
+                                        message: "Selected the same project",
+                                      );
                                       return;
                                     }
                                     if (openProject != null &&
@@ -201,9 +202,10 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                                       navigator.pop();
                                     } on PathNotFoundException {
                                       projects.remove(currentProject);
+                                      PrefsState.setRecentProjects(projects);
                                       showSimpleSnackBar(
                                         context,
-                                        message: "File Not Found",
+                                        message: "File not found",
                                       );
                                     }
                                   },

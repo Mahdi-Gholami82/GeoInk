@@ -52,11 +52,6 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     layers = ref.watch(mapLayerListProvider).items;
@@ -202,7 +197,9 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Icon(MapIcons.fromType(currentLayer.entryType)),
             ),
-            Text(currentLayer.name),
+            Flexible(
+              child: Text(currentLayer.name, overflow: TextOverflow.ellipsis),
+            ),
           ],
         ),
 

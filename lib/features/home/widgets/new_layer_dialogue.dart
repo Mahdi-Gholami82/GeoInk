@@ -61,6 +61,7 @@ class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
               child: TextFormField(
                 decoration: InputDecoration(hintText: "Name"),
                 controller: controller,
+                maxLength: maxCharInName,
                 onFieldSubmitted: (Text) {
                   validateAndPop();
                 },
@@ -70,9 +71,6 @@ class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
                   }
                   RegExpMatch? match = standardNameRegex.firstMatch(value);
                   String? name = match?.group(1);
-                  if (match == null || name == null) {
-                    return "Invalid name / Must be shorter than $maxCharInName";
-                  }
                   if (mapLayerList.items.any((e) => e.name == name)) {
                     return "Duplicate name";
                   }

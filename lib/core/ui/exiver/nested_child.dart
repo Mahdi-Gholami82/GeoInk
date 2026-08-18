@@ -267,7 +267,7 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
           contentPadding: const EdgeInsets.all(0),
           leading: _exiverList.headerLeading,
           trailing: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.only(right: 12),
             child: Icon(expanded ? Icons.expand_less : Icons.expand_more),
           ),
           tileColor: _exiverList.headerColor,

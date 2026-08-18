@@ -96,7 +96,10 @@ class NestedDragTargetState extends State<NestedDragTarget> {
   @override
   Widget build(BuildContext context) {
     var dragIndicator = _targetHolder.holderDragIndicator;
-    Widget dragIndicatorwidget = Container(height: 5, color: Colors.blue);
+    Widget dragIndicatorwidget = Container(
+      height: 5,
+      color: Theme.of(context).colorScheme.primary,
+    );
 
     return Stack(
       children: [

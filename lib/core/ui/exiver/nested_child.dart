@@ -141,9 +141,7 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                         ? mousePositionY
                         : mousePositionY - _selectOffset,
                     child: Padding(
-                      padding: const EdgeInsetsGeometry.symmetric(
-                        horizontal: 4,
-                      ),
+                      padding: const EdgeInsetsGeometry.only(left: 15),
                       child: Material(
                         color: targetType == DragTargetType.child
                             ? _exiverListState.widget.childDraggingColor

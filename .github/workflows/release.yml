@@ -1,4 +1,4 @@
-name: Release-WorkFlow
+name: Release
 on:
   # push:
   #   tags:

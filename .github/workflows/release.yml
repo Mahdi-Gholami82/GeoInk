@@ -1,0 +1,179 @@
+name: Release-WorkFlow
+on:
+  # push:
+  #   tags:
+  #     - '[0-9]+.[0-9]+.[0-9]+'
+  #     - '[0-9]+.[0-9]+.[0-9]+-[a-zA-Z]+'
+  workflow_dispatch:
+    inputs:
+      tag-name:
+        type: string
+        description: Release version, e.g. v1.2.3
+        required: true
+      cleanup:
+        type: boolean
+        description: Whether to remove existing releases related to tag
+        default: false
+
+        
+env:
+  PROJECT_NAME: "GeoInk"
+  FLUTTER_VERSION: "3.47.0"
+  TAG: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event.inputs.tag-name }}
+
+jobs:
+  pre-build:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.cleanup }}
+    permissions: 
+      contents: write
+    runs-on:
+      ubuntu-latest
+    steps:
+      - name: Delete Current Releases
+        uses: 8Mi-Tech/delete-release-assets-action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.TAG }}
+          deleteOnlyFromDrafts: false
+
+  build:
+    strategy:
+      matrix:
+        include:
+          - platform: android
+            os: ubuntu-latest
+            flutter-target: apk
+            artifact-extension: apk
+
+          - platform: windows
+            os: windows-latest
+            arch: x64
+            flutter-target: windows
+            artifact-extension: zip
+
+          - platform: linux
+            os: ubuntu-latest
+            arch: x64
+            flutter-target: linux
+            artifact-extension: tar.gz     
+
+    permissions: 
+      contents: write
+
+    name: Release
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: "stable"
+          cache: false
+          pub-cache: false 
+
+      - name: Install Linux Dependencies
+        if: matrix.platform == 'linux'
+        run: | 
+          sudo apt-get update && 
+          sudo apt-get install -y \
+          libgtk-3-0 \
+          libgtk-3-dev \
+          libblkid1 \
+          liblzma5 \
+          build-essential
+      
+      
+      - name: Cache Gradle
+        uses: actions/cache@v6
+        # cant access cache from other refs
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Clean up disk space
+        if: startsWith(matrix.platform,'android')
+        run: |
+          echo BEFORE CLEAN UP
+          df -h
+          echo "*************************************************************"
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo apt-get autoremove -y
+          sudo apt-get clean 
+          echo "*************************************************************"
+          echo AFTER CLEAN UP
+          df -h
+
+      - name: Pre Android Signing
+        if: matrix.platform == 'android'
+        run: |
+          echo "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 --decode > android/key.jks
+          echo "storeFile=$(pwd)/android/key.jks" > android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}" >> android/key.properties
+
+      - name: Release build
+        run: flutter build ${{ matrix.flutter-target }} --release
+
+      - name: Split ABI Android Release Build
+        if: matrix.platform == 'android'
+        run: flutter build ${{ matrix.flutter-target }} --split-per-abi --release
+
+      - name: Prepare Linux artifact
+        if: matrix.platform == 'linux'
+        run: |
+          DESTINATION_FOLDER="artifacts/${{ env.PROJECT_NAME }}"
+          mkdir -p $DESTINATION_FOLDER
+          cp -r build/linux/x64/release/bundle/* $DESTINATION_FOLDER
+          tar -czf "artifacts/${{ env.PROJECT_NAME }}-${{ matrix.platform }}-${{ env.TAG }}-${{ matrix.arch }}.tar.gz" \
+          -C artifacts/ ${{ env.PROJECT_NAME }}
+
+      - name: Prepare Android artifact
+        if: matrix.platform == 'android'
+        run: |
+          mkdir artifacts
+          ls -R ./build/app/outputs
+          BASE_NAME="${{ env.PROJECT_NAME }}-${{ matrix.platform }}-${{ env.TAG }}"
+          cp ./build/app/outputs/flutter-apk/*arm64-v8a*.apk artifacts/${BASE_NAME}-arm64.apk
+          cp ./build/app/outputs/flutter-apk/*armeabi-v7a*.apk artifacts/${BASE_NAME}-arm7.apk
+          cp ./build/app/outputs/flutter-apk/*x86_64*.apk artifacts/${BASE_NAME}-x86_64.apk
+          cp ./build/app/outputs/flutter-apk/app-release.apk artifacts/${BASE_NAME}-universal.apk
+
+      - name: Prepare Windows artifact
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $destination_folder = "artifacts/${{ env.PROJECT_NAME }}"
+
+          New-Item -ItemType Directory -Force -Path $destination_folder
+
+          Copy-Item `
+            -Path "build/windows/x64/runner/Release/*" `
+            -Destination $destination_folder `
+            -Recurse
+
+          Compress-Archive `
+            -Path "$destination_folder" `
+            -DestinationPath "artifacts/${{ env.PROJECT_NAME }}-${{ matrix.platform }}-${{ env.TAG }}-${{ matrix.arch }}.zip"
+      
+      - name: Draft release
+        uses: softprops/action-gh-release@v3
+        with:
+          draft: true
+          files: artifacts/*
+          tag_name: ${{ env.TAG }}
+          overwrite_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

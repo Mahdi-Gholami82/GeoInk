@@ -35,6 +35,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   bool finishedDrawing = true;
   bool finishedMouseTrackDraw = true;
   bool addedTempPoint = false;
+  bool _layerWasInvisible = false;
   var _focusNode = FocusNode();
   var _mousePosition = Offset.zero;
   late LatLng lastMouseClickPoint;
@@ -81,6 +82,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           ModalRoute.of(context)!.settings.arguments as FreestyleArguments;
       selectedType = arguments.initSelectedType;
       homeMapCamera = arguments.mapCamera;
+      makeLayerVisible();
       _isInitialized = true;
     }
   }
@@ -214,6 +216,20 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     });
   }
 
+  void resetLayerVisiblity() {
+    if (_layerWasInvisible) {
+      currentLayer?.visible = false;
+    }
+    _layerWasInvisible = false;
+  }
+
+  void makeLayerVisible() {
+    if (currentLayer != null && !currentLayer!.visible) {
+      _layerWasInvisible = true;
+      currentLayer!.visible = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.watch(historyProvider);
@@ -236,10 +252,13 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           initSelectedType: selectedType,
           onTypeSwitch: (EntryType type) {
             setState(() {
+              resetLayerVisiblity();
               selectedType = type;
+              makeLayerVisible();
             });
           },
           onConfirm: () {
+            resetLayerVisiblity();
             historyNotifier.applyFromPoints();
           },
           onCancel: () {
@@ -252,6 +271,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               int end = layer.items.length;
               layer.items.removeRange(start, end);
             }
+            resetLayerVisiblity();
             historyNotifier.restoreFromPoints();
           },
         ),
@@ -451,7 +471,9 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                             entryType: selectedType,
                                             initialLayer: currentLayer,
                                             onConfirm: (MapLayer? selection) {
+                                              resetLayerVisiblity();
                                               currentLayer = selection;
+                                              makeLayerVisible();
                                             },
                                           ),
                                         );

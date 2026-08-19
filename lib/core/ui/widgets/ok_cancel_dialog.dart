@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 class OkCancelDialog extends StatelessWidget {
   OkCancelDialog({
     super.key,
+    required this.title,
+    required this.message,
     this.onOk,
     this.onCancel,
-    required this.message,
-    required this.title,
   });
   final void Function()? onOk;
   final void Function()? onCancel;

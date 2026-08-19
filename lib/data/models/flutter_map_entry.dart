@@ -339,6 +339,7 @@ class MapLayer {
   final UniqueList<FlutterMapEntry> items = UniqueList.strict();
   final bool isMain;
   final EntryType entryType;
+  bool visible = true;
   bool isInvalid = false;
 
   MapLayer({required this.name, required this.entryType, this.isMain = false});
@@ -355,6 +356,21 @@ class MapLayer {
   MapLayer copy() =>
       MapLayer(name: name, entryType: entryType, isMain: isMain)
         ..items.addAll(items);
+
+  MapLayer copyWith({
+    String? name,
+    List<FlutterMapEntry>? items,
+    EntryType? entryType,
+    bool? isMain,
+  }) => MapLayer(
+    name: name ?? this.name,
+    entryType: entryType ?? this.entryType,
+    isMain: isMain ?? this.isMain,
+  )..items.addAll(items ?? this.items);
+
+  void toggleVisiblity() {
+    visible = !visible;
+  }
 
   String getUniqueName(String name) {
     return getUniqueNameFromTargets(name, namesList);
@@ -508,7 +524,7 @@ class MapLayerList {
   }
 
   Iterable<Widget> getMapChildren() {
-    return items.map((e) => e.toFlutterMapObject());
+    return items.where((e) => e.visible).map((e) => e.toFlutterMapObject());
   }
 }
 

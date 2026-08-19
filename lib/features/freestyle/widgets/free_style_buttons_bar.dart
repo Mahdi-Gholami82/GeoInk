@@ -35,6 +35,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
     return Stack(
       fit: StackFit.passthrough,
       children: [
@@ -59,9 +60,8 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                       children: [
                         IconButton(
                           style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.surfaceContainerHighest,
+                            backgroundColor:
+                                theme.colorScheme.surfaceContainerHighest,
                           ),
                           onPressed: () {
                             widget.onCancel();
@@ -109,9 +109,8 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                               },
                               showSelectedIcon: false,
                               style: SegmentedButton.styleFrom(
-                                selectedBackgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerHigh,
+                                selectedBackgroundColor:
+                                    theme.colorScheme.surfaceContainerHigh,
                                 side: BorderSide.none,
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.zero,

@@ -4,11 +4,14 @@ import 'package:geoink/core/ui/exiver/nested_child.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geoink/core/ui/widgets/ok_cancel_dialog.dart';
 import 'package:geoink/core/ui/widgets/responsive_drawer.dart';
+import 'package:geoink/core/utils/standard_name.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/home/widgets/new_layer_dialogue.dart';
+import 'package:geoink/features/home/widgets/rename_dialogue.dart';
 
 extension Drawer on MenuController {
   void toggle([Offset? position]) {
@@ -63,16 +66,35 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
       return NestedChild(
         (context, childIndex) {
           FlutterMapEntry entry = currentLayer.items[childIndex];
-          var menuController = MenuController();
+          var childMenuController = MenuController();
 
           List<Widget> menu = [
             MenuItemButton(
               leadingIcon: Icon(
-                entry.visible ? Icons.visibility : Icons.visibility_off,
+                entry.visible ? Icons.visibility_off : Icons.visibility,
               ),
               child: Text("Visibility"),
               onPressed: () {
                 historyNotifier.actionToggleEntryVisibility(entry);
+              },
+            ),
+            MenuItemButton(
+              leadingIcon: Icon(Icons.abc),
+              child: Text("Rename"),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => RenameDialogue(
+                    initialName: entry.name,
+                    onRename: (String newName) {
+                      historyNotifier.actionRenameEntry(entry, newName);
+                    },
+                    validator: (value) => standarNameValidatorForEntries(
+                      value,
+                      currentLayer.items,
+                    ),
+                  ),
+                );
               },
             ),
             MenuItemButton(
@@ -83,7 +105,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      content: Text("Remove \"${entry.name}\"?"),
+                      content: Text("Remove entry?"),
                       actions: [
                         TextButton(
                           onPressed: () {
@@ -134,14 +156,14 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
           ];
 
           return MenuAnchor(
-            controller: menuController,
+            controller: childMenuController,
             menuChildren: menu,
             child: GestureDetector(
               onSecondaryTapDown: (details) {
-                menuController.toggle(details.localPosition);
+                childMenuController.toggle(details.localPosition);
               },
               onTap: () {
-                menuController.close();
+                childMenuController.close();
               },
               child: ListTile(
                 contentPadding: EdgeInsets.all(0),
@@ -191,17 +213,135 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
             ),
           );
         },
-        headerBuilder: () => Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Icon(MapIcons.fromType(currentLayer.entryType)),
+        headerBuilder: (context, doExpand, expanded) {
+          var headerMonuroller = MenuController();
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            child: MenuAnchor(
+              controller: headerMonuroller,
+              menuChildren: [
+                MenuItemButton(
+                  leadingIcon: Icon(
+                    currentLayer.visible
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                  ),
+                  child: Text("Visibility"),
+                  onPressed: () {
+                    historyNotifier.actionToggleLayerVisibility(currentLayer);
+                  },
+                ),
+                MenuItemButton(
+                  leadingIcon: Icon(Icons.abc),
+                  child: Text("Rename"),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => RenameDialogue(
+                        initialName: currentLayer.name,
+                        onRename: (String newName) {
+                          historyNotifier.actionRenameLayer(
+                            currentLayer,
+                            newName,
+                          );
+                        },
+                        validator: (value) =>
+                            standarNameValidatorForLayers(value, layers),
+                      ),
+                    );
+                  },
+                ),
+                MenuItemButton(
+                  leadingIcon: Icon(Icons.delete),
+                  child: Text("Remove"),
+                  onPressed: () {
+                    showDialog<bool>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          content: Text("Remove layer?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(false);
+                              },
+                              child: Text("cancel"),
+                            ),
+
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(true);
+                              },
+                              child: Text("ok"),
+                            ),
+                          ],
+                        );
+                      },
+                    ).then((value) {
+                      if (value!) {
+                        historyNotifier.actionRemoveLayer(currentLayer);
+                      }
+                    });
+                  },
+                ),
+                MenuItemButton(
+                  leadingIcon: Icon(Icons.arrow_upward),
+                  child: Text("Move to top"),
+                  onPressed: () {
+                    historyNotifier.actionMoveLayerToTop(currentLayer);
+                  },
+                ),
+                MenuItemButton(
+                  leadingIcon: Icon(Icons.arrow_downward),
+                  child: Text("Move to bottom"),
+                  onPressed: () {
+                    historyNotifier.actionMoveLayerToBottom(currentLayer);
+                  },
+                ),
+              ],
+              child: GestureDetector(
+                onSecondaryTapDown: (details) {
+                  headerMonuroller.toggle(details.localPosition);
+                },
+                child: ListTile(
+                  trailing: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Icon(
+                      expanded ? Icons.expand_less : Icons.expand_more,
+                    ),
+                  ),
+                  tileColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(10),
+                  ),
+                  onTap: () {
+                    headerMonuroller.close();
+                    doExpand();
+                  },
+                  title: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Icon(MapIcons.fromType(currentLayer.entryType)),
+                      ),
+                      Flexible(
+                        child: Text(
+                          currentLayer.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            decoration: currentLayer.visible
+                                ? TextDecoration.none
+                                : TextDecoration.lineThrough,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            Flexible(
-              child: Text(currentLayer.name, overflow: TextOverflow.ellipsis),
-            ),
-          ],
-        ),
+          );
+        },
 
         childCount: currentLayer.length,
         index: index,
@@ -289,15 +429,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
 
         Expanded(
           child: ExiverList(
-            headerColor: Theme.of(context).colorScheme.surfaceContainerHigh,
             childDraggingColor: theme.colorScheme.surface,
-            headerPadding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 3,
-            ),
-            headerShape: RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(10),
-            ),
             childPadding: EdgeInsetsGeometry.symmetric(horizontal: 10),
             onReorder: (fromIndex, toIndex, isUpperHalf) {
               historyNotifier.actionReorderLayer(

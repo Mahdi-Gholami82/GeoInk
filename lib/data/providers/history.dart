@@ -12,6 +12,30 @@ extension<T> on List<T> {
   void swapByIndex(int oldIndex, int newIndex) {
     this.insert(newIndex, this.removeAt(oldIndex));
   }
+
+  int moveToFirstGetIndex(T element) {
+    int index = indexOf(element);
+    assert(index != -1);
+    removeAt(index);
+    insert(0, element);
+    return index;
+  }
+
+  int moveToLastGetIndex(T element) {
+    int index = indexOf(element);
+    assert(index != -1);
+    removeAt(index);
+    add(element);
+    return index;
+  }
+
+  void moveLastToIndex(int index) {
+    insert(index, removeLast());
+  }
+
+  void moveFirstToIndex(int index) {
+    insert(index, removeAt(0));
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -235,6 +259,15 @@ class HistoryNotifier extends _$HistoryNotifier {
     );
   }
 
+  void actionToggleLayerVisibility(MapLayer layer) {
+    addAndDo(
+      ManualDoable(
+        executeBase: layer.toggleVisiblity,
+        undoBase: layer.toggleVisiblity,
+      ),
+    );
+  }
+
   void actionRemoveLayer(MapLayer layer) {
     MapLayer? data;
     addAndDo(
@@ -272,12 +305,10 @@ class HistoryNotifier extends _$HistoryNotifier {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          index = layer.items.indexOf(entry);
-          layer.items.removeAt(index!);
-          layer.items.add(entry);
+          index = layer.items.moveToLastGetIndex(entry);
         },
         undoBase: () {
-          layer.items.insert(index!, layer.items.removeLast());
+          layer.items.moveLastToIndex(index!);
         },
       ),
     );
@@ -288,12 +319,38 @@ class HistoryNotifier extends _$HistoryNotifier {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          index = layer.items.indexOf(entry);
-          layer.items.removeAt(index!);
-          layer.items.insert(0, entry);
+          index = layer.items.moveToFirstGetIndex(entry);
         },
         undoBase: () {
-          layer.items.insert(index!, layer.items.removeAt(0));
+          layer.items.moveFirstToIndex(index!);
+        },
+      ),
+    );
+  }
+
+  void actionMoveLayerToBottom(MapLayer layer) {
+    int? index;
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          index = _mapLayerList.items.moveToLastGetIndex(layer);
+        },
+        undoBase: () {
+          _mapLayerList.items.moveLastToIndex(index!);
+        },
+      ),
+    );
+  }
+
+  void actionMoveLayerToTop(MapLayer layer) {
+    int? index;
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          index = _mapLayerList.items.moveToFirstGetIndex(layer);
+        },
+        undoBase: () {
+          _mapLayerList.items.moveFirstToIndex(index!);
         },
       ),
     );
@@ -307,6 +364,36 @@ class HistoryNotifier extends _$HistoryNotifier {
         },
         undoBase: () {
           _mapLayerList.items.removeLast();
+        },
+      ),
+    );
+  }
+
+  void actionRenameLayer(MapLayer layer, String newName) {
+    String? previousName;
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          previousName = layer.name;
+          layer.name = newName;
+        },
+        undoBase: () {
+          layer.name = previousName!;
+        },
+      ),
+    );
+  }
+
+  void actionRenameEntry(FlutterMapEntry entry, String newName) {
+    String? previousName;
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          previousName = entry.name;
+          entry.name = newName;
+        },
+        undoBase: () {
+          entry.name = previousName!;
         },
       ),
     );

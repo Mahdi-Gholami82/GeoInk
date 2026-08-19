@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geoink/core/utils/standard_name_regex.dart';
+import 'package:geoink/core/utils/standard_name.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
+import 'package:geoink/features/home/widgets/layer_name_form_field.dart';
 
 class NewLayerDialogue extends ConsumerStatefulWidget {
   @override
@@ -22,16 +23,13 @@ class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
     mapLayerList = ref.read(mapLayerListProvider);
   }
 
-  void validateAndPop() {
-    final bool isValid = formKey.currentState?.validate() ?? false;
-    if (isValid) {
-      ref
-          .read(historyProvider.notifier)
-          .actionAddLayer(
-            MapLayer(name: controller.text, entryType: selectedType),
-          );
-      Navigator.of(context).pop();
-    }
+  void doIfValid(String text) {
+    ref
+        .read(historyProvider.notifier)
+        .actionAddLayer(
+          MapLayer(name: controller.text, entryType: selectedType),
+        );
+    Navigator.of(context).pop();
   }
 
   @override
@@ -46,6 +44,9 @@ class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
           children: [
             SegmentedButton<EntryType>(
               showSelectedIcon: false,
+              style: SegmentedButton.styleFrom(
+                selectedForegroundColor: Theme.of(context).colorScheme.primary,
+              ),
               selected: {selectedType},
               segments: EntryType.values
                   .map((e) => ButtonSegment(value: e, label: Text(e.name)))
@@ -56,34 +57,22 @@ class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
                 });
               },
             ),
-            Form(
-              key: formKey,
-              child: TextFormField(
-                decoration: InputDecoration(hintText: "Name"),
-                controller: controller,
-                maxLength: maxCharInName,
-                onFieldSubmitted: (Text) {
-                  validateAndPop();
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return "Please enter a name";
-                  }
-                  RegExpMatch? match = standardNameRegex.firstMatch(value);
-                  String? name = match?.group(1);
-                  if (mapLayerList.items.any((e) => e.name == name)) {
-                    return "Duplicate name";
-                  }
-                  return null;
-                },
-              ),
+            NameFormField(
+              formKey: formKey,
+              controller: controller,
+              onSubmitIfValid: doIfValid,
+              validator: (value) =>
+                  standarNameValidatorForLayers(value, mapLayerList.items),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () {
-              validateAndPop();
+              final bool isValid = formKey.currentState?.validate() ?? false;
+              if (isValid) {
+                doIfValid(controller.text);
+              }
             },
             child: Text("ok"),
           ),

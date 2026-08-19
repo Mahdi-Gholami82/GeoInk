@@ -9,21 +9,13 @@ class ExiverList extends StatefulWidget {
   const ExiverList({
     super.key,
     required this.children,
-    this.headerColor,
-    this.headerLeading,
-    this.headerShape,
-    this.headerPadding,
     required this.onReorder,
     this.childPadding = const EdgeInsetsGeometry.symmetric(horizontal: 20),
     this.childDraggingColor,
   });
   final List<NestedChild> children;
-  final Color? headerColor;
-  final Widget? headerLeading;
-  final ShapeBorder? headerShape;
   final EdgeInsetsGeometry childPadding;
   final Color? childDraggingColor;
-  final EdgeInsetsGeometry? headerPadding;
   final NestedReorderCallback onReorder;
 
   static ExiverList? maybeOf(BuildContext context) {

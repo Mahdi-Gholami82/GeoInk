@@ -12,7 +12,12 @@ class NestedChild extends StatefulWidget {
     required this.index,
     required this.onReorder,
   });
-  final Widget Function() headerBuilder;
+  final Widget Function(
+    BuildContext context,
+    void Function() doExpand,
+    bool expanded,
+  )
+  headerBuilder;
   final Widget? Function(BuildContext context, int index) builder;
   final NestedReorderCallback onReorder;
   final int childCount;
@@ -111,10 +116,7 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
         DragTargetType.child => builderIndex,
       };
       EdgeInsetsGeometry getPadding() => switch (targetType) {
-        DragTargetType.header =>
-          _exiverListState.widget.headerPadding ??
-              const EdgeInsetsGeometry.all(0),
-
+        DragTargetType.header => const EdgeInsetsGeometry.all(0),
         DragTargetType.child => ExiverList.of(context).childPadding,
       };
 
@@ -263,22 +265,13 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
     var localIndex = index - 1;
     if (localIndex == -1) {
       return _wrapWithDragWidgets(
-        (BuildContext context, int index) => ListTile(
-          contentPadding: const EdgeInsets.all(0),
-          leading: _exiverList.headerLeading,
-          trailing: Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Icon(expanded ? Icons.expand_less : Icons.expand_more),
-          ),
-          tileColor: _exiverList.headerColor,
-          shape: _exiverList.headerShape,
-          onTap: () {
+        (BuildContext context, int index) {
+          return widget.headerBuilder(context, () {
             setState(() {
               expanded = !expanded;
             });
-          },
-          title: widget.headerBuilder(),
-        ),
+          }, expanded);
+        },
         targets: _exiverListState.targets,
         onReorder: _exiverList.onReorder,
         targetType: DragTargetType.header,

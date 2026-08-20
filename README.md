@@ -5,7 +5,7 @@
 <h1 align="center">GeoInk</h1>
 
 <p align="center">
-  <strong>A cross-platform geospatial intelligence application for collecting and visualizing geolocational data.</strong>
+  <strong>A cross-platform GEOINT application for collecting, and visualizing geospatial data.</strong>
 </p>
 
 <p align="center">

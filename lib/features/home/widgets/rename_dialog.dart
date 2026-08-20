@@ -6,8 +6,8 @@ import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/home/widgets/layer_name_form_field.dart';
 
-class RenameDialogue extends StatefulWidget {
-  RenameDialogue({
+class RenameDialog extends StatefulWidget {
+  RenameDialog({
     super.key,
     required this.initialName,
     required this.onRename,
@@ -18,10 +18,10 @@ class RenameDialogue extends StatefulWidget {
   final String? Function(String? value) validator;
 
   @override
-  State<RenameDialogue> createState() => _RenameDialogueState();
+  State<RenameDialog> createState() => _RenameDialogState();
 }
 
-class _RenameDialogueState extends State<RenameDialogue> {
+class _RenameDialogState extends State<RenameDialog> {
   final GlobalKey<FormState> formKey = GlobalKey();
 
   late final TextEditingController controller;
@@ -42,8 +42,6 @@ class _RenameDialogueState extends State<RenameDialogue> {
       widget.onRename(text);
       Navigator.of(context).pop();
     }
-
-    print(controller.selection);
 
     return AlertDialog(
       title: Text("Rename"),

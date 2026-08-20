@@ -6,12 +6,12 @@ import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/home/widgets/layer_name_form_field.dart';
 
-class NewLayerDialogue extends ConsumerStatefulWidget {
+class NewLayerDialog extends ConsumerStatefulWidget {
   @override
-  ConsumerState<NewLayerDialogue> createState() => _NewLayerDialogueState();
+  ConsumerState<NewLayerDialog> createState() => _NewLayerDialogState();
 }
 
-class _NewLayerDialogueState extends ConsumerState<NewLayerDialogue> {
+class _NewLayerDialogState extends ConsumerState<NewLayerDialog> {
   final formKey = GlobalKey<FormState>();
   var controller = TextEditingController();
   EntryType selectedType = EntryType.circle;

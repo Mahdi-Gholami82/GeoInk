@@ -28,6 +28,7 @@ class ProjectNotifier extends _$ProjectNotifier {
 
   void updatePath(String? newPath) {
     state = state?.copyWith(path: newPath);
+    PrefsState.setSelectedProject(state!);
   }
 
   String export() {

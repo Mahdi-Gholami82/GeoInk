@@ -10,8 +10,8 @@ import 'package:geoink/core/utils/standard_name.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
-import 'package:geoink/features/home/widgets/new_layer_dialogue.dart';
-import 'package:geoink/features/home/widgets/rename_dialogue.dart';
+import 'package:geoink/features/home/widgets/new_layer_dialog.dart';
+import 'package:geoink/features/home/widgets/rename_dialog.dart';
 
 extension Drawer on MenuController {
   void toggle([Offset? position]) {
@@ -84,7 +84,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => RenameDialogue(
+                  builder: (context) => RenameDialog(
                     initialName: entry.name,
                     onRename: (String newName) {
                       historyNotifier.actionRenameEntry(entry, newName);
@@ -237,7 +237,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (context) => RenameDialogue(
+                      builder: (context) => RenameDialog(
                         initialName: currentLayer.name,
                         onRename: (String newName) {
                           historyNotifier.actionRenameLayer(
@@ -403,7 +403,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                           showDialog(
                             context: context,
                             builder: (context) {
-                              return NewLayerDialogue();
+                              return NewLayerDialog();
                             },
                           );
                         },

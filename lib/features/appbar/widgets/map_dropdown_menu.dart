@@ -15,7 +15,6 @@ import 'package:geoink/features/appbar/widgets/appbar_menu.dart';
 import 'package:geoink/features/home/utils/show_projects_sheet.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
-import 'package:geoink/features/save_map_to_image/utils/show_bottom_sheet.dart';
 
 class MapDropdownMenu extends ConsumerStatefulWidget {
   const MapDropdownMenu({super.key});

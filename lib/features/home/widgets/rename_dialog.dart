@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geoink/core/utils/standard_name.dart';
-import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/providers/history.dart';
-import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/home/widgets/layer_name_form_field.dart';
 
 class RenameDialog extends StatefulWidget {

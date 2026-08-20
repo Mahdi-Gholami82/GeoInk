@@ -72,10 +72,10 @@ class _SheetOptionsMenuState extends ConsumerState<SheetOptionsMenu> {
           },
           child: const Text('Parse From Clipboard'),
         ),
-        MenuItemButton(
-          onPressed: () {},
-          child: const Text('Parse From Text Input'),
-        ),
+        // MenuItemButton(
+        //   onPressed: () {},
+        //   child: const Text('Parse From Text Input'),
+        // ),
         MenuItemButton(
           onPressed: () {
             inputListNotifier.clearEmptyFields();

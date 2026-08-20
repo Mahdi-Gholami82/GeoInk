@@ -1,4 +1,3 @@
-
 abstract class Doable {
   bool done = false;
   void doIt();
@@ -6,7 +5,7 @@ abstract class Doable {
 }
 
 class ManualDoable extends Doable {
-  ManualDoable({required this.executeBase,required this.undoBase}) {}
+  ManualDoable({required this.executeBase, required this.undoBase}) {}
 
   final Function executeBase;
   final Function undoBase;
@@ -23,8 +22,12 @@ class ManualDoable extends Doable {
   }
 }
 
-class ContainerDoable<T> extends Doable{
-  ContainerDoable({required this.data,required this.executeBase,required this.undoBase}) {}
+class ContainerDoable<T> extends Doable {
+  ContainerDoable({
+    required this.data,
+    required this.executeBase,
+    required this.undoBase,
+  }) {}
 
   bool done = false;
   T data;
@@ -44,8 +47,8 @@ class ContainerDoable<T> extends Doable{
 }
 
 class BatchDoable extends ManualDoable {
-  BatchDoable({required List<Doable> batch}) :
-      super(
+  BatchDoable({required List<Doable> batch})
+    : super(
         executeBase: () {
           for (var action in batch) {
             action.doIt();
@@ -60,9 +63,9 @@ class BatchDoable extends ManualDoable {
 }
 
 class DoableHistory {
-  DoableHistory({List<Doable>? undoStack,List<Doable>? redoStack}) {
-    if(undoStack != null) _undoStack = undoStack;
-    if(redoStack != null) _redoStack = redoStack;
+  DoableHistory({List<Doable>? undoStack, List<Doable>? redoStack}) {
+    if (undoStack != null) _undoStack = undoStack;
+    if (redoStack != null) _redoStack = redoStack;
   }
 
   List<Doable> _undoStack = [];
@@ -71,7 +74,7 @@ class DoableHistory {
   bool get canUndo => _undoStack.isNotEmpty;
   bool get canRedo => _redoStack.isNotEmpty;
   List<Doable> get undoStack => _undoStack;
-  List<Doable> get redoStack => _redoStack; 
+  List<Doable> get redoStack => _redoStack;
 
   bool undo() {
     if (canUndo) {
@@ -95,12 +98,11 @@ class DoableHistory {
 
   void add(Doable action) {
     _undoStack.add(action);
-
   }
 
   void addAndDo(Doable action) {
     action.doIt();
-    _undoStack.add(action);
+    add(action);
     _redoStack.clear();
   }
 
@@ -108,5 +110,4 @@ class DoableHistory {
     _undoStack.removeRange(index, _undoStack.length);
     _redoStack.clear();
   }
-
 }

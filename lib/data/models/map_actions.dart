@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:geoink/data/models/action_manager.dart';
 
 class TempDoable extends ManualDoable {
@@ -14,9 +16,21 @@ class MapHistory extends DoableHistory {
        _undoRestorePoints = undoRestorePoint ?? [] {}
   List<int> _undoRestorePoints;
   List<int> _redoRestorePoints;
-  bool get canRestore => _undoRestorePoints.isNotEmpty && _redoRestorePoints.isNotEmpty && _undoRestorePoints.length == _redoRestorePoints.length;
+  bool get canRestore =>
+      _undoRestorePoints.isNotEmpty &&
+      _redoRestorePoints.isNotEmpty &&
+      _undoRestorePoints.length == _redoRestorePoints.length;
   bool get undoReachedRestore => _undoRestorePoints == undoStack.length;
   bool clearRedoAfterUndo = false;
+
+  // will be changeable in setting
+  final int historyLimit = 50;
+  bool get needsToRemoveOnAdd {
+    return (_undoRestorePoints.isEmpty
+            ? undoStack.length
+            : _undoRestorePoints.min) >
+        historyLimit;
+  }
 
   @override
   bool undo() {
@@ -26,6 +40,15 @@ class MapHistory extends DoableHistory {
       clearRedoAfterUndo = false;
     }
     return result;
+  }
+
+  @override
+  void add(Doable action) {
+    super.add(action);
+    if (needsToRemoveOnAdd) {
+      undoStack.removeAt(0);
+      debugPrint("Removed the oldest undoable for limit");
+    }
   }
 
   void setRestorePoint() {
@@ -42,5 +65,11 @@ class MapHistory extends DoableHistory {
   List<Doable> getDoableFromRestorePoint() {
     return undoStack.sublist(_undoRestorePoints.last);
   }
-  MapHistory copy() => MapHistory(redoStack: redoStack,undoStack: undoStack,undoRestorePoint: _undoRestorePoints,redoRestorePoint: _redoRestorePoints);
+
+  MapHistory copy() => MapHistory(
+    redoStack: redoStack,
+    undoStack: undoStack,
+    undoRestorePoint: _undoRestorePoints,
+    redoRestorePoint: _redoRestorePoints,
+  );
 }

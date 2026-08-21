@@ -140,6 +140,7 @@ jobs:
         run: |
           DESTINATION_FOLDER="artifacts/${{ env.PROJECT_NAME }}"
           mkdir -p $DESTINATION_FOLDER
+          cp assets/images/icon.png $DESTINATION_FOLDER/${{ env.PROJECT_NAME }}.png
           cp -r build/linux/x64/release/bundle/* $DESTINATION_FOLDER
           tar -czf "artifacts/${{ env.PROJECT_NAME }}-${{ matrix.platform }}-${{ env.TAG }}-${{ matrix.arch }}.tar.gz" \
           -C artifacts/ ${{ env.PROJECT_NAME }}

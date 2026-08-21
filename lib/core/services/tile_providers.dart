@@ -13,7 +13,7 @@ TileLayer getOpenStreetMapTileLayer({
   tileBuilder: darkMode ? darkModeTileBuilder : null,
   keepBuffer: 0,
   userAgentPackageName:
-      "com.example.geoink (contact: mahdigholamigodarzi@gmail.com)",
+      "com.mahdigholamigodarzi.geoink (contact: mahdigholamigodarzi@gmail.com)",
   tileProvider: networkTileProvider,
   tileDisplay: instantLoad
       ? const TileDisplay.fadeIn()

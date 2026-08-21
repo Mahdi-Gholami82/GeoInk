@@ -63,22 +63,24 @@ class PrefsState {
     );
   }
 
-  static void addToRecentProjects(GeoinkProject project) {
+  static void addToRecentProjectsIfNotExists(GeoinkProject project) {
     assert(project.path != null);
     List<String>? recentProjectsPaths = instance.getStringList(
       "recentProjectsPaths",
     );
-    recentProjectsPaths?.add(project.path!);
-    if (recentProjectsPaths != null &&
-        recentProjectsPaths.length > recentProjectsCountLimit) {
-      recentProjectsPaths.removeRange(
-        0,
-        recentProjectsPaths.length - recentProjectsCountLimit,
+    if (!(recentProjectsPaths?.contains(project.path) ?? false)) {
+      recentProjectsPaths?.add(project.path!);
+      if (recentProjectsPaths != null &&
+          recentProjectsPaths.length > recentProjectsCountLimit) {
+        recentProjectsPaths.removeRange(
+          0,
+          recentProjectsPaths.length - recentProjectsCountLimit,
+        );
+      }
+      instance.setStringList(
+        "recentProjectsPaths",
+        recentProjectsPaths ?? [project.path!],
       );
     }
-    instance.setStringList(
-      "recentProjectsPaths",
-      recentProjectsPaths ?? [project.path!],
-    );
   }
 }

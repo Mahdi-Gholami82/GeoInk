@@ -1,7 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
+import 'package:geoink/core/ui/widgets/custom_map_attributions.dart';
 import 'package:geoink/core/ui/widgets/responsive_drawer.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/geoink_project.dart';
@@ -36,6 +38,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   late ProjectNotifier projectNotifier;
   late Function openRichAttributionWidget;
   late ThemeNotifier themeNotifier;
+  late final customMapAttributionsController =
+      CustomMapAttributionsController();
+  bool showMapAttribution = true;
 
   bool loading = false;
 
@@ -48,12 +53,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     loading = true;
     loadProjectFuture = PrefsState.loadSelectedProject().then((value) {
       if (value == null) {
+        showMapAttribution = false;
         showProjectsSheet(context).then((_) async {
           await Future.delayed(Duration(milliseconds: 200));
-          openRichAttributionWidget();
+          customMapAttributionsController.open();
         });
       } else {
-        ref.watch(projectProvider.notifier).update(value);
+        ref.watch(projectProvider.notifier).importFromProject(value);
       }
       return value;
     });
@@ -104,35 +110,31 @@ class _HomePageState extends ConsumerState<HomePage> {
                         darkMode: themeNotifier.isDark(context),
                       ),
                       ...mapChildren,
-                      RichAttributionWidget(
-                        openButton: (context, open) {
-                          openRichAttributionWidget = open;
-                          return IconButton(
-                            onPressed: open,
-                            tooltip: 'Attributions',
-                            icon: Icon(
-                              Icons.info_outlined,
-                              color: Colors.black,
-                              size: 24,
+                      Align(
+                        alignment: AlignmentGeometry.bottomLeft,
+                        child: CustomMapAttributions(
+                          initialyOpened: showMapAttribution,
+                          controller: customMapAttributionsController,
+                          children: [
+                            Text.rich(
+                              TextSpan(
+                                text: "© OSM Contributors",
+                                style: TextStyle(
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => launchUrl(
+                                    Uri.parse(
+                                      "https://www.openstreetmap.org/about/",
+                                    ),
+                                  ),
+                              ),
                             ),
-                          );
-                        },
-                        alignment: AttributionAlignment.bottomLeft,
-                        showFlutterMapAttribution: false,
-                        attributions: [
-                          TextSourceAttribution(
-                            "OSM Contributors",
-                            onTap: () => launchUrl(
-                              Uri.parse("https://www.openstreetmap.org/about/"),
+                            Text(
+                              "This attribution is the same throughout this app, except where otherwise specified",
                             ),
-                            prependCopyright: true,
-                          ),
-
-                          TextSourceAttribution(
-                            "This attribution is the same throughout this app, except where otherwise specified",
-                            prependCopyright: false,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),

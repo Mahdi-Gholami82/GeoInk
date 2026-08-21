@@ -83,6 +83,17 @@ class GeoinkProject {
     );
   }
 
+  @override
+  int get hashCode => Object.hash(this.title, this.path);
+
+  @override
+  bool operator ==(Object other) {
+    if (other case GeoinkProject otherProject) {
+      return this.title == otherProject.title && this.path == otherProject.path;
+    }
+    return false;
+  }
+
   static Future<GeoinkProject> fromFile(File file) async {
     var decoded = jsonDecode(file.readAsStringSync());
     if (!(decoded is Map)) {
@@ -102,11 +113,6 @@ class GeoinkProject {
       description: properties["description"] ?? "",
       lastModified: lastModified,
     );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is GeoinkProject ? this.path == other.path : super == other;
   }
 
   String? title;

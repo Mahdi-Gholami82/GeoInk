@@ -23,6 +23,7 @@ class ProjectNotifier extends _$ProjectNotifier {
 
   void update(GeoinkProject project) {
     PrefsState.setSelectedProject(project);
+    PrefsState.addToRecentProjectsIfNotExists(project);
     state = project;
   }
 

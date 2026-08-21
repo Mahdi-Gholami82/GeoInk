@@ -30,7 +30,7 @@ Future<void> _doHandleSaveAs(WidgetRef ref) async {
     } else {
       projectNotifier.updatePath(savedPath);
     }
-    PrefsState.addToRecentProjects(ref.read(projectProvider)!);
+    PrefsState.addToRecentProjectsIfNotExists(ref.read(projectProvider)!);
   }
 }
 

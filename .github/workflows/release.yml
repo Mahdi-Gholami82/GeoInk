@@ -95,7 +95,7 @@ jobs:
       - name: Cache Gradle
         uses: actions/cache@v6
         # cant access cache from other refs
-        if: github.event_name == 'workflow_dispatch'
+        if: matrix.platform == 'android' && github.event_name == 'workflow_dispatch'
         with:
           path: |
             ~/.gradle/caches
@@ -105,7 +105,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Clean up disk space
-        if: startsWith(matrix.platform,'android')
+        if: matrix.platform == 'android'
         run: |
           echo BEFORE CLEAN UP
           df -h

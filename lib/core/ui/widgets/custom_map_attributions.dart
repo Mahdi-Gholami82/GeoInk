@@ -46,6 +46,7 @@ class CustomMapAttributions extends StatefulWidget {
     this.initialyOpened = true,
     required this.controller,
     required this.children,
+    this.duration = const Duration(milliseconds: 200),
   });
   final double buttonHeight;
   final double width;
@@ -53,6 +54,7 @@ class CustomMapAttributions extends StatefulWidget {
   final CustomMapAttributionsAlignment alignment;
   final List<Widget> children;
   final bool initialyOpened;
+  final Duration duration;
   @override
   State<CustomMapAttributions> createState() => _CustomMapAttributionsState();
 }
@@ -74,19 +76,9 @@ class _CustomMapAttributionsState extends State<CustomMapAttributions> {
         });
       });
     }
-  }
-
-  @override
-  void dispose() {
-    unawaited(mapEvent?.cancel());
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     void subscribeToMap() {
       mapEvent = MapController.of(context).mapEventStream.listen((e) async {
-        setState(() => isOpen = false);
+        setState(() => widget.controller.close());
         await mapEvent?.cancel();
       });
     }
@@ -102,7 +94,16 @@ class _CustomMapAttributionsState extends State<CustomMapAttributions> {
         isOpen = false;
       });
     };
+  }
 
+  @override
+  void dispose() {
+    unawaited(mapEvent?.cancel());
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     var button = AnimatedSwitcher(
       switchInCurve: Curves.easeOut,
       switchOutCurve: Curves.easeIn,
@@ -138,11 +139,11 @@ class _CustomMapAttributionsState extends State<CustomMapAttributions> {
           children: [
             AnimatedScale(
               alignment: widget.alignment.widgetAlignment,
-              scale: isOpen ? 1 : 0.1,
-              duration: Duration(milliseconds: 200),
+              scale: isOpen ? 1 : 0.01,
+              duration: widget.duration,
               child: AnimatedOpacity(
-                opacity: isOpen ? 1 : 0.1,
-                duration: Duration(milliseconds: 200),
+                opacity: isOpen ? 1 : 0,
+                duration: widget.duration,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,

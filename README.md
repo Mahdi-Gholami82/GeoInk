@@ -27,3 +27,9 @@
 
 
 > Note: GeoInk is still under development and lacks many advanced features, but it provides the basic functionality needed to get you started.
+
+
+## Special Thanks
+
+Special thanks to **Alireza Masrour** for designing the icon.
+

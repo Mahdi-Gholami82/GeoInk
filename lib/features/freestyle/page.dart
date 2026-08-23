@@ -277,7 +277,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
         ),
         extendBodyBehindAppBar: true,
         body: BaseShortcuts(
-          freeStyleShortcuts: true,
+          freeStyleEnable: true,
           child: Actions(
             actions: {
               CancelDrawIntent: CallbackAction(

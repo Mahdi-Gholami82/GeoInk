@@ -1,18 +1,13 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geoink/core/ui/lock_screen_on_future.dart';
-import 'package:geoink/core/utils/handle_save.dart';
-import 'package:geoink/core/utils/show_simple_snackbar.dart';
+import 'package:geoink/core/ui/widgets/desktop_only_tooltip.dart';
+import 'package:geoink/core/utils/handle_project_files.dart';
 import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/features/appbar/widgets/appbar_menu.dart';
 
 class FileMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ProjectNotifier projectNotifier = ref.read(projectProvider.notifier);
     ref.watch(projectProvider);
 
     return AppbarMenu(
@@ -21,21 +16,7 @@ class FileMenu extends ConsumerWidget {
         MenuItemButton(
           leadingIcon: Icon(Icons.file_open),
           onPressed: () async {
-            lockScreenOnFuture(
-              context,
-              job: () async {
-                var result = await FilePicker.platform.pickFiles(
-                  dialogTitle: "Open Project",
-                );
-                if (result != null) {
-                  var file = File(result.files.single.path!);
-                  await projectNotifier.importProjectFromFile(file);
-                }
-              },
-              onError: () {
-                showSimpleSnackBar(context, message: "Failed to load project");
-              },
-            );
+            handleOpen(context, ref);
           },
           child: const Text("Open"),
         ),

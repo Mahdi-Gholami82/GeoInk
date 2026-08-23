@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/lock_screen_on_future.dart';
 import 'package:geoink/core/utils/process_file_path.dart';
+import 'package:geoink/core/utils/show_simple_snackbar.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/models/prefs_state.dart';
 import 'package:geoink/data/providers/projects.dart';
@@ -49,3 +50,20 @@ Future<void> handleSave(BuildContext context, WidgetRef ref) async {
     await projectNotifier.saveToPath();
   }
 }
+
+Future<void> handleOpen(BuildContext context, WidgetRef ref) async =>
+    lockScreenOnFuture(
+      context,
+      job: () async {
+        var result = await FilePicker.platform.pickFiles(
+          dialogTitle: "Open Project",
+        );
+        if (result != null) {
+          var file = File(result.files.single.path!);
+          await ref.read(projectProvider.notifier).importProjectFromFile(file);
+        }
+      },
+      onError: () {
+        showSimpleSnackBar(context, message: "Failed to load project");
+      },
+    );

@@ -5,17 +5,19 @@ Future<T> lockScreenOnFuture<T>(
   required Future<T> Function() job,
   Function? onError,
 }) {
-  showDialog(
-    context: context,
-    builder: (context) => Container(color: Colors.black26),
+  final overLayEntry = OverlayEntry(
+    builder: (context) =>
+        const ModalBarrier(dismissible: false, color: Colors.black26),
   );
+
+  Overlay.of(context).insert(overLayEntry);
   return job().then(
-    (value) {
-      Navigator.of(context).pop();
+    (value) async {
+      overLayEntry.remove();
       return value;
     },
-    onError: (error, stackTrace) {
-      Navigator.of(context).pop();
+    onError: (error, stackTrace) async {
+      overLayEntry.remove();
       onError?.call();
     },
   );

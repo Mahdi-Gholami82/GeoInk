@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geoink/core/ui/widgets/desktop_only_tooltip.dart';
 import 'package:geoink/features/freestyle/widgets/floating_container.dart';
 import 'package:geoink/features/freestyle/widgets/toolbar_button.dart';
 
@@ -44,6 +45,7 @@ class _FloatingToolBarState extends State<FloatingToolBar> {
         child: Row(
           children: [
             ToolbarButton(
+              desktopOnlyToolTip: "Ctrl + Z",
               constraints: buttonConstraints,
               onTap: () {
                 widget.onUndo();
@@ -54,6 +56,7 @@ class _FloatingToolBarState extends State<FloatingToolBar> {
               ],
             ),
             ToolbarButton(
+              desktopOnlyToolTip: "Ctrl + Shift + Z",
               constraints: buttonConstraints,
               onTap: () {
                 widget.onRedo();
@@ -67,31 +70,37 @@ class _FloatingToolBarState extends State<FloatingToolBar> {
             Row(
               spacing: 8,
               children: [
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(10),
+                DesktopOnlyTooltip(
+                  toolTip: "Esc",
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusGeometry.circular(10),
+                      ),
                     ),
+                    onPressed: widget.enableCancel
+                        ? () {
+                            widget.onCancel();
+                          }
+                        : null,
+                    child: Text("Cancel"),
                   ),
-                  onPressed: widget.enableCancel
-                      ? () {
-                          widget.onCancel();
-                        }
-                      : null,
-                  child: Text("Cancel"),
                 ),
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(10),
+                DesktopOnlyTooltip(
+                  toolTip: "Enter",
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusGeometry.circular(10),
+                      ),
                     ),
+                    onPressed: widget.enableOk
+                        ? () {
+                            widget.onOk();
+                          }
+                        : null,
+                    child: Text("Ok"),
                   ),
-                  onPressed: widget.enableOk
-                      ? () {
-                          widget.onOk();
-                        }
-                      : null,
-                  child: Text("Ok"),
                 ),
               ],
             ),

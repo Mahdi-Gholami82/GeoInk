@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geoink/core/utils/handle_project_files.dart';
 import 'package:geoink/data/providers/history.dart';
 
 // Base
 class UndoIntent extends Intent {}
-class Redointent extends Intent {}
+
+class RedoIntent extends Intent {}
 
 // FreeStyle
 class CancelDrawIntent extends Intent {}
+
 class ConfirmDrawIntent extends Intent {}
 
 class BaseShortcuts extends ConsumerWidget {
-  const BaseShortcuts({required this.child, this.freeStyleShortcuts = false});
+  const BaseShortcuts({required this.child, this.freeStyleEnable = false});
   final Widget child;
-  final bool freeStyleShortcuts;
+  final bool freeStyleEnable;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     HistoryNotifier historyNotifier = ref.watch(historyProvider.notifier);
@@ -27,16 +30,19 @@ class BaseShortcuts extends ConsumerWidget {
           LogicalKeyboardKey.control,
           LogicalKeyboardKey.shift,
           LogicalKeyboardKey.keyZ,
-        ): Redointent(),
-        if (freeStyleShortcuts) ...{
-          SingleActivator(LogicalKeyboardKey.escape):CancelDrawIntent(),
-          SingleActivator(LogicalKeyboardKey.enter):ConfirmDrawIntent()
-        }
+        ): RedoIntent(),
+        // not enabled in free style page
+        // if (!freeStyleEnable) ...{},
+        // enabled in freestyle page
+        if (freeStyleEnable) ...{
+          SingleActivator(LogicalKeyboardKey.escape): CancelDrawIntent(),
+          SingleActivator(LogicalKeyboardKey.enter): ConfirmDrawIntent(),
+        },
       },
       child: Actions(
         actions: {
-          UndoIntent: CallbackAction(onInvoke: (intent) => historyNotifier.undo()),
-          Redointent: CallbackAction(onInvoke: (intent) => historyNotifier.redo()),
+          UndoIntent: CallbackAction(onInvoke: (_) => historyNotifier.undo()),
+          RedoIntent: CallbackAction(onInvoke: (_) => historyNotifier.redo()),
         },
         child: child,
       ),

@@ -63,6 +63,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
     var children = List.generate(layers.length, (index) {
       var currentLayer = layers[index];
       return NestedChild(
+        key: ValueKey(currentLayer.name),
         (context, childIndex) {
           FlutterMapEntry entry = currentLayer.items[childIndex];
           var childMenuController = MenuController();

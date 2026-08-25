@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class DesktopOnlyTooltip extends StatelessWidget {
-  DesktopOnlyTooltip({super.key, required this.child, this.toolTip = ""});
-  Widget child;
-  String toolTip;
+  const DesktopOnlyTooltip({super.key, required this.child, this.toolTip = ""});
+  final Widget child;
+  final String toolTip;
   @override
   Widget build(BuildContext context) {
     return Tooltip(

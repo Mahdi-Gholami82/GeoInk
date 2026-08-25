@@ -14,13 +14,13 @@ enum CustomMapAttributionsAlignment {
 }
 
 class CustomMapAttributionsController {
-  void Function()? _open;
+  void Function(Duration? duration)? _open;
   void Function()? _close;
   bool isOpen = false;
 
-  void open() {
+  void open([Duration? duration]) {
     assert(_open != null, "controller not attached on open");
-    _open!();
+    _open!(duration);
   }
 
   void close() {
@@ -47,6 +47,7 @@ class CustomMapAttributions extends StatefulWidget {
     required this.controller,
     required this.children,
     this.duration = const Duration(milliseconds: 200),
+    this.closureDuration = const Duration(seconds: 3),
   });
   final double buttonHeight;
   final double width;
@@ -55,6 +56,7 @@ class CustomMapAttributions extends StatefulWidget {
   final List<Widget> children;
   final bool initialyOpened;
   final Duration duration;
+  final Duration closureDuration;
   @override
   State<CustomMapAttributions> createState() => _CustomMapAttributionsState();
 }
@@ -65,16 +67,20 @@ class _CustomMapAttributionsState extends State<CustomMapAttributions> {
   set isOpen(bool value) => widget.controller.isOpen = value;
   bool initialized = false;
 
+  void addPostFrameClosureOfAttributionWidget(Duration duration) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(duration).then((_) {
+        widget.controller.close();
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     isOpen = widget.initialyOpened;
     if (isOpen) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(Duration(seconds: 3)).then((_) {
-          widget.controller.close();
-        });
-      });
+      addPostFrameClosureOfAttributionWidget(widget.closureDuration);
     }
     void subscribeToMap() {
       mapEvent = MapController.of(context).mapEventStream.listen((e) async {
@@ -83,10 +89,14 @@ class _CustomMapAttributionsState extends State<CustomMapAttributions> {
       });
     }
 
-    widget.controller._open = () {
+    widget.controller._open = (Duration? duration) {
       setState(() {
         isOpen = true;
-        subscribeToMap();
+        if (duration == null) {
+          subscribeToMap();
+        } else {
+          addPostFrameClosureOfAttributionWidget(duration);
+        }
       });
     };
     widget.controller._close = () {

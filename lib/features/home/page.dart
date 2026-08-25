@@ -56,7 +56,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         showMapAttribution = false;
         showProjectsSheet(context).then((_) async {
           await Future.delayed(Duration(milliseconds: 200));
-          customMapAttributionsController.open();
+          customMapAttributionsController.open(Duration(seconds: 3));
         });
       } else {
         ref.watch(projectProvider.notifier).importFromProject(value);

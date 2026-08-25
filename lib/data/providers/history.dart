@@ -76,6 +76,14 @@ class HistoryNotifier extends _$HistoryNotifier {
     forceRebuild();
   }
 
+  // doesnt enable redo after undo
+  void shadowUndo() {
+    debugPrint("Job : Shadow Undo");
+    state.shadowUndo();
+    debugPrint("Undo stack lenght : ${state.undoStack.length} ");
+    forceRebuild();
+  }
+
   void redo() {
     debugPrint("Job : Redo");
     state.redo();

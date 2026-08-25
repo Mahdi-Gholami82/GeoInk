@@ -43,6 +43,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   MapLayer? get currentLayer => chosenLayers[selectedType];
   bool mouseEntered = false;
   set currentLayer(MapLayer? newLayer) {
+    assert(newLayer != null && selectedType == newLayer.entryType);
     chosenLayers[selectedType] = newLayer;
   }
 
@@ -115,7 +116,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
 
   void cancelDrawing() {
     historyNotifier.restoreFromPoints();
-    historyNotifier.undo();
+    historyNotifier.shadowUndo();
     endDrawing();
   }
 
@@ -132,12 +133,12 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           );
           // if no layer is selected or layer is invalid (deleted) default to main layer
           if (layer == null) {
-            currentLayer = mapLayerList.createNewDefaultLayer(type);
-            layer = currentLayer;
+            chosenLayers[type] = mapLayerList.createNewDefaultLayer(type);
+            layer = chosenLayers[type];
             createdLayer = true;
           } else if (layer!.isInvalid) {
-            currentLayer = mapLayerList.getDefaultLayerEntryOrNull(type)!;
-            layer = currentLayer;
+            chosenLayers[type] = mapLayerList.getDefaultLayerEntryOrNull(type)!;
+            layer = chosenLayers[type];
           }
           layer!.addUnique(entry);
         },
@@ -153,8 +154,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           }
           if (createdLayer) {
             mapLayerList.items.remove(layer);
-            if (currentLayer != null && currentLayer!.isMain) {
-              currentLayer = null;
+            if (chosenLayers[type] != null && chosenLayers[type]!.isMain) {
+              chosenLayers[type] = null;
             }
             // Mark invalid to notify other entries on redo
             layer!.isInvalid = true;

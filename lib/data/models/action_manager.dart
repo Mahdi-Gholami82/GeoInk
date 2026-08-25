@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 abstract class Doable {
   bool done = false;
   void doIt();
@@ -76,14 +78,24 @@ class DoableHistory {
   List<Doable> get undoStack => _undoStack;
   List<Doable> get redoStack => _redoStack;
 
-  bool undo() {
+  bool _undo({bool addRedo = true}) {
     if (canUndo) {
       Doable action = _undoStack.removeLast();
       action.undoIt();
-      _redoStack.add(action);
+      if (addRedo) {
+        _redoStack.add(action);
+      }
       return true;
     }
     return false;
+  }
+
+  bool undo() {
+    return _undo(addRedo: true);
+  }
+
+  bool shadowUndo() {
+    return _undo(addRedo: false);
   }
 
   bool redo() {

@@ -512,7 +512,7 @@ class MapLayerList {
     return getDefaultLayerEntry(type);
   }
 
-  void addLayer(MapLayer layerEntry) {
+  void addLayerIgnoreIfExists(MapLayer layerEntry) {
     try {
       items.add(layerEntry);
     } on DuplicateValueError {}

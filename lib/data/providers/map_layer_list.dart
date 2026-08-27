@@ -96,16 +96,19 @@ class MapLayerListNotifier extends _$MapLayerListNotifier {
       );
       if (entries.isEmpty) continue;
       assert(entries.every((e) => e.runtimeType == entries.first.runtimeType));
-      String? name = properties["name"];
+      String? layerName = properties["layer-name"];
+      EntryType type = EntryType.fromType(entries.first.runtimeType);
       MapLayer layer =
-          (name == null
-              ? null
+          (layerName == null
+              ? state.getDefaultLayerEntry(type)
               : state.items.toList().firstWhereOrNull(
-                  (e) => e.name.trim() == name,
+                  (e) => e.name.trim() == layerName,
                 )) ??
-          state.getDefaultLayerEntry(
-            EntryType.fromType(entries.first.runtimeType),
+          MapLayer(
+            name: layerName!,
+            entryType: EntryType.fromType(entries.first.runtimeType),
           );
+      state.addLayerIgnoreIfExists(layer);
       layerEntryMap[layer] = entries;
     }
     return layerEntryMap;

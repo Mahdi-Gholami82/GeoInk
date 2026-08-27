@@ -47,6 +47,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     chosenLayers[selectedType] = newLayer;
   }
 
+  var mapController = MapController();
   late Map<EntryType, MapLayer?> chosenLayers;
   late Map<MapLayer, int> oldLayerLenghts;
   late HistoryNotifier historyNotifier;
@@ -171,7 +172,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   FlutterMapEntry get currentEntry => currentLayer!.items.last;
 
   LatLng mousePositionToCoords(Offset mousePosition) =>
-      homeMapCamera.screenOffsetToLatLng(mousePosition);
+      mapController.camera.screenOffsetToLatLng(mousePosition);
 
   void updateOnMousePosition(LatLng mouseCoords) {
     setState(() {
@@ -231,6 +232,13 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     }
   }
 
+  void updateMousePositionCallBack(PointerEvent event) {
+    _mousePosition = event.position;
+    if (!finishedDrawing) {
+      updateOnMousePosition(mousePositionToCoords(_mousePosition));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.watch(historyProvider);
@@ -242,294 +250,299 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
       onExit: (event) {
         mouseEntered = false;
       },
-      onHover: (event) {
-        _mousePosition = event.position;
-        if (!finishedDrawing) {
-          updateOnMousePosition(mousePositionToCoords(_mousePosition));
-        }
-      },
-      child: Scaffold(
-        appBar: FreeStyleButtonsBar(
-          initSelectedType: selectedType,
-          onTypeSwitch: (EntryType type) {
-            setState(() {
-              resetLayerVisiblity();
-              selectedType = type;
-              makeLayerVisible();
-            });
-          },
-          onConfirm: () {
-            resetLayerVisiblity();
-            historyNotifier.applyFromPoints();
-          },
-          onCancel: () {
-            for (var layer in mapLayerList.items) {
-              int? start = oldLayerLenghts[layer];
-              if (start == null) {
-                mapLayerList.items.remove(layer);
-                return;
-              }
-              int end = layer.items.length;
-              layer.items.removeRange(start, end);
-            }
-            resetLayerVisiblity();
-            historyNotifier.restoreFromPoints();
-          },
-        ),
-        extendBodyBehindAppBar: true,
-        body: BaseShortcuts(
-          freeStyleEnable: true,
-          child: Actions(
-            actions: {
-              CancelDrawIntent: CallbackAction(
-                onInvoke: (_) {
-                  setState(() {
-                    if (!finishedDrawing) cancelDrawing();
-                  });
-                  return true;
-                },
-              ),
-              ConfirmDrawIntent: CallbackAction(
-                onInvoke: (_) {
-                  setState(() {
-                    if (!finishedDrawing) confirmDrawing();
-                  });
-                  return true;
-                },
-              ),
+      child: Listener(
+        onPointerMove: updateMousePositionCallBack,
+        onPointerHover: updateMousePositionCallBack,
+        child: Scaffold(
+          appBar: FreeStyleButtonsBar(
+            initSelectedType: selectedType,
+            onTypeSwitch: (EntryType type) {
+              setState(() {
+                resetLayerVisiblity();
+                selectedType = type;
+                makeLayerVisible();
+              });
             },
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                FlutterMap(
-                  options: MapOptions(
-                    initialZoom: homeMapCamera.zoom,
-                    initialCenter: homeMapCamera.center,
-                    interactionOptions: InteractionOptions(
-                      flags:
-                          InteractiveFlag.all &
-                          ~InteractiveFlag.doubleTapZoom &
-                          ~InteractiveFlag.doubleTapDragZoom,
-                    ),
-                    onTap: (tapPosition, point) {
-                      lastMouseClickPoint = point;
-                      setState(() {
-                        switch (selectedType) {
-                          case EntryType.marker:
-                            {
-                              _addToLayerWithHistory(
-                                MarkerEntry.withDefaults(
-                                  color: currentColor,
-                                  point: point,
-                                ),
-                              );
-                              break;
-                            }
-                          case EntryType.polygon:
-                            {
-                              if (canAddNewFlutterMapEntry) {
-                                _addToLayerWithHistory(
-                                  PolygonEntry.withDefaults(
-                                    borderColor: currentColor,
-                                    points: [point],
-                                  ),
-                                );
-                                beginDrawing();
-                              } else {
-                                var polygon =
-                                    (currentLayer!.items.last as PolygonEntry);
-                                historyNotifier.addAndDo(
-                                  ManualDoable(
-                                    executeBase: () {
-                                      polygon.points.add(point);
-                                    },
-                                    undoBase: () {
-                                      polygon.points.removeLast();
-                                      if (mouseEntered) {
-                                        updateOnMousePosition(
-                                          mousePositionToCoords(_mousePosition),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                );
-                              }
-                            }
-                          case EntryType.polyline:
-                            {
-                              if (canAddNewFlutterMapEntry) {
-                                _addToLayerWithHistory(
-                                  PolylineEntry.withDefaults(
-                                    color: currentColor,
-                                    points: [point],
-                                  ),
-                                );
-                                beginDrawing();
-                              } else {
-                                var polyline =
-                                    (currentLayer!.items.last as PolylineEntry);
-                                historyNotifier.addAndDo(
-                                  ManualDoable(
-                                    executeBase: () {
-                                      polyline.points.add(point);
-                                    },
-                                    undoBase: () {
-                                      polyline.points.removeLast();
-                                      if (mouseEntered) {
-                                        updateOnMousePosition(
-                                          mousePositionToCoords(_mousePosition),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                );
-                              }
-                            }
-                          case EntryType.circle:
-                            {
-                              if (canAddNewFlutterMapEntry) {
-                                _addToLayerWithHistory(
-                                  CircleEntry.withDefaults(
-                                    borderColor: currentColor,
-                                    center: point,
-                                    radius: 0,
-                                  ),
-                                );
-                                beginDrawing();
-                              } else {
-                                updateOnMousePosition(point);
-                                confirmDrawing();
-                              }
-                            }
-                        }
-                      });
-                    },
-                  ),
-                  children: [
-                    getOpenStreetMapTileLayer(
-                      darkMode: ref
-                          .watch(themeProvider.notifier)
-                          .isDark(context),
-                    ),
-                    ...mapLayerList.getMapChildren(),
-                  ],
+            onConfirm: () {
+              resetLayerVisiblity();
+              historyNotifier.applyFromPoints();
+            },
+            onCancel: () {
+              for (var layer in mapLayerList.items) {
+                int? start = oldLayerLenghts[layer];
+                if (start == null) {
+                  mapLayerList.items.remove(layer);
+                  return;
+                }
+                int end = layer.items.length;
+                layer.items.removeRange(start, end);
+              }
+              resetLayerVisiblity();
+              historyNotifier.restoreFromPoints();
+            },
+          ),
+          extendBodyBehindAppBar: true,
+          body: BaseShortcuts(
+            freeStyleEnable: true,
+            child: Actions(
+              actions: {
+                CancelDrawIntent: CallbackAction(
+                  onInvoke: (_) {
+                    setState(() {
+                      if (!finishedDrawing) cancelDrawing();
+                    });
+                    return true;
+                  },
                 ),
-                Align(
-                  alignment: AlignmentGeometry.bottomStart,
-                  child: Padding(
-                    padding: const EdgeInsetsGeometry.only(
-                      left: 20,
-                      right: 20,
-                      bottom: 20,
-                    ),
-                    child: SafeArea(
-                      child: FittedBox(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 15,
-                          children: [
-                            Row(
-                              spacing: 10,
-                              children: [
-                                Container(
-                                  decoration: makeFloatingDecoration(context),
-                                  padding: EdgeInsets.all(2),
-                                  child: IconButton(
-                                    color: currentColor.onColor(),
-                                    style: IconButton.styleFrom(
-                                      iconSize: 18,
-                                      backgroundColor: currentColor,
-                                      fixedSize: Size.square(40),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadiusGeometry.circular(15),
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      showSimpleColorPicker(
-                                        context: context,
-                                        initialColor: currentColor,
-                                      ).then((chosenColor) {
-                                        if (chosenColor != null) {
-                                          chosenColors[selectedType] =
-                                              chosenColor;
-                                        }
-                                      });
-                                    },
-                                    icon: Icon(Icons.colorize),
+                ConfirmDrawIntent: CallbackAction(
+                  onInvoke: (_) {
+                    setState(() {
+                      if (!finishedDrawing) confirmDrawing();
+                    });
+                    return true;
+                  },
+                ),
+              },
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  FlutterMap(
+                    mapController: mapController,
+                    options: MapOptions(
+                      initialZoom: homeMapCamera.zoom,
+                      initialCenter: homeMapCamera.center,
+                      interactionOptions: InteractionOptions(
+                        flags:
+                            InteractiveFlag.all &
+                            ~InteractiveFlag.doubleTapZoom &
+                            ~InteractiveFlag.doubleTapDragZoom,
+                      ),
+                      onTap: (tapPosition, point) {
+                        lastMouseClickPoint = point;
+                        setState(() {
+                          switch (selectedType) {
+                            case EntryType.marker:
+                              {
+                                _addToLayerWithHistory(
+                                  MarkerEntry.withDefaults(
+                                    color: currentColor,
+                                    point: point,
                                   ),
-                                ),
-                                FloatingContainer(
-                                  child: Material(
-                                    child: ToolbarButton(
-                                      constraints: BoxConstraints.tightFor(
-                                        height: 42,
-                                      ),
-                                      onTap: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) => LayerSelector(
-                                            entryType: selectedType,
-                                            initialLayer: currentLayer,
-                                            onConfirm: (MapLayer? selection) {
-                                              resetLayerVisiblity();
-                                              currentLayer = selection;
-                                              makeLayerVisible();
-                                            },
-                                          ),
-                                        );
+                                );
+                                break;
+                              }
+                            case EntryType.polygon:
+                              {
+                                if (canAddNewFlutterMapEntry) {
+                                  _addToLayerWithHistory(
+                                    PolygonEntry.withDefaults(
+                                      borderColor: currentColor,
+                                      points: [point],
+                                    ),
+                                  );
+                                  beginDrawing();
+                                } else {
+                                  var polygon =
+                                      (currentLayer!.items.last
+                                          as PolygonEntry);
+                                  historyNotifier.addAndDo(
+                                    ManualDoable(
+                                      executeBase: () {
+                                        polygon.points.add(point);
                                       },
-                                      spacing: 10,
-                                      children: [
-                                        Icon(Icons.layers_outlined),
-                                        ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            minWidth: 0,
-                                            maxWidth: 100,
-                                          ),
-                                          child: Text(
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            currentLayer?.name ??
-                                                selectedType.mainLayerName,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
+                                      undoBase: () {
+                                        polygon.points.removeLast();
+                                        if (mouseEntered) {
+                                          updateOnMousePosition(
+                                            mousePositionToCoords(
+                                              _mousePosition,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  );
+                                }
+                              }
+                            case EntryType.polyline:
+                              {
+                                if (canAddNewFlutterMapEntry) {
+                                  _addToLayerWithHistory(
+                                    PolylineEntry.withDefaults(
+                                      color: currentColor,
+                                      points: [point],
+                                    ),
+                                  );
+                                  beginDrawing();
+                                } else {
+                                  var polyline =
+                                      (currentLayer!.items.last
+                                          as PolylineEntry);
+                                  historyNotifier.addAndDo(
+                                    ManualDoable(
+                                      executeBase: () {
+                                        polyline.points.add(point);
+                                      },
+                                      undoBase: () {
+                                        polyline.points.removeLast();
+                                        if (mouseEntered) {
+                                          updateOnMousePosition(
+                                            mousePositionToCoords(
+                                              _mousePosition,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  );
+                                }
+                              }
+                            case EntryType.circle:
+                              {
+                                if (canAddNewFlutterMapEntry) {
+                                  _addToLayerWithHistory(
+                                    CircleEntry.withDefaults(
+                                      borderColor: currentColor,
+                                      center: point,
+                                      radius: 0,
+                                    ),
+                                  );
+                                  beginDrawing();
+                                } else {
+                                  updateOnMousePosition(point);
+                                  confirmDrawing();
+                                }
+                              }
+                          }
+                        });
+                      },
+                    ),
+                    children: [
+                      getOpenStreetMapTileLayer(
+                        darkMode: ref
+                            .watch(themeProvider.notifier)
+                            .isDark(context),
+                      ),
+                      ...mapLayerList.getMapChildren(),
+                    ],
+                  ),
+                  Align(
+                    alignment: AlignmentGeometry.bottomStart,
+                    child: Padding(
+                      padding: const EdgeInsetsGeometry.only(
+                        left: 20,
+                        right: 20,
+                        bottom: 20,
+                      ),
+                      child: SafeArea(
+                        child: FittedBox(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 15,
+                            children: [
+                              Row(
+                                spacing: 10,
+                                children: [
+                                  Container(
+                                    decoration: makeFloatingDecoration(context),
+                                    padding: EdgeInsets.all(2),
+                                    child: IconButton(
+                                      color: currentColor.onColor(),
+                                      style: IconButton.styleFrom(
+                                        iconSize: 18,
+                                        backgroundColor: currentColor,
+                                        fixedSize: Size.square(40),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadiusGeometry.circular(15),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        showSimpleColorPicker(
+                                          context: context,
+                                          initialColor: currentColor,
+                                        ).then((chosenColor) {
+                                          if (chosenColor != null) {
+                                            chosenColors[selectedType] =
+                                                chosenColor;
+                                          }
+                                        });
+                                      },
+                                      icon: Icon(Icons.colorize),
+                                    ),
+                                  ),
+                                  FloatingContainer(
+                                    child: Material(
+                                      child: ToolbarButton(
+                                        constraints: BoxConstraints.tightFor(
+                                          height: 42,
+                                        ),
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => LayerSelector(
+                                              entryType: selectedType,
+                                              initialLayer: currentLayer,
+                                              onConfirm: (MapLayer? selection) {
+                                                resetLayerVisiblity();
+                                                currentLayer = selection;
+                                                makeLayerVisible();
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        spacing: 10,
+                                        children: [
+                                          Icon(Icons.layers_outlined),
+                                          ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              minWidth: 0,
+                                              maxWidth: 100,
+                                            ),
+                                            child: Text(
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              currentLayer?.name ??
+                                                  selectedType.mainLayerName,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            FloatingToolBar(
-                              onCancel: () {
-                                setState(() {
-                                  cancelDrawing();
-                                });
-                              },
-                              onOk: () {
-                                setState(() {
-                                  confirmDrawing();
-                                });
-                              },
-                              onRedo: () {
-                                historyNotifier.redo();
-                              },
-                              onUndo: () {
-                                historyNotifier.undo();
-                              },
-                              enableCancel: !finishedDrawing,
-                              enableOk: !finishedDrawing,
-                            ),
-                          ],
+                                ],
+                              ),
+                              FloatingToolBar(
+                                onCancel: () {
+                                  setState(() {
+                                    cancelDrawing();
+                                  });
+                                },
+                                onOk: () {
+                                  setState(() {
+                                    confirmDrawing();
+                                  });
+                                },
+                                onRedo: () {
+                                  historyNotifier.redo();
+                                },
+                                onUndo: () {
+                                  historyNotifier.undo();
+                                },
+                                enableCancel: !finishedDrawing,
+                                enableOk: !finishedDrawing,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

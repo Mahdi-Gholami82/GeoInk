@@ -31,5 +31,5 @@
 
 ## Special Thanks
 
-Special thanks to **Alireza Masrour** for designing the icon.
+Special thanks to [**Alireza Masrour**](https://x.com/MasrourHQ) for designing the icon.
 

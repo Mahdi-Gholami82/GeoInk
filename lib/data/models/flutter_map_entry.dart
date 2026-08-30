@@ -342,6 +342,7 @@ class MapLayer {
   bool visible = true;
   bool isInvalid = false;
 
+  
   MapLayer({required this.name, required this.entryType, this.isMain = false});
 
   bool get isEmpty => items.isEmpty;

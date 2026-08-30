@@ -264,15 +264,17 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               });
             },
             onConfirm: () {
+              if (!finishedDrawing) cancelDrawing();
               resetLayerVisiblity();
               historyNotifier.applyFromPoints();
             },
             onCancel: () {
+              debugPrint("Cancel freestyle process");
               for (var layer in mapLayerList.items) {
                 int? start = oldLayerLenghts[layer];
                 if (start == null) {
                   mapLayerList.items.remove(layer);
-                  return;
+                  break;
                 }
                 int end = layer.items.length;
                 layer.items.removeRange(start, end);

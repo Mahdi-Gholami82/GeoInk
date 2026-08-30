@@ -2,6 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:geoink/data/models/action_manager.dart';
 
+typedef RestorePoint = ({int undoRestorePoint, int redoRestorePoint});
+
 class TempDoable extends ManualDoable {
   TempDoable({required super.executeBase, required super.undoBase});
 }
@@ -10,25 +12,18 @@ class MapHistory extends DoableHistory {
   MapHistory({
     super.redoStack,
     super.undoStack,
-    List<int>? undoRestorePoint,
-    List<int>? redoRestorePoint,
-  }) : _redoRestorePoints = redoRestorePoint ?? [],
-       _undoRestorePoints = undoRestorePoint ?? [] {}
-  List<int> _undoRestorePoints;
-  List<int> _redoRestorePoints;
-  bool get canRestore =>
-      _undoRestorePoints.isNotEmpty &&
-      _redoRestorePoints.isNotEmpty &&
-      _undoRestorePoints.length == _redoRestorePoints.length;
-  bool get undoReachedRestore => _undoRestorePoints == undoStack.length;
+    List<RestorePoint>? restorePoints,
+  }) : _restorePoints = restorePoints ?? [] {}
+  List<RestorePoint> _restorePoints;
+  bool get canRestore => _restorePoints.isNotEmpty;
   bool clearRedoAfterUndo = false;
 
   // will be changeable in setting
   final int historyLimit = 50;
   bool get needsToRemoveOnAdd {
-    return (_undoRestorePoints.isEmpty
+    return (_restorePoints.isEmpty
             ? undoStack.length
-            : _undoRestorePoints.min) >
+            : _restorePoints.map((e) => e.undoRestorePoint).min) >
         historyLimit;
   }
 
@@ -52,24 +47,27 @@ class MapHistory extends DoableHistory {
   }
 
   void setRestorePoint() {
-    _undoRestorePoints.add(undoStack.length);
-    _redoRestorePoints.add(redoStack.length);
+    _restorePoints.add((
+      undoRestorePoint: undoStack.length,
+      redoRestorePoint: redoStack.length,
+    ));
   }
 
   void restore() {
     assert(canRestore);
-    undoStack.removeRange(_undoRestorePoints.removeLast(), undoStack.length);
-    redoStack.removeRange(_redoRestorePoints.removeLast(), redoStack.length);
+    var points = _restorePoints.removeLast();
+    undoStack.removeRange(points.undoRestorePoint, undoStack.length);
+    redoStack.removeRange(points.redoRestorePoint, redoStack.length);
+    debugPrint("restored\n_restorePoints lenght : ${_restorePoints.length}");
   }
 
   List<Doable> getDoableFromRestorePoint() {
-    return undoStack.sublist(_undoRestorePoints.last);
+    return undoStack.sublist(_restorePoints.last.undoRestorePoint);
   }
 
   MapHistory copy() => MapHistory(
     redoStack: redoStack,
     undoStack: undoStack,
-    undoRestorePoint: _undoRestorePoints,
-    redoRestorePoint: _redoRestorePoints,
+    restorePoints: _restorePoints,
   );
 }

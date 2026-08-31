@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:geoink/core/services/tile_providers.dart';
 import 'package:geoink/core/ui/floating_decoration.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
@@ -38,7 +39,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   bool _layerWasInvisible = false;
   var _focusNode = FocusNode();
   var _mousePosition = Offset.zero;
-  late LatLng lastMouseClickPoint;
   late MapCamera homeMapCamera;
   MapLayer? get currentLayer => chosenLayers[selectedType];
   bool mouseEntered = false;
@@ -185,8 +185,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               var polygon = (currentEntry as PolygonEntry);
               if (finishedMouseTrackDraw) {
                 polygon.points.add(mouseCoords);
-                finishedMouseTrackDraw = false;
                 addedTempPoint = true;
+                finishedMouseTrackDraw = false;
               } else {
                 polygon.points.last = mouseCoords;
               }
@@ -196,8 +196,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               var polyline = (currentEntry as PolylineEntry);
               if (finishedMouseTrackDraw) {
                 polyline.points.add(mouseCoords);
-                finishedMouseTrackDraw = false;
                 addedTempPoint = true;
+                finishedMouseTrackDraw = false;
               } else {
                 polyline.points.last = mouseCoords;
               }
@@ -251,8 +251,14 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
         mouseEntered = false;
       },
       child: Listener(
-        onPointerMove: updateMousePositionCallBack,
-        onPointerHover: updateMousePositionCallBack,
+        onPointerMove: (event) {
+          if (event.kind == PointerDeviceKind.mouse) {
+            updateMousePositionCallBack(event);
+          }
+        },
+        onPointerHover: (event) {
+          updateMousePositionCallBack(event);
+        },
         child: Scaffold(
           appBar: FreeStyleButtonsBar(
             initSelectedType: selectedType,
@@ -320,7 +326,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                             ~InteractiveFlag.doubleTapDragZoom,
                       ),
                       onTap: (tapPosition, point) {
-                        lastMouseClickPoint = point;
                         setState(() {
                           switch (selectedType) {
                             case EntryType.marker:

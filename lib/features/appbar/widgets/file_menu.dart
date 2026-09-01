@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geoink/core/ui/widgets/desktop_only_tooltip.dart';
 import 'package:geoink/core/utils/handle_project_files.dart';
 import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/features/appbar/widgets/appbar_menu.dart';

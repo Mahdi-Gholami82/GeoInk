@@ -45,6 +45,18 @@ abstract class FlutterMapEntry {
   }
 }
 
+/// Base class for polygon and polyline entry.
+abstract class FlutterMapMultiPointEntry extends FlutterMapEntry {
+  FlutterMapMultiPointEntry({
+    required super.name,
+    super.visible,
+    super.description,
+    required this.points,
+  });
+
+  final List<LatLng> points;
+}
+
 /// Keeps track of a [Marker] feature that will be added to map layers later.
 class MarkerEntry extends FlutterMapEntry {
   LatLng point;
@@ -108,14 +120,13 @@ class MarkerEntry extends FlutterMapEntry {
 }
 
 /// Keeps track of a [Polygon] feature that will be added to map layers later.
-class PolygonEntry extends FlutterMapEntry {
-  final List<LatLng> points;
+class PolygonEntry extends FlutterMapMultiPointEntry {
   final Color fillColor;
   final Color borderColor;
   final double borderWidth;
   PolygonEntry({
     required super.name,
-    required this.points,
+    required super.points,
     this.fillColor = MapDefaultColors.polygon,
     Color? borderColor,
     this.borderWidth = 2.0,
@@ -125,7 +136,7 @@ class PolygonEntry extends FlutterMapEntry {
 
   PolygonEntry.withDefaults({
     super.name = "polygon",
-    required this.points,
+    required super.points,
     Color? fillColor,
     Color? borderColor,
     num? borderWidth,
@@ -178,14 +189,13 @@ class PolygonEntry extends FlutterMapEntry {
 }
 
 /// Keeps track of a [Polyline] feature that will be added to map layers later.
-class PolylineEntry extends FlutterMapEntry {
-  List<LatLng> points;
+class PolylineEntry extends FlutterMapMultiPointEntry {
   Color color;
   double strokeWidth;
 
   PolylineEntry({
     required super.name,
-    required this.points,
+    required super.points,
     this.color = MapDefaultColors.polyline,
     this.strokeWidth = 3.0,
     super.visible,
@@ -194,7 +204,7 @@ class PolylineEntry extends FlutterMapEntry {
 
   PolylineEntry.withDefaults({
     super.name = "polyline",
-    required this.points,
+    required super.points,
     Color? color,
     num? strokeWidth,
     bool? visible,
@@ -342,7 +352,6 @@ class MapLayer {
   bool visible = true;
   bool isInvalid = false;
 
-  
   MapLayer({required this.name, required this.entryType, this.isMain = false});
 
   bool get isEmpty => items.isEmpty;

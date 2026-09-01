@@ -411,12 +411,13 @@ class HistoryNotifier extends _$HistoryNotifier {
     state.restore();
   }
 
-  void setClearRedoAfterRedo() {
+  void setClearRedoAfterUndo() {
     state.clearRedoAfterUndo = true;
   }
 
   void applyFromPoints() {
     List<Doable> doables = state.getDoableFromRestorePoint();
+    print(doables.length);
     state.restore();
     ManualDoable bulkDoable = ManualDoable(
       executeBase: () {

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 abstract class Doable {
   bool done = false;
   void doIt();
@@ -10,7 +8,7 @@ class ManualDoable extends Doable {
   ManualDoable({required this.executeBase, required this.undoBase}) {}
 
   final Function executeBase;
-  final Function undoBase;
+  final Function() undoBase;
   void doIt() {
     assert(!done);
     executeBase();
@@ -19,8 +17,8 @@ class ManualDoable extends Doable {
 
   void undoIt() {
     assert(done);
-    undoBase();
     done = false;
+    return undoBase();
   }
 }
 

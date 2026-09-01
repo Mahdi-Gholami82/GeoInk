@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:geoink/core/services/tile_providers.dart';
 import 'package:geoink/core/ui/floating_decoration.dart';
 import 'package:geoink/core/ui/widgets/base_shortcuts.dart';
@@ -7,6 +6,7 @@ import 'package:geoink/core/ui/show_color_picker.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/models/freestyle_arguments.dart';
+import 'package:geoink/data/models/map_actions.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/data/providers/theme.dart';
@@ -116,6 +116,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   }
 
   void cancelDrawing() {
+    debugPrint("Canceled");
     historyNotifier.restoreFromPoints();
     historyNotifier.shadowUndo();
     endDrawing();
@@ -132,6 +133,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           debugPrint(
             "Executing _addToLayerWithHistory with {\nentry : ${entry.name}, type : $type\n}",
           );
+
           // if no layer is selected or layer is invalid (deleted) default to main layer
           if (layer == null) {
             chosenLayers[type] = mapLayerList.createNewDefaultLayer(type);
@@ -147,12 +149,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           debugPrint(
             "Undoing _addToLayerWithHistory with {\nentry : ${entry.name}, type : $type}",
           );
-          // If undo has reached a point when the shape isnt being drawn anymore
-          // Happens in the middle of drawing
-          if (!finishedDrawing && !finishedMouseTrackDraw) {
-            historyNotifier.setClearRedoAfterRedo();
-            endDrawing();
-          }
           if (createdLayer) {
             mapLayerList.items.remove(layer);
             if (chosenLayers[type] != null && chosenLayers[type]!.isMain) {
@@ -176,7 +172,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
 
   void updateOnMousePosition(LatLng mouseCoords) {
     setState(() {
-      if (!currentLayer!.isEmpty) {
+      if (currentLayer != null && !currentLayer!.isEmpty) {
         switch (currentLayer!.entryType) {
           case EntryType.marker:
             break;
@@ -205,6 +201,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           case EntryType.circle:
             {
               var circle = (currentEntry as CircleEntry);
+              finishedMouseTrackDraw = false;
               circle.radius = FlutterMapMath.distanceBetween(
                 circle.center.latitude,
                 circle.center.longitude,
@@ -239,6 +236,25 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     }
   }
 
+  void safeUndo() {
+    var history = ref.read(historyProvider);
+    if (!finishedDrawing && !(history.undoStack.last is TempDoable)) {
+      assert(
+        currentEntry is FlutterMapMultiPointEntry &&
+                (currentEntry as FlutterMapMultiPointEntry).points.length ==
+                    1 ||
+            currentEntry is CircleEntry,
+      );
+      historyNotifier.restoreFromPoints();
+      endDrawing();
+      historyNotifier.shadowUndo();
+      history.redoStack.clear();
+    } else {
+      historyNotifier.undo();
+      if (history.redoStack.isEmpty) {}
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.watch(historyProvider);
@@ -251,11 +267,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
         mouseEntered = false;
       },
       child: Listener(
-        onPointerMove: (event) {
-          if (event.kind == PointerDeviceKind.mouse) {
-            updateMousePositionCallBack(event);
-          }
-        },
         onPointerHover: (event) {
           updateMousePositionCallBack(event);
         },
@@ -310,6 +321,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                     return true;
                   },
                 ),
+                UndoIntent: CallbackAction(onInvoke: (_) => safeUndo()),
               },
               child: Stack(
                 clipBehavior: Clip.none,
@@ -353,12 +365,13 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                       (currentLayer!.items.last
                                           as PolygonEntry);
                                   historyNotifier.addAndDo(
-                                    ManualDoable(
+                                    TempDoable(
                                       executeBase: () {
                                         polygon.points.add(point);
                                       },
                                       undoBase: () {
                                         polygon.points.removeLast();
+
                                         if (mouseEntered) {
                                           updateOnMousePosition(
                                             mousePositionToCoords(
@@ -386,12 +399,13 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                       (currentLayer!.items.last
                                           as PolylineEntry);
                                   historyNotifier.addAndDo(
-                                    ManualDoable(
+                                    TempDoable(
                                       executeBase: () {
                                         polyline.points.add(point);
                                       },
                                       undoBase: () {
                                         polyline.points.removeLast();
+
                                         if (mouseEntered) {
                                           updateOnMousePosition(
                                             mousePositionToCoords(
@@ -537,7 +551,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                   historyNotifier.redo();
                                 },
                                 onUndo: () {
-                                  historyNotifier.undo();
+                                  safeUndo();
                                 },
                                 enableCancel: !finishedDrawing,
                                 enableOk: !finishedDrawing,

@@ -55,7 +55,7 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
                     ),
                   )
                   .toList();
-              showMainLayer = widget.entryType.mainLayerName.contains(
+              showMainLayer = widget.entryType.defaultLayerName.contains(
                 RegExp(value, caseSensitive: false),
               );
             } else {
@@ -70,7 +70,7 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
         width: 300,
         child: CustomScrollView(
           slivers: [
-            if (!layers.any((e) => e.isMain) && showMainLayer)
+            if (showMainLayer)
               SliverToBoxAdapter(
                 child: ListTile(
                   leading: const Icon(Icons.layers_outlined),
@@ -80,7 +80,7 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
                       selectedLayer = null;
                     });
                   },
-                  title: Text(widget.entryType.mainLayerName),
+                  title: Text(widget.entryType.defaultLayerName),
                 ),
               ),
             SliverList(

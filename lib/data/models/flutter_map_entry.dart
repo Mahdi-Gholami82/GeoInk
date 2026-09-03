@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geoink/core/ui/icon_with_strok.dart';
-import 'package:geoink/core/utils/unique_name_in_list.dart';
+import 'package:geoink/core/utils/unique_named_items.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/core/utils/map_colors.dart';
@@ -17,8 +17,7 @@ typedef LayerEntryMap = Map<MapLayer, List<FlutterMapEntry>>;
 /// Data models to keep track of map features or layers.
 
 /// Base class for all Entries which are used to generate map features.
-abstract class FlutterMapEntry {
-  String name;
+abstract class FlutterMapEntry extends WithNameField {
   String description;
   bool visible;
 
@@ -32,7 +31,7 @@ abstract class FlutterMapEntry {
   }
 
   FlutterMapEntry({
-    required this.name,
+    required super.name,
     this.visible = true,
     this.description = "",
   });
@@ -331,9 +330,9 @@ enum EntryType {
     this.name,
     this.type, [
     this.acceptsMultipleCoordinates = false,
-  ]) : mainLayerName = "$name main";
+  ]) : defaultLayerName = "$name new";
   final String name;
-  final String mainLayerName;
+  final String defaultLayerName;
   final Type type;
   final bool acceptsMultipleCoordinates;
 
@@ -347,19 +346,15 @@ enum EntryType {
 }
 
 /// Collection of [FlutterMapEntry] sub classes, which have the same type.
-class MapLayer {
-  String name;
-  final UniqueList<FlutterMapEntry> items = UniqueList.strict();
-  final bool isMain;
+class MapLayer extends WithNameField with UniqueNamedItems<FlutterMapEntry> {
   final EntryType entryType;
   bool visible = true;
   bool isInvalid = false;
 
-  MapLayer({required this.name, required this.entryType, this.isMain = false});
+  MapLayer({required super.name, required this.entryType});
 
   bool get isEmpty => items.isEmpty;
   int get length => items.length;
-  List<String> get namesList => items.map((e) => e.name).toList();
 
   @override
   int get hashCode => name.hashCode;
@@ -369,26 +364,19 @@ class MapLayer {
       other is MapLayer ? (name.trim() == other.name.trim()) : super == other;
 
   MapLayer copy() =>
-      MapLayer(name: name, entryType: entryType, isMain: isMain)
-        ..items.addAll(items);
+      MapLayer(name: name, entryType: entryType)..items.addAll(items);
 
   MapLayer copyWith({
     String? name,
     List<FlutterMapEntry>? items,
     EntryType? entryType,
     bool? isMain,
-  }) => MapLayer(
-    name: name ?? this.name,
-    entryType: entryType ?? this.entryType,
-    isMain: isMain ?? this.isMain,
-  )..items.addAll(items ?? this.items);
+  }) =>
+      MapLayer(name: name ?? this.name, entryType: entryType ?? this.entryType)
+        ..items.addAll(items ?? this.items);
 
   void toggleVisiblity() {
     visible = !visible;
-  }
-
-  String getUniqueName(String name) {
-    return getUniqueNameFromTargets(name, namesList);
   }
 
   void add(FlutterMapEntry entry) {
@@ -401,37 +389,10 @@ class MapLayer {
     items.addAll(entries);
   }
 
-  void uniqifyName(FlutterMapEntry entry) {
-    assert(entry.runtimeType == entryType.type);
-    entry.name = getUniqueName(entry.name);
-  }
-
-  void addUnique(FlutterMapEntry entry) {
-    uniqifyName(entry);
-    items.add(entry);
-  }
-
-  void addAllUnique(List<FlutterMapEntry> entries) {
-    Map<String, int> preNamesMax = {};
-    List<String> names = namesList;
-    for (var entry in entries) {
-      int? preMax = preNamesMax[entry.name];
-      int maxNum = 0;
-      if (preMax == null) {
-        maxNum = getUniqueMaxNum(entry.name, names);
-        if (maxNum == 0) {
-          items.add(entry);
-          preNamesMax[entry.name] = maxNum;
-          continue;
-        }
-      } else {
-        maxNum = preMax;
-      }
-      maxNum++;
-      preNamesMax[entry.name] = maxNum;
-      entry.name = "${entry.name} ($maxNum)";
-      items.add(entry);
-    }
+  @override
+  void uniqifyName(FlutterMapEntry item) {
+    assert(item.runtimeType == entryType.type);
+    super.uniqifyName(item);
   }
 
   /// Converts all [FlutterMapEntry] sub classes in [items] to a map layer which will be added to the [FlutterMap] children.
@@ -474,21 +435,15 @@ class MapLayer {
       GeoJSONFeatureCollection(
         items.map((e) => e.toGeoJsonFeature(name)).toList(),
       );
+
+  @override
+  String toString() {
+    return name;
+  }
 }
 
-class MapLayerList {
-  final UniqueList<MapLayer> items = UniqueList(strict: true);
-
+class MapLayerList with UniqueNamedItems<MapLayer> {
   MapLayerList();
-
-  MapLayerList.withMainLayers() {
-    items.addAll(
-      EntryType.values.map(
-        (type) =>
-            MapLayer(name: type.mainLayerName, isMain: true, entryType: type),
-      ),
-    );
-  }
 
   MapLayerList copy({List<MapLayer>? newItems}) =>
       MapLayerList()..items.addAll([...newItems ?? items]);
@@ -503,17 +458,11 @@ class MapLayerList {
   }
 
   MapLayer? getDefaultLayerEntryOrNull(EntryType type) =>
-      items.firstWhereOrNull(
-        (element) => element.isMain && element.entryType == type,
-      );
+      items.firstWhereOrNull((element) => element.entryType == type);
 
   MapLayer createNewDefaultLayer(EntryType type) {
-    var newLayer = MapLayer(
-      name: type.mainLayerName,
-      isMain: true,
-      entryType: type,
-    );
-    items.add(newLayer);
+    var newLayer = MapLayer(name: type.defaultLayerName, entryType: type);
+    addUnique(newLayer);
     return newLayer;
   }
 

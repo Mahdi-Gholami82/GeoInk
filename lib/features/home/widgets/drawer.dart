@@ -47,6 +47,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     List<MapLayer> layers = ref.watch(mapLayerListProvider).items;
+    print(layers);
     ref.watch(historyProvider);
     HistoryNotifier historyNotifier = ref.read(historyProvider.notifier);
 

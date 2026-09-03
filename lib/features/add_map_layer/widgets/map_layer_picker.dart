@@ -19,8 +19,12 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
   late InputListCoordinatesNotifier inputListCoordinatesNotifier;
   late InputListCoordinatesState inputListState;
   late MapLayer? initialSelection;
-  late List<MapLayer> layers;
-  late int filteredEntryLenght;
+  late MapLayerList mapLayerList = ref.read(mapLayerListProvider);
+  late List<MapLayer> layers = mapLayerList.items
+      .where((e) => e.entryType == widget.entryType)
+      .toList();
+  late String defaultLayerName = widget.entryType.defaultLayerName;
+  DropdownMenuEntry<MapLayer?>? addMenuEntry;
 
   List<DropdownMenuEntry<MapLayer?>> filterCallback(
     List<DropdownMenuEntry<MapLayer?>> entries,
@@ -39,13 +43,12 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
         .toList();
 
     if (filtered.isEmpty || filtered.every((e) => e.label != filter)) {
-      filtered.add(
-        DropdownMenuEntry(
-          value: MapLayer(name: controller.text, entryType: widget.entryType),
-          label: controller.text,
-          labelWidget: Text("+ Add : ${controller.text}"),
-        ),
+      addMenuEntry = DropdownMenuEntry<MapLayer?>(
+        value: MapLayer(name: controller.text, entryType: widget.entryType),
+        label: controller.text,
+        labelWidget: Text("+ Add : ${controller.text}"),
       );
+      filtered.add(addMenuEntry!);
     }
 
     return filtered;
@@ -69,11 +72,10 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
     controller = TextEditingController();
     controller.addListener(_handleTextChange);
     inputListState = ref.read(inputListCoordinatesProvider);
-    layers = ref.read(mapLayerListProvider).items;
-    initialSelection = layers.firstWhereOrNull(
-      (e) => e.isMain && e.entryType == widget.entryType,
-    );
-    filteredEntryLenght = layers.length;
+    initialSelection = layers.firstOrNull;
+    if (initialSelection == null) {
+      defaultLayerName = mapLayerList.getUniqueName(defaultLayerName);
+    }
   }
 
   @override
@@ -92,7 +94,7 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
         DropdownMenu(
           filterCallback: filterCallback,
           width: 180,
-          hintText: initialSelection?.name ?? widget.entryType.mainLayerName,
+          hintText: initialSelection?.name ?? defaultLayerName,
           onSelected: (value) {
             if (value == null) {
               inputListState.layer = initialSelection;
@@ -113,13 +115,9 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
           enableFilter: true,
           dropdownMenuEntries: [
             if (initialSelection == null)
-              DropdownMenuEntry(
-                value: null,
-                label: widget.entryType.mainLayerName,
-              ),
-            ...layers
-                .where((e) => e.entryType == widget.entryType)
-                .map((e) => DropdownMenuEntry(value: e, label: e.name)),
+              DropdownMenuEntry(value: null, label: defaultLayerName),
+            ...layers.map((e) => DropdownMenuEntry(value: e, label: e.name)),
+            ?addMenuEntry,
           ],
         ),
         const Text(

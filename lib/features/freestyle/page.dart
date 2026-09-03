@@ -51,6 +51,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
 
   var mapController = MapController();
   late Map<EntryType, MapLayer?> chosenLayers;
+  late Map<EntryType, String> defaultLayerNames;
   late Map<MapLayer, int> oldLayerLenghts;
   late HistoryNotifier historyNotifier;
   Map<EntryType, Color> chosenColors = Map.fromEntries(
@@ -68,6 +69,15 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     chosenLayers = Map.fromEntries(
       EntryType.values.map(
         (e) => MapEntry(e, mapLayerList.getDefaultLayerEntryOrNull(e)),
+      ),
+    );
+    defaultLayerNames = Map.fromEntries(
+      EntryType.values.map(
+        (e) => MapEntry(
+          e,
+          chosenLayers[e]?.name ??
+              mapLayerList.getUniqueName(e.defaultLayerName),
+        ),
       ),
     );
     oldLayerLenghts = Map.fromEntries(
@@ -153,9 +163,6 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           );
           if (createdLayer) {
             mapLayerList.items.remove(layer);
-            if (chosenLayers[type] != null && chosenLayers[type]!.isMain) {
-              chosenLayers[type] = null;
-            }
             // Mark invalid to notify other entries on redo
             layer!.isInvalid = true;
             layer = null;
@@ -526,7 +533,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               currentLayer?.name ??
-                                                  selectedType.mainLayerName,
+                                                  defaultLayerNames[selectedType]!,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                               ),

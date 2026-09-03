@@ -368,7 +368,7 @@ class HistoryNotifier extends _$HistoryNotifier {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          _mapLayerList.items.add(layer);
+          _mapLayerList.addUnique(layer);
         },
         undoBase: () {
           _mapLayerList.items.removeLast();

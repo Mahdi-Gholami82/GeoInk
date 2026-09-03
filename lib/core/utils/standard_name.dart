@@ -29,7 +29,7 @@ String? processToStandardName(String value) {
   return match?.group(1);
 }
 
-String? standarNameValidatorForLayers(String? value, List<MapLayer> mapLayers) {
+String? standarNameValidatorForLayersDuplicateAllowed(String? value) {
   if (value == null) {
     return "Please enter a name";
   }
@@ -37,7 +37,22 @@ String? standarNameValidatorForLayers(String? value, List<MapLayer> mapLayers) {
   if (name == null) {
     return "Invalid name";
   }
-  if (mapLayers.any((e) => e.name == name)) {
+  return null;
+}
+
+String? standarNameValidatorForLayers(
+  String? value,
+  List<MapLayer> mapLayers, {
+  bool duplicateAllowed = false,
+}) {
+  if (value == null) {
+    return "Please enter a name";
+  }
+  var name = processToStandardName(value);
+  if (name == null) {
+    return "Invalid name";
+  }
+  if (!duplicateAllowed && mapLayers.any((e) => e.name == name)) {
     return "Duplicate name";
   }
   return null;

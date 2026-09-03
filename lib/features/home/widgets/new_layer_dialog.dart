@@ -18,6 +18,7 @@ class _NewLayerDialogState extends ConsumerState<NewLayerDialog> {
   var controller = TextEditingController();
   EntryType selectedType = EntryType.circle;
   late final MapLayerList mapLayerList;
+  bool wasDuplicate = false;
 
   @override
   void initState() {
@@ -63,12 +64,21 @@ class _NewLayerDialogState extends ConsumerState<NewLayerDialog> {
               formKey: formKey,
               controller: controller,
               onSubmitIfValid: doIfValid,
-              validator: (value) =>
-                  standarNameValidatorForLayers(value, mapLayerList.items),
+              validator: (value) => standarNameValidatorForLayers(
+                value,
+                mapLayerList.items,
+                duplicateAllowed: true,
+              ),
             ),
           ],
         ),
         actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text("cancel"),
+          ),
           TextButton(
             onPressed: () {
               final bool isValid = formKey.currentState?.validate() ?? false;
@@ -77,12 +87,6 @@ class _NewLayerDialogState extends ConsumerState<NewLayerDialog> {
               }
             },
             child: const Text("ok"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text("cancel"),
           ),
         ],
       ),

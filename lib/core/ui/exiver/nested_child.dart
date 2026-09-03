@@ -4,7 +4,7 @@ import 'package:geoink/core/ui/exiver/etc.dart';
 import 'package:geoink/core/ui/exiver/exiver.dart';
 
 class NestedChild extends StatefulWidget {
-  NestedChild(
+  const NestedChild(
     this.builder, {
     super.key,
     required this.headerBuilder,
@@ -23,7 +23,7 @@ class NestedChild extends StatefulWidget {
   final int childCount;
   final int index;
 
-  copyWithIndex(int newIndex) => NestedChild(
+  NestedChild copyWithIndex(int newIndex) => NestedChild(
     builder,
     key: key,
     headerBuilder: headerBuilder,
@@ -261,7 +261,7 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
   }
 
   Widget? builder(BuildContext context, int index) {
-    var _exiverList = ExiverList.of(context);
+    var exiverList = ExiverList.of(context);
     var localIndex = index - 1;
     if (localIndex == -1) {
       return _wrapWithDragWidgets(
@@ -273,7 +273,7 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
           }, expanded);
         },
         targets: _exiverListState.targets,
-        onReorder: _exiverList.onReorder,
+        onReorder: exiverList.onReorder,
         targetType: DragTargetType.header,
       )(context, localIndex);
     } else if (!expanded) {

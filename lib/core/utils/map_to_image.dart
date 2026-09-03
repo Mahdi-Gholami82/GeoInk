@@ -1,3 +1,5 @@
+// ignore_for_file: implementation_imports
+
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -73,12 +75,12 @@ Future<Uint8List> mapToImage({
 
   var imageFuture = mapToImageWaiter(
     FlutterMap(
-      children: [tileLayer, ...mapChildren],
       options: MapOptions(
         initialCenter: LatLng(0, 0),
         initialCameraFit: CameraFit.bounds(bounds: MercBounds.maxBounds),
         initialZoom: 2,
       ),
+      children: [tileLayer, ...mapChildren],
     ),
     tilesLoadedGenerator: () {
       Future<List> tileLoad = Future.wait(

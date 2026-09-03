@@ -44,7 +44,7 @@ List<String> getUniqueNameAll(List<String> names, List<String> targetList) {
     }
     maxNum++;
     preNamesMax[name] = maxNum;
-    name = "${name} (${maxNum})";
+    name = "$name ($maxNum)";
     results.add(name);
   }
   return results;

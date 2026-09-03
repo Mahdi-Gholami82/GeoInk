@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 class InheritedMapController extends InheritedWidget {
-  InheritedMapController({required super.child, required this.mapController});
+  const InheritedMapController({
+    super.key,
+    required super.child,
+    required this.mapController,
+  });
   final MapController mapController;
 
   static InheritedMapController? maybeOf(BuildContext context) {

@@ -73,7 +73,7 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
             if (!layers.any((e) => e.isMain) && showMainLayer)
               SliverToBoxAdapter(
                 child: ListTile(
-                  leading: Icon(Icons.layers_outlined),
+                  leading: const Icon(Icons.layers_outlined),
                   trailing: null == selectedLayer ? Icon(Icons.check) : null,
                   onTap: () {
                     setState(() {
@@ -89,7 +89,7 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
                 (context, index) {
                   MapLayer currentLayer = filteredLayers[index];
                   return ListTile(
-                    leading: Icon(Icons.layers_outlined),
+                    leading: const Icon(Icons.layers_outlined),
                     trailing: currentLayer == selectedLayer
                         ? Icon(Icons.check)
                         : null,
@@ -111,14 +111,14 @@ class _LayerSelectorState extends ConsumerState<LayerSelector> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text("cancel"),
+          child: const Text("cancel"),
         ),
         TextButton(
           onPressed: () {
             widget.onConfirm(selectedLayer);
             Navigator.of(context).pop();
           },
-          child: Text("ok"),
+          child: const Text("ok"),
         ),
       ],
     );

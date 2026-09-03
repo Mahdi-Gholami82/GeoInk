@@ -13,7 +13,7 @@ import 'package:geoink/data/models/prefs_state.dart';
 import 'package:geoink/data/providers/projects.dart';
 
 class ProjectsSheet extends ConsumerStatefulWidget {
-  ProjectsSheet({required this.scrollController}) {}
+  const ProjectsSheet({super.key, required this.scrollController});
   final ScrollController scrollController;
 
   @override
@@ -60,7 +60,7 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Warning"),
+            title: const Text("Warning"),
             content: Text(
               "The current project is still unsaved. continue anyway?",
             ),
@@ -70,21 +70,21 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                   onCancel?.call();
                   navigator.pop();
                 },
-                child: Text("cancel"),
+                child: const Text("cancel"),
               ),
               TextButton(
                 onPressed: () {
                   onOk?.call();
                   navigator.pop();
                 },
-                child: Text("ok"),
+                child: const Text("ok"),
               ),
               TextButton(
                 onPressed: () {
                   handleSaveAs(context, ref);
                   navigator.pop();
                 },
-                child: Text("save"),
+                child: const Text("save"),
               ),
             ],
           );
@@ -104,21 +104,21 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
               }
               navigator.pop();
             },
-            icon: Icon(Icons.close),
+            icon: const Icon(Icons.close),
           ),
         ),
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             CustomSheetDragHandle(),
-            Padding(padding: EdgeInsetsGeometry.all(25)),
+            Padding(padding: const EdgeInsetsGeometry.all(25)),
             Expanded(
               child: CustomScrollView(
                 controller: widget.scrollController,
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsetsGeometry.only(bottom: 20),
+                      padding: const EdgeInsetsGeometry.only(bottom: 20),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Column(
@@ -140,7 +140,7 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                                 ],
                               ),
                             ),
-                            Padding(padding: EdgeInsetsGeometry.all(2)),
+                            Padding(padding: const EdgeInsetsGeometry.all(2)),
                             ConstrainedBox(
                               constraints: BoxConstraints(maxHeight: 50),
                               child: SearchBar(
@@ -150,7 +150,7 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                                 ),
                                 leading: Padding(
                                   padding: const EdgeInsets.only(left: 7),
-                                  child: Icon(Icons.search),
+                                  child: const Icon(Icons.search),
                                 ),
                                 hintText: "Search Projects...",
                                 onChanged: (value) {
@@ -179,13 +179,14 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                     ),
                   ),
                   SliverPadding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 30),
+                    padding: const EdgeInsetsGeometry.symmetric(horizontal: 30),
                     sliver: FutureBuilder(
                       future: recentProjectsFuture,
                       builder: (context, asyncSnapshot) {
                         if (asyncSnapshot.hasData) {
-                          if (filteredProjects.isEmpty)
+                          if (filteredProjects.isEmpty) {
                             return SliverToBoxAdapter(child: SizedBox.shrink());
+                          }
                           return SliverFixedExtentList(
                             itemExtent: 50,
                             delegate: SliverChildBuilderDelegate(
@@ -224,10 +225,12 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                                       PrefsState.setRecentProjects(
                                         filteredProjects,
                                       );
-                                      showSimpleSnackBar(
-                                        context,
-                                        message: "File not found",
-                                      );
+                                      if (mounted) {
+                                        showSimpleSnackBar(
+                                          context,
+                                          message: "File not found",
+                                        );
+                                      }
                                     }
                                   },
                                   child: Row(
@@ -320,7 +323,7 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                       },
                     ),
                   ),
-                  SliverPadding(padding: EdgeInsetsGeometry.all(10)),
+                  SliverPadding(padding: const EdgeInsetsGeometry.all(10)),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -330,10 +333,12 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                             showSimpleProgress(context);
                             await projectNotifier.saveToPath();
                             navigator.pop();
-                            showSimpleSnackBar(
-                              context,
-                              message: "Saved The Previous File",
-                            );
+                            if (mounted) {
+                              showSimpleSnackBar(
+                                context,
+                                message: "Saved The Previous File",
+                              );
+                            }
                           } else if (openProject != null) {
                             showUnsavedDialogue(
                               onOk: () {
@@ -344,10 +349,6 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                           }
                           initNewUnsavedAndPop(searchBarController.text);
                         },
-                        child: Text(
-                          "[+]  Create New Project",
-                          overflow: TextOverflow.ellipsis,
-                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(
                             context,
@@ -356,6 +357,10 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                             context,
                           ).colorScheme.onPrimary,
                           minimumSize: Size.fromHeight(50),
+                        ),
+                        child: Text(
+                          "[+]  Create New Project",
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),

@@ -54,7 +54,7 @@ class _SaveToImageButtomSheetState
             onPressed: () {
               Navigator.of(context).pop();
             },
-            icon: Icon(Icons.close),
+            icon: const Icon(Icons.close),
           ),
         ),
         Padding(
@@ -82,7 +82,7 @@ class _SaveToImageButtomSheetState
                       );
                     }
                     if (snapshot.hasError) {
-                      return loadError(
+                      return LoadError(
                         message: 'Failed to load tiles.',
                         onRetry: () {
                           setState(() {});

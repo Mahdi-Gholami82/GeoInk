@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 
 class FloatingShadow extends BoxShadow {
   const FloatingShadow({
-    Offset offset = const Offset(0, 6),
-    double blurRadius = 8,
-    double spreadRadius = 2,
-    Color color = Colors.black26,
-  }) : super(
-         offset: offset,
-         blurRadius: blurRadius,
-         spreadRadius: spreadRadius,
-         color: color,
-       );
+    super.offset = const Offset(0, 6),
+    super.blurRadius = 8,
+    super.spreadRadius = 2,
+    super.color = Colors.black26,
+  });
 }

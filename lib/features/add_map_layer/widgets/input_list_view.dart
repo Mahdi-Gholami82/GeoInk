@@ -110,7 +110,7 @@ class _InputListViewState extends ConsumerState<InputListView> {
                             },
                           );
                         },
-                        icon: Icon(Icons.delete_outline),
+                        icon: const Icon(Icons.delete_outline),
                       )
                     : null,
               ),

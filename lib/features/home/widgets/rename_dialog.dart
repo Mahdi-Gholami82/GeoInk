@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geoink/features/home/widgets/layer_name_form_field.dart';
 
 class RenameDialog extends StatefulWidget {
-  RenameDialog({
+  const RenameDialog({
     super.key,
     required this.initialName,
     required this.onRename,
@@ -39,7 +39,7 @@ class _RenameDialogState extends State<RenameDialog> {
     }
 
     return AlertDialog(
-      title: Text("Rename"),
+      title: const Text("Rename"),
       content: NameFormField(
         formKey: formKey,
         controller: controller,
@@ -51,7 +51,7 @@ class _RenameDialogState extends State<RenameDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text("cancel"),
+          child: const Text("cancel"),
         ),
         TextButton(
           onPressed: () {
@@ -60,7 +60,7 @@ class _RenameDialogState extends State<RenameDialog> {
               doIfValid(controller.text);
             }
           },
-          child: Text("ok"),
+          child: const Text("ok"),
         ),
       ],
     );

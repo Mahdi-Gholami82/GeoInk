@@ -51,7 +51,7 @@ String getDefaultFileNameWhenFileSaving(GeoinkProject? project) {
       fileName = getFileNameFromPath(project.path!);
     } else {
       if (project.title != null) {
-        fileName = project.title! + ".geojson";
+        fileName = "${project.title!}.geojson";
       }
     }
   }
@@ -64,7 +64,7 @@ class GeoinkProject {
     required this.title,
     String? description,
     required this.lastModified,
-  }) : this.description = description ?? "" {}
+  }) : description = description ?? "";
 
   GeoinkProject.empty(DateTime lastModified)
     : this("", title: "", description: "", lastModified: lastModified);
@@ -84,19 +84,19 @@ class GeoinkProject {
   }
 
   @override
-  int get hashCode => Object.hash(this.title, this.path);
+  int get hashCode => Object.hash(title, path);
 
   @override
   bool operator ==(Object other) {
     if (other case GeoinkProject otherProject) {
-      return this.title == otherProject.title && this.path == otherProject.path;
+      return title == otherProject.title && path == otherProject.path;
     }
     return false;
   }
 
   static Future<GeoinkProject> fromFile(File file) async {
     var decoded = jsonDecode(file.readAsStringSync());
-    if (!(decoded is Map)) {
+    if (decoded is! Map) {
       throw FormatException;
     }
     var properties = decoded["properties"];

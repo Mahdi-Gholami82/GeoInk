@@ -10,7 +10,7 @@ part 'history.g.dart';
 
 extension<T> on List<T> {
   void swapByIndex(int oldIndex, int newIndex) {
-    this.insert(newIndex, this.removeAt(oldIndex));
+    insert(newIndex, removeAt(oldIndex));
   }
 
   int moveToFirstGetIndex(T element) {
@@ -417,7 +417,6 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   void applyFromPoints() {
     List<Doable> doables = state.getDoableFromRestorePoint();
-    print(doables.length);
     state.restore();
     ManualDoable bulkDoable = ManualDoable(
       executeBase: () {

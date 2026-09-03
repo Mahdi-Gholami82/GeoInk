@@ -287,13 +287,13 @@ class CoordinatesMatcher {
 
   /// The text format type of the matcher.
   CoordinatesFormatTypes formatType;
-  get leadingDiectionalLat =>
+  String get leadingDiectionalLat =>
       "(?<${formatType.name}_LAT_LD>$leadingLat$latPattern)";
-  get leadingDiectionalLong =>
+  String get leadingDiectionalLong =>
       "(?<${formatType.name}_LONG_LD>$leadingLong$longPattern)";
-  get trailingDiectionalLat =>
+  String get trailingDiectionalLat =>
       "(?<${formatType.name}_LAT_TD>$latPattern$trailingLat)";
-  get trailingDiectionalLong =>
+  String get trailingDiectionalLong =>
       "(?<${formatType.name}_LONG_TD>$longPattern$trailingLong)";
 
   /// generates a pattern with a given seperator between lat and long patterns

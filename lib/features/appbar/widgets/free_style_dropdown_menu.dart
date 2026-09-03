@@ -17,7 +17,7 @@ class _FreeStyleDropdownMenuState extends State<FreeStyleDropdownMenu> {
   @override
   Widget build(BuildContext context) {
     return AppbarMenu(
-      title: Text("Free Style"),
+      title: const Text("Free Style"),
       menuChildren: [
         Column(
           children: [

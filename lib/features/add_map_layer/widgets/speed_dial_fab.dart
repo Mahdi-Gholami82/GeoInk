@@ -20,7 +20,7 @@ class AddMapElementFab extends ConsumerWidget {
       spacing: 3,
       children: [
         SpeedDialChild(
-          child: Icon(Icons.location_on),
+          child: const Icon(Icons.location_on),
           label: "Marker",
           onTap: () {
             showCoordinatesButtomSheet(
@@ -36,7 +36,7 @@ class AddMapElementFab extends ConsumerWidget {
           },
         ),
         SpeedDialChild(
-          child: Icon(Icons.polyline),
+          child: const Icon(Icons.polyline),
           label: "Polyline",
           onTap: () {
             showCoordinatesButtomSheet(
@@ -52,7 +52,7 @@ class AddMapElementFab extends ConsumerWidget {
           },
         ),
         SpeedDialChild(
-          child: Icon(Icons.adjust),
+          child: const Icon(Icons.adjust),
           label: "Circle",
           onTap: () {
             showCoordinatesButtomSheet(
@@ -68,7 +68,7 @@ class AddMapElementFab extends ConsumerWidget {
           },
         ),
         SpeedDialChild(
-          child: Icon(Icons.hexagon_outlined),
+          child: const Icon(Icons.hexagon_outlined),
           label: "Polygon",
           onTap: () {
             showCoordinatesButtomSheet(
@@ -85,7 +85,7 @@ class AddMapElementFab extends ConsumerWidget {
         ),
         // TODO: Implement overlay image adder
         // SpeedDialChild(
-        //   child: Icon(Icons.image_outlined),
+        //   child: const Icon(Icons.image_outlined),
         //   label: "Overlay Image",
         //   onTap: null,
         // ),

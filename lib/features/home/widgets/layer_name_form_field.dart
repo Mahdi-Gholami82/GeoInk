@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geoink/core/utils/standard_name.dart';
 
 class NameFormField extends StatelessWidget {
-  NameFormField({
+  const NameFormField({
     super.key,
     required this.formKey,
     required this.onSubmitIfValid,
@@ -22,7 +22,7 @@ class NameFormField extends StatelessWidget {
         decoration: InputDecoration(hintText: "Name"),
         controller: controller,
         maxLength: maxCharInName,
-        onFieldSubmitted: (Text) {
+        onFieldSubmitted: (text) {
           final bool isValid = formKey.currentState?.validate() ?? false;
           if (isValid) {
             onSubmitIfValid(controller.text);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ResponsiveDrawerController {
-  _ResponsiveDrawerState? state;
+  ResponsiveDrawerState? state;
 
   void open() {
     assert(state != null);
@@ -21,12 +21,13 @@ class ResponsiveDrawerController {
 
 class ResponsiveDrawer extends StatefulWidget {
   ResponsiveDrawer({
+    super.key,
     this.width,
     this.shape,
     ResponsiveDrawerController? controller,
     required this.drawer,
     required this.body,
-  }) : controller = controller ?? ResponsiveDrawerController() {}
+  }) : controller = controller ?? ResponsiveDrawerController();
 
   final ResponsiveDrawerController controller;
   final Widget drawer;
@@ -44,10 +45,10 @@ class ResponsiveDrawer extends StatefulWidget {
   }
 
   @override
-  State<ResponsiveDrawer> createState() => _ResponsiveDrawerState();
+  State<ResponsiveDrawer> createState() => ResponsiveDrawerState();
 }
 
-class _ResponsiveDrawerState extends State<ResponsiveDrawer> {
+class ResponsiveDrawerState extends State<ResponsiveDrawer> {
   double? width;
   late bool needsDesktopDrawer;
   bool isDrawerOpen = false;

@@ -49,7 +49,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(15),
@@ -67,7 +67,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                             widget.onCancel();
                             Navigator.of(context).pop();
                           },
-                          icon: Icon(Icons.close),
+                          icon: const Icon(Icons.close),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -87,7 +87,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                                         SizedBox(height: 8),
                                         Text(
                                           type.name,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -129,7 +129,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                             widget.onConfirm();
                             Navigator.of(context).pop();
                           },
-                          icon: Icon(Icons.check),
+                          icon: const Icon(Icons.check),
                         ),
                       ],
                     ),

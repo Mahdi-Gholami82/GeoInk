@@ -5,29 +5,31 @@ import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/features/appbar/widgets/appbar_menu.dart';
 
 class FileMenu extends ConsumerWidget {
+  const FileMenu({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(projectProvider);
 
     return AppbarMenu(
-      title: Text("File"),
+      title: const Text("File"),
       menuChildren: [
         MenuItemButton(
-          leadingIcon: Icon(Icons.file_open),
+          leadingIcon: const Icon(Icons.file_open),
           onPressed: () async {
             handleOpen(context, ref);
           },
           child: const Text("Open"),
         ),
         MenuItemButton(
-          leadingIcon: Icon(Icons.save),
+          leadingIcon: const Icon(Icons.save),
           onPressed: () {
             handleSave(context, ref);
           },
           child: const Text("Save"),
         ),
         MenuItemButton(
-          leadingIcon: Icon(Icons.save_as),
+          leadingIcon: const Icon(Icons.save_as),
           onPressed: () {
             handleSaveAs(context, ref);
           },

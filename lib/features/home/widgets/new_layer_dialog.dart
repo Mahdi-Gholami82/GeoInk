@@ -7,6 +7,8 @@ import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/home/widgets/layer_name_form_field.dart';
 
 class NewLayerDialog extends ConsumerStatefulWidget {
+  const NewLayerDialog({super.key});
+
   @override
   ConsumerState<NewLayerDialog> createState() => _NewLayerDialogState();
 }
@@ -37,7 +39,7 @@ class _NewLayerDialogState extends ConsumerState<NewLayerDialog> {
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: AlertDialog(
-        title: Text("Add a layer"),
+        title: const Text("Add a layer"),
         content: Column(
           spacing: 10,
           mainAxisSize: MainAxisSize.min,
@@ -74,13 +76,13 @@ class _NewLayerDialogState extends ConsumerState<NewLayerDialog> {
                 doIfValid(controller.text);
               }
             },
-            child: Text("ok"),
+            child: const Text("ok"),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text("cancel"),
+            child: const Text("cancel"),
           ),
         ],
       ),

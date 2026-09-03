@@ -13,8 +13,8 @@ class MapHistory extends DoableHistory {
     super.redoStack,
     super.undoStack,
     List<RestorePoint>? restorePoints,
-  }) : _restorePoints = restorePoints ?? [] {}
-  List<RestorePoint> _restorePoints;
+  }) : _restorePoints = restorePoints ?? [];
+  final List<RestorePoint> _restorePoints;
   bool get canRestore => _restorePoints.isNotEmpty;
   bool clearRedoAfterUndo = false;
 
@@ -60,14 +60,14 @@ class MapHistory extends DoableHistory {
       undoStack.removeRange(points.undoRestorePoint, undoStack.length);
     } on RangeError {
       debugPrint(
-        "RangeError in undo: ${points}, lenght: undo=${undoStack.length}, redo=${redoStack.length}",
+        "RangeError in undo: $points, lenght: undo=${undoStack.length}, redo=${redoStack.length}",
       );
     }
     try {
       redoStack.removeRange(points.redoRestorePoint, redoStack.length);
     } on RangeError {
       debugPrint(
-        "RangeError in redo: ${points}, lenght: undo=${undoStack.length}, redo=${redoStack.length}",
+        "RangeError in redo: $points, lenght: undo=${undoStack.length}, redo=${redoStack.length}",
       );
     }
     debugPrint(
@@ -76,8 +76,6 @@ class MapHistory extends DoableHistory {
   }
 
   List<Doable> getDoableFromRestorePoint() {
-    print("point:");
-    print(_restorePoints.last.undoRestorePoint);
     return undoStack.sublist(_restorePoints.last.undoRestorePoint);
   }
 

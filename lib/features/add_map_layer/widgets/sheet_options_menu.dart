@@ -43,7 +43,7 @@ class _SheetOptionsMenuState extends ConsumerState<SheetOptionsMenu> {
               controller.open();
             }
           },
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
         );
       },
       menuChildren: [

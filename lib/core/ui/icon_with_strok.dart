@@ -39,11 +39,12 @@ class IconStrokPainter extends CustomPainter {
 class IconWithStrok extends StatelessWidget {
   IconWithStrok(
     IconData icon, {
+    super.key,
     required this.color,
     double? size,
     this.strokWidth = 4,
     required this.strokColor,
-  }) : this.icon = Icon(icon, size: size, color: color) {}
+  }) : icon = Icon(icon, size: size, color: color);
   final Icon icon;
   final Color color;
   final Color strokColor;

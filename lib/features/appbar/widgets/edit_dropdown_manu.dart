@@ -5,16 +5,18 @@ import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/features/appbar/widgets/appbar_menu.dart';
 
 class EditDropdownManu extends ConsumerWidget {
+  const EditDropdownManu({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     HistoryNotifier historyNotifier = ref.read(historyProvider.notifier);
     return AppbarMenu(
-      title: Text("Edit"),
+      title: const Text("Edit"),
       menuChildren: [
         DesktopOnlyTooltip(
           toolTip: "Ctrl + Z",
           child: MenuItemButton(
-            leadingIcon: Icon(Icons.undo),
+            leadingIcon: const Icon(Icons.undo),
             onPressed: () {
               historyNotifier.undo();
             },
@@ -24,7 +26,7 @@ class EditDropdownManu extends ConsumerWidget {
         DesktopOnlyTooltip(
           toolTip: "Ctrl + Shift + Z",
           child: MenuItemButton(
-            leadingIcon: Icon(Icons.redo),
+            leadingIcon: const Icon(Icons.redo),
             onPressed: () {
               historyNotifier.redo();
             },

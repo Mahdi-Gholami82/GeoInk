@@ -41,8 +41,19 @@ class _HomePageState extends ConsumerState<HomePage> {
   late final customMapAttributionsController =
       CustomMapAttributionsController();
   bool showMapAttribution = true;
-
+  bool shouldShowProjectsSheet = false;
   bool loading = false;
+
+  Future<GeoinkProject?> _loadRecentProject() async {
+    var selectedProject = await PrefsState.loadSelectedProject();
+    if (selectedProject == null) {
+      showMapAttribution = false;
+      shouldShowProjectsSheet = true;
+    } else {
+      ref.read(projectProvider.notifier).importFromProject(selectedProject);
+    }
+    return selectedProject;
+  }
 
   @override
   void initState() {
@@ -51,18 +62,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     projectNotifier = ref.read(projectProvider.notifier);
     themeNotifier = ref.read(themeProvider.notifier);
     loading = true;
-    loadProjectFuture = PrefsState.loadSelectedProject().then((value) {
-      if (value == null) {
-        showMapAttribution = false;
-        showProjectsSheet(context).then((_) async {
-          await Future.delayed(Duration(milliseconds: 200));
-          customMapAttributionsController.open(Duration(seconds: 3));
-        });
-      } else {
-        ref.watch(projectProvider.notifier).importFromProject(value);
-      }
-      return value;
-    });
+    loadProjectFuture = _loadRecentProject();
   }
 
   @override
@@ -82,6 +82,15 @@ class _HomePageState extends ConsumerState<HomePage> {
         body: FutureBuilder(
           future: loadProjectFuture,
           builder: (context, asyncSnapshot) {
+            if (shouldShowProjectsSheet) {
+              shouldShowProjectsSheet = false;
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                showProjectsSheet(context).then((_) async {
+                  await Future.delayed(Duration(milliseconds: 200));
+                  customMapAttributionsController.open(Duration(seconds: 3));
+                });
+              });
+            }
             return Stack(
               children: [
                 Scaffold(
@@ -130,7 +139,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   ),
                               ),
                             ),
-                            Text(
+                            const Text(
                               "This attribution is the same throughout this app, except where otherwise specified",
                             ),
                           ],

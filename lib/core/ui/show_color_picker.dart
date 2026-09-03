@@ -26,13 +26,13 @@ Future<Color?> showSimpleColorPicker({
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("cancel"),
+              child: const Text("cancel"),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(chosenColor);
               },
-              child: Text("ok"),
+              child: const Text("ok"),
             ),
           ],
         ),

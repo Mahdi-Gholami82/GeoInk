@@ -39,19 +39,19 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
   @override
   Widget build(BuildContext context) {
     return AppbarMenu(
-      title: Text("Map"),
+      title: const Text("Map"),
       menuChildren: [
         Column(
           children: [
             MenuItemButton(
-              leadingIcon: Icon(Icons.map),
+              leadingIcon: const Icon(Icons.map),
               onPressed: () {
                 showProjectsSheet(context);
               },
               child: const Text("Projects"),
             ),
             MenuItemButton(
-              leadingIcon: Icon(Icons.file_download),
+              leadingIcon: const Icon(Icons.file_download),
               onPressed: () async {
                 await lockScreenOnFuture(
                   context,
@@ -72,7 +72,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               child: const Text("Import"),
             ),
             MenuItemButton(
-              leadingIcon: Icon(Icons.file_upload),
+              leadingIcon: const Icon(Icons.file_upload),
               onPressed: () async {
                 await lockScreenOnFuture(
                   context,
@@ -111,7 +111,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
             ),
             // Open Street Map policy doesnt allow prefetching tiles
             // MenuItemButton(
-            //   leadingIcon: Icon(Icons.image_outlined),
+            //   leadingIcon: const Icon(Icons.image_outlined),
             //   onPressed: () {
             //     showSaveToImageBottomSheet(context);
             //   },
@@ -120,7 +120,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
 
             // TODO: Implement parser tool.
             // MenuItemButton(
-            //   leadingIcon: Icon(Icons.code),
+            //   leadingIcon: const Icon(Icons.code),
             //   onPressed: () {},
             //   child: const Text("Parser"),
             // ),

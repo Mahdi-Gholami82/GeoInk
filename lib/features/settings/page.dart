@@ -27,7 +27,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             title: Text('Common'),
             tiles: <SettingsTile>[
               // SettingsTile.navigation(
-              //   leading: Icon(Icons.language),
+              //   leading: const Icon(Icons.language),
               //   title: Text('Language'),
               //   value: Text('English'),
               // ),
@@ -36,7 +36,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 onToggle: (value) {
                   ref.read(themeProvider.notifier).toggleMode(context);
                 },
-                leading: Icon(Icons.format_paint),
+                leading: const Icon(Icons.format_paint),
                 title: Text('Light/Dark Theme'),
               ),
             ],

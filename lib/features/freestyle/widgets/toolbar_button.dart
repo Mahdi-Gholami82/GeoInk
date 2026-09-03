@@ -3,6 +3,7 @@ import 'package:geoink/core/ui/widgets/desktop_only_tooltip.dart';
 
 class ToolbarButton extends StatelessWidget {
   const ToolbarButton({
+    super.key,
     required this.onTap,
     required this.children,
     this.spacing = 4,
@@ -23,7 +24,7 @@ class ToolbarButton extends StatelessWidget {
         toolTip: desktopOnlyToolTip,
         child: Container(
           constraints: constraints,
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           alignment: Alignment.center,
           child: Row(spacing: spacing, children: children),
         ),

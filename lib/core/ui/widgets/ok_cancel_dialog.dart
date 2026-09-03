@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class OkCancelDialog extends StatelessWidget {
-  OkCancelDialog({
+  const OkCancelDialog({
     super.key,
     required this.title,
     required this.message,
@@ -19,8 +19,8 @@ class OkCancelDialog extends StatelessWidget {
       title: Text(title),
       content: Text(message),
       actions: [
-        TextButton(onPressed: onCancel ?? () {}, child: Text("cancel")),
-        TextButton(onPressed: onOk, child: Text("ok")),
+        TextButton(onPressed: onCancel ?? () {}, child: const Text("cancel")),
+        TextButton(onPressed: onOk, child: const Text("ok")),
       ],
     );
   }

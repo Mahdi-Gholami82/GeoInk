@@ -14,7 +14,11 @@ class CancelDrawIntent extends Intent {}
 class ConfirmDrawIntent extends Intent {}
 
 class BaseShortcuts extends ConsumerWidget {
-  const BaseShortcuts({required this.child, this.freeStyleEnable = false});
+  const BaseShortcuts({
+    super.key,
+    required this.child,
+    this.freeStyleEnable = false,
+  });
   final Widget child;
   final bool freeStyleEnable;
   @override

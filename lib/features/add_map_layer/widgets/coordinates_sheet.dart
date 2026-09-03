@@ -60,7 +60,9 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                             textAlign: TextAlign.center,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          Padding(padding: EdgeInsets.symmetric(vertical: 15)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             child: FittedBox(
@@ -83,7 +85,9 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                               ),
                             ),
                           ),
-                          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
                           Flexible(
                             fit: FlexFit.loose,
                             child: InputListView(
@@ -166,7 +170,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            icon: Icon(Icons.close),
+            icon: const Icon(Icons.close),
           ),
         ),
         Positioned(top: 10, right: 10, child: SheetOptionsMenu()),

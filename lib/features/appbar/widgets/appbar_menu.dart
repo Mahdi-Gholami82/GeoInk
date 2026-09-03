@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AppbarMenu extends StatelessWidget {
-  AppbarMenu({required this.menuChildren, required this.title}) {}
+  const AppbarMenu({
+    super.key,
+    required this.menuChildren,
+    required this.title,
+  });
   final List<Widget> menuChildren;
   final Widget title;
 

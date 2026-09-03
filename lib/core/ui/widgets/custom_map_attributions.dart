@@ -38,7 +38,7 @@ class CustomMapAttributionsController {
 }
 
 class CustomMapAttributions extends StatefulWidget {
-  CustomMapAttributions({
+  const CustomMapAttributions({
     super.key,
     this.buttonHeight = 24,
     this.width = 400,
@@ -117,6 +117,7 @@ class _CustomMapAttributionsState extends State<CustomMapAttributions> {
     var button = AnimatedSwitcher(
       switchInCurve: Curves.easeOut,
       switchOutCurve: Curves.easeIn,
+      duration: Duration(milliseconds: 200),
       child: isOpen
           ? IconButton(
               key: ValueKey("close"),
@@ -139,7 +140,6 @@ class _CustomMapAttributionsState extends State<CustomMapAttributions> {
                 size: widget.buttonHeight,
               ),
             ),
-      duration: Duration(milliseconds: 200),
     );
     return SafeArea(
       child: Align(

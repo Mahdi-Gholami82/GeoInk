@@ -24,6 +24,8 @@ import 'package:latlong2/latlong.dart';
 
 class FreeStylePage extends ConsumerStatefulWidget {
   static const String route = "/freestyle";
+
+  const FreeStylePage({super.key});
   @override
   ConsumerState<FreeStylePage> createState() => _FreeStylePageState();
 }
@@ -37,7 +39,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   bool finishedMouseTrackDraw = true;
   bool addedTempPoint = false;
   bool _layerWasInvisible = false;
-  var _focusNode = FocusNode();
+  final _focusNode = FocusNode();
   var _mousePosition = Offset.zero;
   late MapCamera homeMapCamera;
   MapLayer? get currentLayer => chosenLayers[selectedType];
@@ -238,7 +240,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
 
   void safeUndo() {
     var history = ref.read(historyProvider);
-    if (!finishedDrawing && !(history.undoStack.last is TempDoable)) {
+    if (!finishedDrawing && history.undoStack.last is! TempDoable) {
       assert(
         currentEntry is FlutterMapMultiPointEntry &&
                 (currentEntry as FlutterMapMultiPointEntry).points.length ==
@@ -466,7 +468,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                 children: [
                                   Container(
                                     decoration: makeFloatingDecoration(context),
-                                    padding: EdgeInsets.all(2),
+                                    padding: const EdgeInsets.all(2),
                                     child: IconButton(
                                       color: currentColor.onColor(),
                                       style: IconButton.styleFrom(
@@ -489,7 +491,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                                           }
                                         });
                                       },
-                                      icon: Icon(Icons.colorize),
+                                      icon: const Icon(Icons.colorize),
                                     ),
                                   ),
                                   FloatingContainer(

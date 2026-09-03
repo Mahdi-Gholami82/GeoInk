@@ -38,7 +38,7 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
         )
         .toList();
 
-    if (filtered.length == 0 || filtered.every((e) => e.label != filter)) {
+    if (filtered.isEmpty || filtered.every((e) => e.label != filter)) {
       filtered.add(
         DropdownMenuEntry(
           value: MapLayer(name: controller.text, entryType: widget.entryType),
@@ -119,11 +119,10 @@ class _MapLayerPickerState extends ConsumerState<MapLayerPicker> {
               ),
             ...layers
                 .where((e) => e.entryType == widget.entryType)
-                .map((e) => DropdownMenuEntry(value: e, label: e.name))
-                .toList(),
+                .map((e) => DropdownMenuEntry(value: e, label: e.name)),
           ],
         ),
-        Text(
+        const Text(
           "Layer",
           style: TextStyle(fontWeight: FontWeight.w500),
           overflow: TextOverflow.ellipsis,

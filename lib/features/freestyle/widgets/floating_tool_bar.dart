@@ -5,6 +5,7 @@ import 'package:geoink/features/freestyle/widgets/toolbar_button.dart';
 
 class FloatingToolBar extends StatefulWidget {
   const FloatingToolBar({
+    super.key,
     required this.onOk,
     required this.onCancel,
     required this.onRedo,
@@ -51,8 +52,11 @@ class _FloatingToolBarState extends State<FloatingToolBar> {
                 widget.onUndo();
               },
               children: [
-                Icon(Icons.undo),
-                Text("Undo", style: TextStyle(fontWeight: FontWeight.w600)),
+                const Icon(Icons.undo),
+                const Text(
+                  "Undo",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
               ],
             ),
             ToolbarButton(
@@ -62,11 +66,16 @@ class _FloatingToolBarState extends State<FloatingToolBar> {
                 widget.onRedo();
               },
               children: [
-                Text("Redo", style: TextStyle(fontWeight: FontWeight.w600)),
-                Icon(Icons.redo),
+                const Text(
+                  "Redo",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const Icon(Icons.redo),
               ],
             ),
-            Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: 10)),
+            Padding(
+              padding: const EdgeInsetsGeometry.symmetric(horizontal: 10),
+            ),
             Row(
               spacing: 8,
               children: [
@@ -83,7 +92,7 @@ class _FloatingToolBarState extends State<FloatingToolBar> {
                             widget.onCancel();
                           }
                         : null,
-                    child: Text("Cancel"),
+                    child: const Text("Cancel"),
                   ),
                 ),
                 DesktopOnlyTooltip(
@@ -99,7 +108,7 @@ class _FloatingToolBarState extends State<FloatingToolBar> {
                             widget.onOk();
                           }
                         : null,
-                    child: Text("Ok"),
+                    child: const Text("Ok"),
                   ),
                 ),
               ],

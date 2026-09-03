@@ -19,7 +19,7 @@ class InkWellTextButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           alignment: Alignment.center,
           child: Row(
             spacing: 4,

@@ -40,9 +40,12 @@ abstract class FlutterMapEntry {
   @override
   bool operator ==(Object other) {
     return other is FlutterMapEntry
-        ? this.name.trim() == other.name.trim()
+        ? name.trim() == other.name.trim()
         : super == other;
   }
+
+  @override
+  int get hashCode => name.trim().hashCode;
 }
 
 /// Base class for polygon and polyline entry.
@@ -328,7 +331,7 @@ enum EntryType {
     this.name,
     this.type, [
     this.acceptsMultipleCoordinates = false,
-  ]) : mainLayerName = "${name} main";
+  ]) : mainLayerName = "$name main";
   final String name;
   final String mainLayerName;
   final Type type;
@@ -359,9 +362,11 @@ class MapLayer {
   List<String> get namesList => items.map((e) => e.name).toList();
 
   @override
-  bool operator ==(Object other) => other is MapLayer
-      ? (this.name.trim() == other.name.trim())
-      : super == other;
+  int get hashCode => name.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is MapLayer ? (name.trim() == other.name.trim()) : super == other;
 
   MapLayer copy() =>
       MapLayer(name: name, entryType: entryType, isMain: isMain)
@@ -424,7 +429,7 @@ class MapLayer {
       }
       maxNum++;
       preNamesMax[entry.name] = maxNum;
-      entry.name = "${entry.name} (${maxNum})";
+      entry.name = "${entry.name} ($maxNum)";
       items.add(entry);
     }
   }
@@ -474,7 +479,7 @@ class MapLayer {
 class MapLayerList {
   final UniqueList<MapLayer> items = UniqueList(strict: true);
 
-  MapLayerList() {}
+  MapLayerList();
 
   MapLayerList.withMainLayers() {
     items.addAll(
@@ -514,7 +519,7 @@ class MapLayerList {
 
   MapLayer getDefaultLayerEntry(EntryType type) {
     MapLayer? layerEntry = getDefaultLayerEntryOrNull(type);
-    return layerEntry == null ? createNewDefaultLayer(type) : layerEntry;
+    return layerEntry ?? createNewDefaultLayer(type);
   }
 
   MapLayer getDefaultLayerEntryGeneric<T extends FlutterMapEntry>() {
@@ -539,7 +544,7 @@ class MapLayerList {
 }
 
 class HitReference {
-  HitReference(this.entry, {this.layer}) {}
+  HitReference(this.entry, {this.layer});
   MapLayer? layer;
   FlutterMapEntry entry;
 }

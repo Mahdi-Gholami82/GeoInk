@@ -9,15 +9,15 @@ abstract final class MapDefaultColors {
 
   static Color from<T extends FlutterMapEntry>() {
     switch (T) {
-      case CircleEntry:
+      case CircleEntry _:
         return circle;
-      case MarkerEntry:
+      case MarkerEntry _:
         return marker;
-      case PolygonEntry:
+      case PolygonEntry _:
         return polygon;
-      case PolylineEntry:
+      case PolylineEntry _:
         return polyline;
-      default: 
+      default:
         throw AssertionError("Invalid type");
     }
   }

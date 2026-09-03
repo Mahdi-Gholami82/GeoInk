@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
@@ -71,15 +70,15 @@ class _CustomAppBarState extends ConsumerState<CustomAppBar> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.menu),
+                        icon: const Icon(Icons.menu),
                         onPressed: () {
                           widget.onTapDrawer(context);
                         },
                         style: IconButton.styleFrom(
                           backgroundColor: theme.colorScheme.primaryContainer,
                           fixedSize: Size.square(40),
-                          shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadiusGeometry.circular(3),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(5),
                           ),
                         ),
                       ),
@@ -101,21 +100,21 @@ class _CustomAppBarState extends ConsumerState<CustomAppBar> {
                         style: IconButton.styleFrom(
                           backgroundColor: theme.colorScheme.primaryContainer,
                           fixedSize: Size.square(40),
-                          shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadiusGeometry.circular(3),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(5),
                           ),
                         ),
                         onPressed: () {
                           widget.onTapSettings();
                         },
-                        icon: Icon(Icons.settings),
+                        icon: const Icon(Icons.settings),
                       ),
                     ],
                   ),
                   Divider(),
                   FittedBox(
                     child: Padding(
-                      padding: EdgeInsetsGeometry.only(bottom: 7),
+                      padding: const EdgeInsetsGeometry.only(bottom: 7),
                       child: Row(
                         children: [
                           FileMenu(),

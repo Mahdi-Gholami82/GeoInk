@@ -41,7 +41,7 @@ class _CustomColorPickerState extends State<CustomColorPicker> {
             size: 18,
           ),
         ),
-        Text(
+        const Text(
           "Color",
           style: TextStyle(fontWeight: FontWeight.w500),
           overflow: TextOverflow.ellipsis,

@@ -15,13 +15,13 @@ class _AddCoordinatesSheetState extends State<AddCoordinatesSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
           Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold)),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 40),
+            margin: const EdgeInsets.symmetric(horizontal: 40),
             child: Row(
               spacing: 15,
               children: [
@@ -51,9 +51,13 @@ class _AddCoordinatesSheetState extends State<AddCoordinatesSheet> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(Icons.colorize, color: Colors.white, size: 18),
+                  child: const Icon(
+                    Icons.colorize,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                 ),
-                Text(
+                const Text(
                   "Change layer color",
                   style: TextStyle(fontWeight: FontWeight.w500),
                 ),

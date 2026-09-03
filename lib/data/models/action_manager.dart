@@ -5,20 +5,23 @@ abstract class Doable {
 }
 
 class ManualDoable extends Doable {
-  ManualDoable({required this.executeBase, required this.undoBase}) {}
+  ManualDoable({required this.executeBase, required this.undoBase});
 
   final Function executeBase;
   final Function() undoBase;
+
+  @override
   void doIt() {
     assert(!done);
     executeBase();
     done = true;
   }
 
+  @override
   void undoIt() {
     assert(done);
     done = false;
-    return undoBase();
+    undoBase();
   }
 }
 
@@ -27,18 +30,20 @@ class ContainerDoable<T> extends Doable {
     required this.data,
     required this.executeBase,
     required this.undoBase,
-  }) {}
+  });
 
-  bool done = false;
   T data;
   final void Function(T data) executeBase;
   final void Function(T data) undoBase;
+
+  @override
   void doIt() {
     assert(!done);
     executeBase(data);
     done = true;
   }
 
+  @override
   void undoIt() {
     assert(done);
     undoBase(data);

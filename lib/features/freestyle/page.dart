@@ -150,7 +150,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
             layer = chosenLayers[type];
             createdLayer = true;
           } else if (layer!.isInvalid) {
-            chosenLayers[type] = mapLayerList.getDefaultLayerEntryOrNull(type)!;
+            chosenLayers[type] = mapLayerList.getDefaultLayerEntry(type);
             layer = chosenLayers[type];
           }
           layer!.addUnique(entry);

@@ -56,25 +56,21 @@ class MapLayerListNotifier extends _$MapLayerListNotifier {
   void addMarker(InputCoordinatesResult result) {
     addLayerIfNotExist(result.layer);
     historyNotifier.actionAddToLayer(result.layer, entry: result.toMarker());
-    forceRebuild();
   }
 
   void addPolyLine(InputCoordinatesResult result) {
     addLayerIfNotExist(result.layer);
     historyNotifier.actionAddToLayer(result.layer, entry: result.toPolyline());
-    forceRebuild();
   }
 
   void addPolygon(InputCoordinatesResult result) {
     addLayerIfNotExist(result.layer);
     historyNotifier.actionAddToLayer(result.layer, entry: result.toPolygon());
-    forceRebuild();
   }
 
   void addCircle(InputCoordinatesResult result) {
     addLayerIfNotExist(result.layer);
     historyNotifier.actionAddToLayer(result.layer, entry: result.toCircle());
-    forceRebuild();
   }
 
   LayerEntryMap fromGeoJSONGeometries(

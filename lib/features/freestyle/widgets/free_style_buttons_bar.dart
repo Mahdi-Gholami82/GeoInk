@@ -4,7 +4,6 @@ import 'package:geoink/core/ui/floating_shadow.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:flutter/material.dart';
-import 'package:geoink/data/providers/map_camera.dart';
 
 class FreeStyleButtonsBar extends ConsumerStatefulWidget
     implements PreferredSizeWidget {

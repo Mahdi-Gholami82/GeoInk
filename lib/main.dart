@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:geoink/core/theme/theme.dart';
 import 'package:geoink/data/models/prefs_state.dart';
 import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/features/freestyle/page.dart';
@@ -55,11 +54,12 @@ class _GeoInkAppState extends ConsumerState<GeoInkApp> {
   @override
   Widget build(BuildContext context) {
     ref.watch(projectProvider);
+    var appTheme = ref.read(themeProvider);
     return MaterialApp(
       home: HomePage(),
-      darkTheme: AppTheme.dark,
-      theme: AppTheme.light,
-      themeMode: ref.watch(themeProvider),
+      darkTheme: appTheme.dark,
+      theme: appTheme.light,
+      themeMode: ref.watch(themeProvider).mode,
       routes: {
         SettingsPage.route: (context) => SettingsPage(),
         FreeStylePage.route: (context) => FreeStylePage(),

@@ -35,7 +35,7 @@ class _SaveToImageButtomSheetState
   Widget build(BuildContext context) {
     imageFuture = mapToImage(
       tileLayer: getOpenStreetMapTileLayer(
-        darkMode: ref.read(themeProvider.notifier).isDark(context),
+        darkMode: ref.read(themeProvider).isDark(context),
       ),
       mapChildren: mapChildren,
     );

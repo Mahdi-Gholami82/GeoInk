@@ -1,7 +1,6 @@
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/models/freestyle_arguments.dart';
 import 'package:geoink/data/providers/map_camera.dart';
 import 'package:geoink/features/appbar/widgets/appbar_menu.dart';
 import 'package:geoink/features/freestyle/page.dart';

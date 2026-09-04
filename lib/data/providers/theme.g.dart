@@ -13,7 +13,7 @@ part of 'theme.dart';
 const themeProvider = ThemeNotifierProvider._();
 
 final class ThemeNotifierProvider
-    extends $NotifierProvider<ThemeNotifier, ThemeMode> {
+    extends $NotifierProvider<ThemeNotifier, ThemeState> {
   const ThemeNotifierProvider._()
     : super(
         from: null,
@@ -33,28 +33,28 @@ final class ThemeNotifierProvider
   ThemeNotifier create() => ThemeNotifier();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ThemeMode value) {
+  Override overrideWithValue(ThemeState value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ThemeMode>(value),
+      providerOverride: $SyncValueProvider<ThemeState>(value),
     );
   }
 }
 
-String _$themeNotifierHash() => r'50d7a172e6559dda973404084fe7d3e2d691905b';
+String _$themeNotifierHash() => r'dd698eb556e8eb5a86d425bc8b1a21d6b32e8ec4';
 
-abstract class _$ThemeNotifier extends $Notifier<ThemeMode> {
-  ThemeMode build();
+abstract class _$ThemeNotifier extends $Notifier<ThemeState> {
+  ThemeState build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<ThemeMode, ThemeMode>;
+    final ref = this.ref as $Ref<ThemeState, ThemeState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ThemeMode, ThemeMode>,
-              ThemeMode,
+              AnyNotifier<ThemeState, ThemeState>,
+              ThemeState,
               Object?,
               Object?
             >;

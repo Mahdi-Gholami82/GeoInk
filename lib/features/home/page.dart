@@ -137,7 +137,7 @@ class HomePageState extends ConsumerState<HomePage> {
                     ),
                     children: [
                       getOpenStreetMapTileLayer(
-                        darkMode: themeNotifier.isDark(context),
+                        darkMode: ref.read(themeProvider).isDark(context),
                       ),
                       ...mapChildren,
                       Align(

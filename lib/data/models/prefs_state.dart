@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:geoink/core/ui/theme_tools.dart';
+import 'package:geoink/data/models/color_theme.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,12 +10,21 @@ class PrefsState {
   static late final SharedPreferences instance;
   static const recentProjectsCountLimit = 15;
 
+  static ColorTheme get colorTheme {
+    var result = instance.getString("colorTheme");
+    return result != null ? ColorTheme.fromString(result) : ColorTheme.orange;
+  }
+
+  static set colorTheme(ColorTheme newTheme) {
+    instance.setString("colorTheme", newTheme.name);
+  }
+
   static Future<void> init() async {
     instance = await SharedPreferences.getInstance();
   }
 
-  static ThemeMode? get themeMode =>
-      themeModeFromString(instance.getString("themeMode"));
+  static ThemeMode get themeMode =>
+      themeModeFromString(instance.getString("themeMode")) ?? ThemeMode.system;
 
   static set themeMode(ThemeMode value) {
     instance.setString("themeMode", value.name);

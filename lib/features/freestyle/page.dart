@@ -451,9 +451,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                     ),
                     children: [
                       getOpenStreetMapTileLayer(
-                        darkMode: ref
-                            .watch(themeProvider.notifier)
-                            .isDark(context),
+                        darkMode: ref.watch(themeProvider).isDark(context),
                       ),
                       ...mapLayerList.getMapChildren(),
                     ],

@@ -38,7 +38,6 @@ dependencies:
   latlong2: ^0.9.1
   http: ^1.6.0
   flutter_speed_dial: ^7.0.0
-  settings_ui: ^2.0.2
   flutter_colorpicker: ^1.1.0
   window_manager: ^0.5.1
   flutter_riverpod: ^3.0.3

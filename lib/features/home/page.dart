@@ -9,6 +9,7 @@ import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/models/prefs_state.dart';
 import 'package:geoink/data/providers/history.dart';
+import 'package:geoink/data/providers/map_camera.dart';
 import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/data/providers/theme.dart';
 import 'package:geoink/features/home/utils/show_projects_sheet.dart';
@@ -26,10 +27,10 @@ class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class HomePageState extends ConsumerState<HomePage> {
   late DoableHistory history;
   final MapController mapController = MapController();
   final ResponsiveDrawerController drawerController =
@@ -43,6 +44,16 @@ class _HomePageState extends ConsumerState<HomePage> {
   bool showMapAttribution = true;
   bool shouldShowProjectsSheet = false;
   bool loading = false;
+
+  static HomePageState? maybeOf(BuildContext context) {
+    return context.findAncestorStateOfType<HomePageState>();
+  }
+
+  static HomePageState of(BuildContext context) {
+    final HomePageState? result = maybeOf(context);
+    assert(result != null, 'No HomePageState found in context');
+    return result!;
+  }
 
   Future<GeoinkProject?> _loadRecentProject() async {
     var selectedProject = await PrefsState.loadSelectedProject();
@@ -66,6 +77,15 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    var freeStyleMapcamera = ref.read(mapCameraProvider);
+    if (freeStyleMapcamera != null) {
+      mapController.move(freeStyleMapcamera.center, freeStyleMapcamera.zoom);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     Iterable<Widget> mapChildren = ref
         .watch(mapLayerListProvider)
@@ -73,6 +93,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     ref.watch(historyProvider);
     ref.watch(projectProvider);
     ref.watch(themeProvider);
+    ref.watch(mapCameraProvider);
 
     return BaseShortcuts(
       child: ResponsiveDrawer(
@@ -100,7 +121,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     mapController: mapController,
                     borderRadius: 16,
                     drawer: MapDrawer(),
-                    onTapSettings: () {
+                    onTapSettings: () async {
                       Navigator.of(context).pushNamed(SettingsPage.route);
                     },
                     onTapDrawer: (context) {
@@ -110,7 +131,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   floatingActionButton: AddMapElementFab(),
                   body: FlutterMap(
                     mapController: mapController,
-                    options: const MapOptions(
+                    options: MapOptions(
                       initialCenter: LatLng(51.5, -0.09),
                       initialZoom: 5,
                     ),

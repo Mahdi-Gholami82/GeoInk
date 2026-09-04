@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'map_layer_list.dart';
+part of 'map_camera.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,53 +9,52 @@ part of 'map_layer_list.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(MapLayerListNotifier)
-const mapLayerListProvider = MapLayerListNotifierProvider._();
+@ProviderFor(MapCameraNotifier)
+const mapCameraProvider = MapCameraNotifierProvider._();
 
-final class MapLayerListNotifierProvider
-    extends $NotifierProvider<MapLayerListNotifier, MapLayerList> {
-  const MapLayerListNotifierProvider._()
+final class MapCameraNotifierProvider
+    extends $NotifierProvider<MapCameraNotifier, MapCamera?> {
+  const MapCameraNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'mapLayerListProvider',
+        name: r'mapCameraProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$mapLayerListNotifierHash();
+  String debugGetCreateSourceHash() => _$mapCameraNotifierHash();
 
   @$internal
   @override
-  MapLayerListNotifier create() => MapLayerListNotifier();
+  MapCameraNotifier create() => MapCameraNotifier();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(MapLayerList value) {
+  Override overrideWithValue(MapCamera? value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<MapLayerList>(value),
+      providerOverride: $SyncValueProvider<MapCamera?>(value),
     );
   }
 }
 
-String _$mapLayerListNotifierHash() =>
-    r'dc3c6a61acb292f694842259b814ccffec8e4781';
+String _$mapCameraNotifierHash() => r'81461b5e1a8fc32043dd3120544172acc333fc04';
 
-abstract class _$MapLayerListNotifier extends $Notifier<MapLayerList> {
-  MapLayerList build();
+abstract class _$MapCameraNotifier extends $Notifier<MapCamera?> {
+  MapCamera? build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<MapLayerList, MapLayerList>;
+    final ref = this.ref as $Ref<MapCamera?, MapCamera?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<MapLayerList, MapLayerList>,
-              MapLayerList,
+              AnyNotifier<MapCamera?, MapCamera?>,
+              MapCamera?,
               Object?,
               Object?
             >;

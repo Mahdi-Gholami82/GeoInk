@@ -1,9 +1,12 @@
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/floating_shadow.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:flutter/material.dart';
+import 'package:geoink/data/providers/map_camera.dart';
 
-class FreeStyleButtonsBar extends StatefulWidget
+class FreeStyleButtonsBar extends ConsumerStatefulWidget
     implements PreferredSizeWidget {
   const FreeStyleButtonsBar({
     super.key,
@@ -11,26 +14,36 @@ class FreeStyleButtonsBar extends StatefulWidget
     required this.onTypeSwitch,
     required this.onConfirm,
     required this.onCancel,
+    required this.mapController,
+    required this.onPop,
   });
   final EntryType initSelectedType;
   final void Function(EntryType type) onTypeSwitch;
   final void Function() onConfirm;
   final void Function() onCancel;
+  final void Function() onPop;
+  final MapController mapController;
 
   @override
-  State<FreeStyleButtonsBar> createState() => _FreeStyleButtonsBarState();
+  ConsumerState<FreeStyleButtonsBar> createState() =>
+      _FreeStyleButtonsBarState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 100);
 }
 
-class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
+class _FreeStyleButtonsBarState extends ConsumerState<FreeStyleButtonsBar> {
   late EntryType selectedType;
 
   @override
   void initState() {
     super.initState();
     selectedType = widget.initSelectedType;
+  }
+
+  void popWithMapCamera(BuildContext context) {
+    Navigator.of(context).pop();
+    widget.onPop();
   }
 
   @override
@@ -65,7 +78,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                           ),
                           onPressed: () {
                             widget.onCancel();
-                            Navigator.of(context).pop();
+                            popWithMapCamera(context);
                           },
                           icon: const Icon(Icons.close),
                         ),
@@ -127,7 +140,7 @@ class _FreeStyleButtonsBarState extends State<FreeStyleButtonsBar> {
                           ),
                           onPressed: () {
                             widget.onConfirm();
-                            Navigator.of(context).pop();
+                            popWithMapCamera(context);
                           },
                           icon: const Icon(Icons.check),
                         ),

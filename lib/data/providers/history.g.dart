@@ -41,7 +41,7 @@ final class HistoryNotifierProvider
   }
 }
 
-String _$historyNotifierHash() => r'0e04b6a0be0eda1bd0d24a135d9367d72de6cccb';
+String _$historyNotifierHash() => r'2ae8d8a7a0011448eb57c42528d884a5c3bfc08c';
 
 abstract class _$HistoryNotifier extends $Notifier<MapHistory> {
   MapHistory build();

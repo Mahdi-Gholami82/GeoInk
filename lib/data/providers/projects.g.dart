@@ -41,7 +41,7 @@ final class ProjectNotifierProvider
   }
 }
 
-String _$projectNotifierHash() => r'5dbcfd5d0fd34b62b303fbe35a3453fb1eaa9701';
+String _$projectNotifierHash() => r'a806928c2ebf79de48a1ee6bebb6728c42243562';
 
 abstract class _$ProjectNotifier extends $Notifier<GeoinkProject?> {
   GeoinkProject? build();

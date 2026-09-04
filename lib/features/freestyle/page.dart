@@ -5,9 +5,9 @@ import 'package:geoink/core/utils/map_colors.dart';
 import 'package:geoink/core/ui/show_color_picker.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
-import 'package:geoink/data/models/freestyle_arguments.dart';
 import 'package:geoink/data/models/map_actions.dart';
 import 'package:geoink/data/providers/history.dart';
+import 'package:geoink/data/providers/map_camera.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/data/providers/theme.dart';
 import 'package:geoink/features/freestyle/widgets/floating_container.dart';
@@ -92,10 +92,8 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInitialized) {
-      FreestyleArguments arguments =
-          ModalRoute.of(context)!.settings.arguments as FreestyleArguments;
-      selectedType = arguments.initSelectedType;
-      homeMapCamera = arguments.mapCamera;
+      selectedType = ModalRoute.of(context)!.settings.arguments as EntryType;
+      homeMapCamera = ref.read(mapCameraProvider)!;
       makeLayerVisible();
       _isInitialized = true;
     }
@@ -281,6 +279,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
         },
         child: Scaffold(
           appBar: FreeStyleButtonsBar(
+            mapController: mapController,
             initSelectedType: selectedType,
             onTypeSwitch: (EntryType type) {
               setState(() {
@@ -288,6 +287,9 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                 selectedType = type;
                 makeLayerVisible();
               });
+            },
+            onPop: () {
+              ref.read(mapCameraProvider.notifier).update(mapController.camera);
             },
             onConfirm: () {
               if (!finishedDrawing) cancelDrawing();

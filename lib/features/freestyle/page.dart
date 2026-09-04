@@ -246,10 +246,11 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   void safeUndo() {
     var history = ref.read(historyProvider);
     if (!finishedDrawing && history.undoStack.last is! TempDoable) {
+      debugPrint("${currentEntry.runtimeType}");
       assert(
         currentEntry is FlutterMapMultiPointEntry &&
                 (currentEntry as FlutterMapMultiPointEntry).points.length ==
-                    1 ||
+                    2 ||
             currentEntry is CircleEntry,
       );
       historyNotifier.restoreFromPoints();

@@ -51,6 +51,7 @@ class MapHistory extends DoableHistory {
       undoRestorePoint: undoStack.length,
       redoRestorePoint: redoStack.length,
     ));
+    debugPrint("Set restor points : ${_restorePoints.last}");
   }
 
   void restore() {

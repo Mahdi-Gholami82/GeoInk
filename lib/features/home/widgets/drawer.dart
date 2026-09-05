@@ -50,8 +50,8 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
     ref.watch(historyProvider);
     HistoryNotifier historyNotifier = ref.read(historyProvider.notifier);
 
-    var children = List.generate(layers.length, (index) {
-      var currentLayer = layers[index];
+    var children = List.generate(layers.length, (layerIndex) {
+      var currentLayer = layers[layerIndex];
       return NestedChild(
         key: ValueKey(currentLayer.name),
         (context, childIndex) {
@@ -338,10 +338,10 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
         },
 
         childCount: currentLayer.length,
-        index: index,
+        index: layerIndex,
         onReorder: (fromIndex, toIndex, isUpperHalf) {
           historyNotifier.actionReorderEntry(
-            currentLayer,
+            layerIndex,
             fromIndex,
             getInsertInIndex(
               fromIndex,

@@ -245,13 +245,19 @@ class HistoryNotifier extends _$HistoryNotifier {
     );
   }
 
-  void actionReorderEntry(MapLayer layer, int oldIndex, int newIndex) {
+  void actionReorderEntry(int layerIndex, int oldIndex, int newIndex) {
     addAndDo(
       ManualDoable(
         executeBase: () {
+          var layer = _mapLayerList.items[layerIndex];
+          debugPrint("Reorder entry from $oldIndex to $newIndex in $layer");
           layer.items.swapByIndex(oldIndex, newIndex);
         },
         undoBase: () {
+          var layer = _mapLayerList.items[layerIndex];
+          debugPrint(
+            "Undo reorder entry from $newIndex to $oldIndex in $layer",
+          );
           layer.items.swapByIndex(newIndex, oldIndex);
         },
       ),

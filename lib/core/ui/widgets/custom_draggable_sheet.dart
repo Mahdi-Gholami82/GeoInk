@@ -37,6 +37,7 @@ class _CustomDraggableSheetState extends State<CustomDraggableSheet> {
   late DraggableScrollableController controller;
   late double childSize = widget.initialChildSize;
   late double buttomInsets = MediaQuery.viewInsetsOf(context).bottom;
+  late double childManualSize = widget.initialChildSize;
 
   @override
   void initState() {
@@ -46,11 +47,12 @@ class _CustomDraggableSheetState extends State<CustomDraggableSheet> {
     controller = DraggableScrollableController();
   }
 
-  void _animateSheetTo(
+  void _animateSheetAndSavePosition(
     double size, [
     Duration duration = const Duration(milliseconds: 300),
   ]) {
     controller.animateTo(size, duration: duration, curve: Curves.easeInOut);
+    childManualSize = size;
   }
 
   @override
@@ -60,13 +62,11 @@ class _CustomDraggableSheetState extends State<CustomDraggableSheet> {
       double newButtomInsets = MediaQuery.viewInsetsOf(context).bottom;
       if (newButtomInsets != buttomInsets) {
         double size = controller.size;
-        _animateSheetTo(
-          ((newButtomInsets > buttomInsets
-                      ? size + newButtomInsets
-                      : size - newButtomInsets) -
-                  buttomInsets)
-              .clamp(widget.initialChildSize, widget.maxChildSize),
-          const Duration(milliseconds: 30),
+        double bottomInsetsDif = newButtomInsets - buttomInsets;
+        controller.animateTo(
+          (size + bottomInsetsDif).clamp(childManualSize, widget.maxChildSize),
+          duration: const Duration(milliseconds: 30),
+          curve: Curves.easeInOut,
         );
         buttomInsets = newButtomInsets;
       }
@@ -106,12 +106,12 @@ class _CustomDraggableSheetState extends State<CustomDraggableSheet> {
             },
             onVerticalDragEnd: (details) {
               if (controller.size < minMaxAverage && controller.size > 0) {
-                _animateSheetTo(widget.initialChildSize);
+                _animateSheetAndSavePosition(widget.initialChildSize);
               } else if (controller.size > minMaxAverage &&
                   controller.size < 1) {
-                _animateSheetTo(widget.maxChildSize);
+                _animateSheetAndSavePosition(widget.maxChildSize);
               } else {
-                _animateSheetTo(initDragPosition);
+                _animateSheetAndSavePosition(initDragPosition);
               }
             },
             child: Material(

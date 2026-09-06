@@ -96,6 +96,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                   title: "Add Bulk Marker",
                   type: EntryType.marker,
                   isBulk: true,
+                  initialChildSize: 0.8,
                 ).then((value) {
                   if (value != null) {
                     ref

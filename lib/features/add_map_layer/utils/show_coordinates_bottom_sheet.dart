@@ -12,6 +12,7 @@ Future<InputCoordinatesResult?> showCoordinatesButtomSheet(
   required String title,
   required EntryType type,
   bool isBulk = false,
+  double initialChildSize = 0.6,
 }) {
   InputListCoordinatesNotifier inputListNotifier = ref.read(
     inputListCoordinatesProvider.notifier,
@@ -25,7 +26,7 @@ Future<InputCoordinatesResult?> showCoordinatesButtomSheet(
     backgroundColor: Colors.transparent,
     context: context,
     builder: (context) => CustomDraggableSheet(
-      initialChildSize: 0.6,
+      initialChildSize: initialChildSize,
       builder: (context, scrollController) {
         return CoordinatesSheet(
           scrollController: scrollController,

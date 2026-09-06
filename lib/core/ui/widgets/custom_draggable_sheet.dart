@@ -30,11 +30,13 @@ class _CustomDraggableSheetState extends State<CustomDraggableSheet> {
   double get minMaxAverage =>
       (widget.initialChildSize + widget.maxChildSize) / 2;
   bool get needsMaxSizeForKeyboard =>
-      MediaQuery.of(context).viewInsets.bottom *
+      MediaQuery.viewInsetsOf(context).bottom *
           100 /
           MediaQuery.sizeOf(context).height >
       0.10;
   late DraggableScrollableController controller;
+  late double childSize = widget.initialChildSize;
+  late double buttomInsets = MediaQuery.viewInsetsOf(context).bottom;
 
   @override
   void initState() {
@@ -44,12 +46,31 @@ class _CustomDraggableSheetState extends State<CustomDraggableSheet> {
     controller = DraggableScrollableController();
   }
 
-  void _animateSheetTo(double size) {
-    controller.animateTo(
-      size,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+  void _animateSheetTo(
+    double size, [
+    Duration duration = const Duration(milliseconds: 300),
+  ]) {
+    controller.animateTo(size, duration: duration, curve: Curves.easeInOut);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (needsMaxSizeForKeyboard) {
+      double newButtomInsets = MediaQuery.viewInsetsOf(context).bottom;
+      if (newButtomInsets != buttomInsets) {
+        double size = controller.size;
+        _animateSheetTo(
+          ((newButtomInsets > buttomInsets
+                      ? size + newButtomInsets
+                      : size - newButtomInsets) -
+                  buttomInsets)
+              .clamp(widget.initialChildSize, widget.maxChildSize),
+          const Duration(milliseconds: 30),
+        );
+        buttomInsets = newButtomInsets;
+      }
+    }
   }
 
   @override

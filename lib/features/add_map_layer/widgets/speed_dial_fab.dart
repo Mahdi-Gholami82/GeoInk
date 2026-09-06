@@ -44,6 +44,7 @@ class AddMapElementFab extends ConsumerWidget {
               ref,
               title: "Add Polyline",
               type: EntryType.polyline,
+              initialChildSize: 0.7,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addPolyLine(value);
@@ -60,6 +61,7 @@ class AddMapElementFab extends ConsumerWidget {
               ref,
               title: "Add Circle",
               type: EntryType.circle,
+              initialChildSize: 0.7,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addCircle(value);
@@ -76,6 +78,7 @@ class AddMapElementFab extends ConsumerWidget {
               ref,
               title: "Add Polygon",
               type: EntryType.polygon,
+              initialChildSize: 0.8,
             ).then((value) {
               if (value != null) {
                 tileEntriesNotifier.addPolygon(value);

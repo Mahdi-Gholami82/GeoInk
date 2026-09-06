@@ -460,9 +460,11 @@ class MapLayerList with UniqueNamedItems<MapLayer> {
   MapLayer? getDefaultLayerEntryOrNull(EntryType type) =>
       items.firstWhereOrNull((element) => element.entryType == type);
 
-  MapLayer createNewDefaultLayer(EntryType type) {
+  MapLayer createNewDefaultLayer(EntryType type, {bool add = true}) {
     var newLayer = MapLayer(name: type.defaultLayerName, entryType: type);
-    addUnique(newLayer);
+    if (add) {
+      addUnique(newLayer);
+    }
     return newLayer;
   }
 

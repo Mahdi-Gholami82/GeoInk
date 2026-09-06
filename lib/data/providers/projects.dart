@@ -48,11 +48,20 @@ class ProjectNotifier extends _$ProjectNotifier {
     var featureCollection = GeoJSONFeatureCollection.fromJSON(fileText);
     var mapLayerListNotifier = ref.read(mapLayerListProvider.notifier);
     mapLayerListNotifier.reset();
+    var localLayerList = EntryType.values
+        .map((e) => MapLayer(name: "${e.name} import", entryType: e))
+        .toSet();
     List<LayerEntryMap> layerEntryMaps = mapLayerListNotifier
-        .fromGeoJSONFeatureCollection(featureCollection);
+        .fromGeoJSONFeatureCollection(
+          featureCollection,
+          localLayerList: localLayerList,
+        );
     ref
         .read(historyProvider.notifier)
-        .actionListAddAllToAllLayer(layerEntryMaps);
+        .actionListAddAllToAllLayer(
+          layerEntryMaps,
+          createdLayers: localLayerList,
+        );
   }
 
   Future<void> importProjectFromFile(File projectFile) async {

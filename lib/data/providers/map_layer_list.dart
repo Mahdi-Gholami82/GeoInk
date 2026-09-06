@@ -76,6 +76,7 @@ class MapLayerListNotifier extends _$MapLayerListNotifier {
   LayerEntryMap fromGeoJSONGeometries(
     List<GeoJSONGeometry> geometries, {
     required Map<String, dynamic> properties,
+    Set<MapLayer> localLayerList = const {},
   }) {
     LayerEntryMap layerEntryMap = {};
     for (var geometry in geometries) {
@@ -83,6 +84,7 @@ class MapLayerListNotifier extends _$MapLayerListNotifier {
         fromGeoJSONGeometries(
           (geometry as GeoJSONGeometryCollection).geometries,
           properties: properties,
+          localLayerList: localLayerList,
         );
         continue;
       }
@@ -94,26 +96,43 @@ class MapLayerListNotifier extends _$MapLayerListNotifier {
       assert(entries.every((e) => e.runtimeType == entries.first.runtimeType));
       String? layerName = properties["layer-name"];
       EntryType type = EntryType.fromType(entries.first.runtimeType);
-      MapLayer layer =
-          (layerName == null
-              ? state.getDefaultLayerEntry(type)
-              : state.items.toList().firstWhereOrNull(
-                  (e) => e.name.trim() == layerName,
-                )) ??
-          MapLayer(
-            name: layerName!,
+      MapLayer? layer;
+      bool createdLayer = true;
+      if (layerName == null) {
+        layer = localLayerList.firstWhere((e) => e.entryType == type);
+        createdLayer = false;
+      } else {
+        layer = state.items.toList().firstWhereOrNull(
+          (e) => e.name.trim() == layerName,
+        );
+        layer ??= localLayerList.firstWhereOrNull(
+          (e) => e.name.trim() == layerName,
+        );
+        if (layer == null) {
+          layer = MapLayer(
+            name: layerName,
             entryType: EntryType.fromType(entries.first.runtimeType),
           );
-      state.addLayerIgnoreIfExists(layer);
+        } else {
+          createdLayer = false;
+        }
+      }
+
+      if (createdLayer) {
+        localLayerList.add(layer);
+      }
+
       layerEntryMap[layer] = entries;
     }
     return layerEntryMap;
   }
 
   List<LayerEntryMap> fromGeoJSONFeatureCollection(
-    GeoJSONFeatureCollection featureCollection,
-  ) {
+    GeoJSONFeatureCollection featureCollection, {
+    required Set<MapLayer> localLayerList,
+  }) {
     List<LayerEntryMap> results = [];
+
     for (var feature in featureCollection.features) {
       if (feature == null || feature.geometry == null) {
         continue;
@@ -122,7 +141,13 @@ class MapLayerListNotifier extends _$MapLayerListNotifier {
       Map<String, dynamic> properties = feature.properties ?? {};
       List<GeoJSONGeometry> geomatries = [geometry];
       while (geomatries.isNotEmpty) {
-        results.add(fromGeoJSONGeometries(geomatries, properties: properties));
+        results.add(
+          fromGeoJSONGeometries(
+            geomatries,
+            properties: properties,
+            localLayerList: localLayerList,
+          ),
+        );
         geomatries.removeWhere((e) => geomatries.contains(e));
         geomatries = geomatries.expand((e) {
           return (e as GeoJSONGeometryCollection).geometries;

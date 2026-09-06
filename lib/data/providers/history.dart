@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
@@ -189,21 +190,32 @@ class HistoryNotifier extends _$HistoryNotifier {
     );
   }
 
-  void actionListAddAllToAllLayer(List<LayerEntryMap> layerEntryMaps) {
+  void actionListAddAllToAllLayer(
+    List<LayerEntryMap> layerEntryMapResults, {
+    required Set<MapLayer> createdLayers,
+  }) {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          for (var layerEntryMap in layerEntryMaps) {
-            for (var layerFlutterMapEntriesPair in layerEntryMap.entries) {
+          var mapLayerList = _mapLayerList;
+          for (var layerEntryMapResult in layerEntryMapResults) {
+            for (var layerFlutterMapEntriesPair
+                in layerEntryMapResult.entries) {
+              debugPrint("${layerFlutterMapEntriesPair.value}");
               layerFlutterMapEntriesPair.key.addAllUnique(
                 layerFlutterMapEntriesPair.value,
               );
             }
           }
+          mapLayerList.items.addAll(
+            createdLayers.where((e) => e.items.isNotEmpty),
+          );
         },
         undoBase: () {
-          for (var layerEntryMap in layerEntryMaps) {
-            for (var layerFlutterMapEntriesPair in layerEntryMap.entries) {
+          _mapLayerList.items.removeWhere((e) => createdLayers.contains(e));
+          for (var layerEntryMapResult in layerEntryMapResults) {
+            for (var layerFlutterMapEntriesPair
+                in layerEntryMapResult.entries) {
               MapLayer mapLayer = layerFlutterMapEntriesPair.key;
               int length = mapLayer.items.length;
               mapLayer.items.removeRange(

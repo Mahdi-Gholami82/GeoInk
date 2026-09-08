@@ -42,7 +42,7 @@ final class MapLayerListNotifierProvider
 }
 
 String _$mapLayerListNotifierHash() =>
-    r'd3a4fb4fa43d8fb40d0d1096a8dcd5797017096b';
+    r'ccc3a07d6ac884ca8a2ca82398e735912523df95';
 
 abstract class _$MapLayerListNotifier extends $Notifier<MapLayerList> {
   MapLayerList build();

@@ -79,9 +79,11 @@ class HomePageState extends ConsumerState<HomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    var freeStyleMapcamera = ref.read(mapCameraProvider);
-    if (freeStyleMapcamera != null) {
-      mapController.move(freeStyleMapcamera.center, freeStyleMapcamera.zoom);
+    final cameraState = ref.read(mapCameraProvider);
+    final camera = cameraState.camera;
+    if (camera != null) {
+      mapController.move(camera.center, camera.zoom);
+      cameraState.camera = null;
     }
   }
 

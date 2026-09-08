@@ -4,6 +4,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geoink/core/ui/icon_with_strok.dart';
 import 'package:geoink/core/utils/unique_named_items.dart';
+import 'package:geoink/core/utils/color_tools.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/core/utils/map_colors.dart';
@@ -93,7 +94,7 @@ class MarkerEntry extends FlutterMapEntry {
         Icons.location_pin,
         size: 40,
         color: color,
-        strokColor: Colors.white70,
+        strokColor: color.onColorWithColors(Colors.black38, Colors.white70),
         strokWidth: 2,
       ),
     ),

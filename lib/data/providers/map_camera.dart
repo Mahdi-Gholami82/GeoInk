@@ -3,14 +3,19 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'map_camera.g.dart';
 
+class MapCameraState {
+  MapCameraState([this.camera]);
+  MapCamera? camera;
+}
+
 @Riverpod(keepAlive: true)
 class MapCameraNotifier extends _$MapCameraNotifier {
   @override
-  MapCamera? build() {
-    return null;
+  MapCameraState build() {
+    return MapCameraState();
   }
 
   void update(MapCamera mapCamera) {
-    state = mapCamera;
+    state = MapCameraState(mapCamera);
   }
 }

@@ -94,7 +94,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     super.didChangeDependencies();
     if (!_isInitialized) {
       selectedType = ModalRoute.of(context)!.settings.arguments as EntryType;
-      homeMapCamera = ref.read(mapCameraProvider)!;
+      homeMapCamera = ref.read(mapCameraProvider).camera!;
       makeLayerVisible();
       _isInitialized = true;
     }

@@ -13,5 +13,13 @@ extension ColorExtension on Color {
     );
   }
 
-  Color onColor() => computeLuminance() > 0.5 ? Colors.black : Colors.white;
+  Color withLightness(double brightness) {
+    return HSLColor.fromColor(Colors.black).withLightness(brightness).toColor();
+  }
+
+  Color onColorWithColors(Color colorBlack, Color colorWhite) {
+    return computeLuminance() > 0.5 ? colorBlack : colorWhite;
+  }
+
+  Color onColor() => onColorWithColors(Colors.black, Colors.white);
 }

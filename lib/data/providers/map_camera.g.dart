@@ -13,7 +13,7 @@ part of 'map_camera.dart';
 const mapCameraProvider = MapCameraNotifierProvider._();
 
 final class MapCameraNotifierProvider
-    extends $NotifierProvider<MapCameraNotifier, MapCamera?> {
+    extends $NotifierProvider<MapCameraNotifier, MapCameraState> {
   const MapCameraNotifierProvider._()
     : super(
         from: null,
@@ -33,28 +33,28 @@ final class MapCameraNotifierProvider
   MapCameraNotifier create() => MapCameraNotifier();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(MapCamera? value) {
+  Override overrideWithValue(MapCameraState value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<MapCamera?>(value),
+      providerOverride: $SyncValueProvider<MapCameraState>(value),
     );
   }
 }
 
-String _$mapCameraNotifierHash() => r'81461b5e1a8fc32043dd3120544172acc333fc04';
+String _$mapCameraNotifierHash() => r'91a6eb5d0ee53cffc9b4d2e0d2b32b3af151b5bf';
 
-abstract class _$MapCameraNotifier extends $Notifier<MapCamera?> {
-  MapCamera? build();
+abstract class _$MapCameraNotifier extends $Notifier<MapCameraState> {
+  MapCameraState build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<MapCamera?, MapCamera?>;
+    final ref = this.ref as $Ref<MapCameraState, MapCameraState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<MapCamera?, MapCamera?>,
-              MapCamera?,
+              AnyNotifier<MapCameraState, MapCameraState>,
+              MapCameraState,
               Object?,
               Object?
             >;

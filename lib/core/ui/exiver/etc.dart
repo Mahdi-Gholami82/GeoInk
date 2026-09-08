@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:geoink/core/ui/exiver/drags.dart';
 
 mixin TargetHolder {
@@ -17,10 +18,25 @@ mixin TargetHolder {
 }
 
 typedef NestedReorderCallback =
-    void Function(int fromIndex, int toIndex, bool isUpperHalf);
+    void Function(
+      int fromIndex,
+      int toIndex,
+      int insertIndex,
+      bool isUpperHalf,
+    );
 
-int getInsertInIndex(int fromIndex, int toIndex, bool isUpperHalf) {
-  if (fromIndex < toIndex) {
+int getInsertIndex(
+  int fromIndex,
+  int toIndex,
+  bool isUpperHalf, {
+  bool reverse = false,
+}) {
+  if (reverse) {
+    isUpperHalf = isUpperHalf ^ !reverse;
+  }
+  if (fromIndex == toIndex) {
+    return fromIndex;
+  } else if (fromIndex < toIndex) {
     return isUpperHalf ? toIndex - 1 : toIndex;
   } else {
     return isUpperHalf ? toIndex : toIndex + 1;

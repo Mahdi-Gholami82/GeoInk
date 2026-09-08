@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:geoink/core/ui/exiver/etc.dart';
 import 'package:geoink/core/ui/exiver/exiver.dart';
 import 'package:geoink/core/ui/exiver/nested_child.dart';
@@ -29,8 +31,7 @@ class MapDrawer extends ConsumerStatefulWidget {
   ConsumerState<MapDrawer> createState() => _MapDrawerState();
 }
 
-class _MapDrawerState extends ConsumerState<MapDrawer>
-    with AutomaticKeepAliveClientMixin {
+class _MapDrawerState extends ConsumerState<MapDrawer> {
   Color _colorFromEntry(FlutterMapEntry entry) {
     switch (EntryType.fromType(entry.runtimeType)) {
       case EntryType.polygon:
@@ -340,15 +341,14 @@ class _MapDrawerState extends ConsumerState<MapDrawer>
 
         childCount: currentLayer.length,
         index: layerIndex,
-        onReorder: (fromIndex, toIndex, isUpperHalf) {
+        onReorder: (fromIndex, toIndex, insertIndex, isUpperHalf) {
+          debugPrint(
+            "from $fromIndex to $insertIndex, touching $toIndex on upperhalf $isUpperHalf",
+          );
           historyNotifier.actionReorderEntry(
             layerIndex,
             fromIndex,
-            getInsertInIndex(
-              fromIndex,
-              toIndex,
-              isUpperHalf,
-            ).clamp(0, currentLayer.length - 1),
+            insertIndex,
           );
         },
       );
@@ -416,17 +416,17 @@ class _MapDrawerState extends ConsumerState<MapDrawer>
 
         Expanded(
           child: ExiverList(
+            reverse: true,
             childDraggingColor: theme.colorScheme.surface,
             childPadding: const EdgeInsetsGeometry.symmetric(horizontal: 10),
-            onReorder: (fromIndex, toIndex, isUpperHalf) {
-              historyNotifier.actionReorderLayer(
-                fromIndex,
-                getInsertInIndex(
-                  fromIndex,
-                  toIndex,
-                  isUpperHalf,
-                ).clamp(0, layers.length - 1),
+            onReorder: (fromIndex, toIndex, insertIndex, isUpperHalf) {
+              debugPrint(
+                "from $fromIndex to $insertIndex, touching $toIndex on upperhalf $isUpperHalf",
               );
+              if (fromIndex == insertIndex) {
+                return;
+              }
+              historyNotifier.actionReorderLayer(fromIndex, insertIndex);
             },
             children: children,
           ),
@@ -434,7 +434,4 @@ class _MapDrawerState extends ConsumerState<MapDrawer>
       ],
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

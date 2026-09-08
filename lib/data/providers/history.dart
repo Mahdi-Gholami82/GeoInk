@@ -201,7 +201,6 @@ class HistoryNotifier extends _$HistoryNotifier {
           for (var layerEntryMapResult in layerEntryMapResults) {
             for (var layerFlutterMapEntriesPair
                 in layerEntryMapResult.entries) {
-              debugPrint("${layerFlutterMapEntriesPair.value}");
               layerFlutterMapEntriesPair.key.addAllUnique(
                 layerFlutterMapEntriesPair.value,
               );

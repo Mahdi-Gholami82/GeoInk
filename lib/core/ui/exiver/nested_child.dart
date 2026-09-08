@@ -111,21 +111,26 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
       if (childWidget == null) {
         return null;
       }
-      int movingIndex = switch (targetType) {
-        DragTargetType.header => widget.index,
-        DragTargetType.child => builderIndex,
-      };
-      EdgeInsetsGeometry getPadding() => switch (targetType) {
-        DragTargetType.header => const EdgeInsetsGeometry.all(0),
-        DragTargetType.child => ExiverList.of(context).childPadding,
-      };
+      final isHeader = targetType == DragTargetType.header;
+
+      final reverse = isHeader ? _exiverListState.widget.reverse : false;
+
+      final movingIndex = isHeader ? widget.index : builderIndex;
+
+      final padding = isHeader
+          ? EdgeInsets.zero
+          : ExiverList.of(context).childPadding;
+
+      final length = isHeader
+          ? _exiverListState.widget.children.length
+          : widget.childCount;
 
       return NestedDragTarget(
         index: movingIndex,
         targetType: targetType,
         child: NestedDragListener(
           index: builderIndex,
-          child: Padding(padding: getPadding(), child: childWidget),
+          child: Padding(padding: padding, child: childWidget),
           onDragDown: (context, event) {
             void handleDragStart(LongPressStartDetails details) {
               draggingTargetType = targetType;
@@ -145,9 +150,9 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                     child: Padding(
                       padding: const EdgeInsetsGeometry.only(left: 15),
                       child: Material(
-                        color: targetType == DragTargetType.child
-                            ? _exiverListState.widget.childDraggingColor
-                            : Colors.transparent,
+                        color: isHeader
+                            ? Colors.transparent
+                            : _exiverListState.widget.childDraggingColor,
                         elevation: 10,
                         child: IntrinsicHeight(
                           child: SizedBox(
@@ -177,7 +182,8 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                 final box = context.findRenderObject() as RenderBox;
                 final rect = box.localToGlobal(Offset.zero) & box.size;
 
-                if (rect.contains(details.globalPosition)) {
+                if (rect.top <= mousePositionY &&
+                    mousePositionY <= rect.bottom) {
                   final targetIndex = entry.key;
                   final double targetStart = rect.top;
                   final double targetEnd = rect.bottom;
@@ -199,50 +205,44 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                 }
               }
               if (currentDragIndicator != null) {
-                if (mousePositionY > _startDragY) {
-                  int maxIndex =
-                      switch (targetType) {
-                        DragTargetType.header =>
-                          _exiverListState.widget.children.length,
-                        DragTargetType.child => widget.childCount,
-                      } -
-                      1;
+                if ((mousePositionY > _startDragY) ^ reverse) {
+                  int maxIndex = length - 1;
                   var maxTarget = targets[maxIndex];
                   if (maxTarget == null) {
                     return;
                   }
-                  final rect = getRenderRect(
-                    maxTarget.context.findRenderObject() as RenderBox,
+                  updateDragIndicatorMarkDirty(
+                    DragIndicatorState(index: maxIndex, isUpperHalf: reverse),
                   );
-                  if (mousePositionY > rect.top) {
-                    updateDragIndicatorMarkDirty(
-                      DragIndicatorState(index: maxIndex, isUpperHalf: false),
-                    );
-                  }
                 } else {
                   var minIndex = 0;
                   var minTarget = targets[minIndex];
                   if (minTarget == null) {
                     return;
                   }
-                  final rect = getRenderRect(
-                    minTarget.context.findRenderObject() as RenderBox,
+                  updateDragIndicatorMarkDirty(
+                    DragIndicatorState(index: minIndex, isUpperHalf: !reverse),
                   );
-                  if (mousePositionY < rect.bottom) {
-                    updateDragIndicatorMarkDirty(
-                      DragIndicatorState(index: minIndex, isUpperHalf: true),
-                    );
-                  }
                 }
               }
             }
 
             void handleDragEnd(LongPressEndDetails details) {
               if (currentDragIndicator != null) {
+                var fromIndex = movingIndex;
+                var toIndex = currentDragIndicator!.index;
+                var isUpperHalf = currentDragIndicator!.isUpperHalf;
+                int insertIndex = getInsertIndex(
+                  fromIndex,
+                  toIndex,
+                  isUpperHalf,
+                  reverse: false,
+                );
                 onReorder(
-                  movingIndex,
-                  currentDragIndicator!.index,
-                  currentDragIndicator!.isUpperHalf,
+                  fromIndex,
+                  toIndex,
+                  insertIndex.clamp(0, length - 1),
+                  isUpperHalf,
                 );
               }
               resetDrag();

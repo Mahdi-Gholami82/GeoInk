@@ -12,11 +12,13 @@ class ExiverList extends StatefulWidget {
     required this.onReorder,
     this.childPadding = const EdgeInsetsGeometry.symmetric(horizontal: 20),
     this.childDraggingColor,
+    this.reverse = false,
   });
   final List<NestedChild> children;
   final EdgeInsetsGeometry childPadding;
   final Color? childDraggingColor;
   final NestedReorderCallback onReorder;
+  final bool reverse;
 
   static ExiverList? maybeOf(BuildContext context) {
     return context.findAncestorWidgetOfExactType<ExiverList>();
@@ -38,15 +40,29 @@ class ExiverListState extends State<ExiverList> with TargetHolder {
     controller: _scrollController,
   );
   LongPressGestureRecognizer? _recognizer;
+  late List<NestedChild> children;
 
   LongPressGestureRecognizer get recognizer {
     _recognizer = LongPressGestureRecognizer();
     return _recognizer!;
   }
 
+  void updateChildren() {
+    children = widget.reverse
+        ? widget.children.reversed.toList()
+        : widget.children;
+  }
+
   @override
   void initState() {
     super.initState();
+    updateChildren();
+  }
+
+  @override
+  void didUpdateWidget(covariant ExiverList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    updateChildren();
   }
 
   static ExiverListState? maybeOf(BuildContext context) {
@@ -79,9 +95,6 @@ class ExiverListState extends State<ExiverList> with TargetHolder {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      controller: _scrollController,
-      slivers: widget.children,
-    );
+    return CustomScrollView(controller: _scrollController, slivers: children);
   }
 }

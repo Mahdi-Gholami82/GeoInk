@@ -60,7 +60,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
   Color get currentColor => chosenColors[selectedType]!;
   bool get canAddNewFlutterMapEntry =>
       finishedDrawing || currentLayer == null || currentLayer!.isEmpty;
-  bool alreadyCancelled = false;
+  bool isAbleToBeCancled = true;
 
   @override
   void initState() {
@@ -279,7 +279,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
     }
     resetLayerVisiblity();
     historyNotifier.restoreFromPoints();
-    alreadyCancelled = true;
+    isAbleToBeCancled = false;
   }
 
   @override
@@ -288,7 +288,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
 
     return PopScope(
       onPopInvokedWithResult: (didPop, _) {
-        if (didPop && !alreadyCancelled) {
+        if (didPop && isAbleToBeCancled) {
           cancelFreeStyleProcess();
         }
       },
@@ -320,6 +320,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
                     .update(mapController.camera);
               },
               onConfirm: () {
+                isAbleToBeCancled = false;
                 if (!finishedDrawing) cancelDrawing();
                 resetLayerVisiblity();
                 historyNotifier.applyFromPoints();

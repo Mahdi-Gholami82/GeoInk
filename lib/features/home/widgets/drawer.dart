@@ -29,7 +29,8 @@ class MapDrawer extends ConsumerStatefulWidget {
   ConsumerState<MapDrawer> createState() => _MapDrawerState();
 }
 
-class _MapDrawerState extends ConsumerState<MapDrawer> {
+class _MapDrawerState extends ConsumerState<MapDrawer>
+    with AutomaticKeepAliveClientMixin {
   Color _colorFromEntry(FlutterMapEntry entry) {
     switch (EntryType.fromType(entry.runtimeType)) {
       case EntryType.polygon:
@@ -433,4 +434,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

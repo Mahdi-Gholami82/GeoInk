@@ -31,7 +31,7 @@ int getInsertIndex(
   bool reverse = false,
 }) {
   if (reverse) {
-    isUpperHalf = isUpperHalf ^ !reverse;
+    isUpperHalf = !isUpperHalf;
   }
   if (fromIndex == toIndex) {
     return fromIndex;

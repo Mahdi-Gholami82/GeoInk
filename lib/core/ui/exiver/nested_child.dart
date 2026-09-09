@@ -236,7 +236,7 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                   fromIndex,
                   toIndex,
                   isUpperHalf,
-                  reverse: false,
+                  reverse: reverse,
                 );
                 onReorder(
                   fromIndex,

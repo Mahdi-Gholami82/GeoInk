@@ -9,9 +9,6 @@ import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/core/utils/map_colors.dart';
 import 'package:unique_list/unique_list.dart';
-import 'package:uuid/uuid.dart';
-
-const uuid = Uuid();
 
 typedef LayerEntryMap = Map<MapLayer, List<FlutterMapEntry>>;
 

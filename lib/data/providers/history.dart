@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:geoink/data/models/action_manager.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';

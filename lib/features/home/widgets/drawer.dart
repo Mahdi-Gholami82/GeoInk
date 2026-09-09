@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:geoink/core/ui/exiver/etc.dart';
 import 'package:geoink/core/ui/exiver/exiver.dart';
 import 'package:geoink/core/ui/exiver/nested_child.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';

@@ -48,9 +48,10 @@ jobs:
           sudo apt-get install -y ${{env.LINUX_DEPS}}
 
       - name: Test
-        run: flutter test integration_test/
+        run: flutter test integration_test/ -d linux
 
   pre-build:
+    needs: integration_test
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.cleanup }}
     permissions: 
       contents: write
@@ -65,6 +66,7 @@ jobs:
           deleteOnlyFromDrafts: false
 
   build:
+    needs: pre-build
     strategy:
       matrix:
         include:
@@ -210,7 +212,7 @@ jobs:
         if: matrix.platform == 'linux'
         run: |
           cd dist/* && dpkg-deb -R *.deb deb-dir
-          DESKTOP_FILE="deb-dir/usr/share/applications/GeoInk.desktop"
+          DESKTOP_FILE="deb-dir/usr/share/applications/geoink.desktop"
           sed -i "/^StartupWMClass.*$/d" $DESKTOP_FILE
           sed -i '/^\[Desktop Entry\]/a StartupWMClass=${{env.APP_ID}}' $DESKTOP_FILE
           rm -rf deb-dir/usr/share/icons/hicolor/*

@@ -67,6 +67,7 @@ jobs:
 
   build:
     needs: pre-build
+    if: ${{ always() && (needs.pre-build.result == 'success' || needs.pre-build.result == 'skipped') }}
     strategy:
       matrix:
         include:

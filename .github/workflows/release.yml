@@ -42,10 +42,10 @@ jobs:
           cache: false
           pub-cache: false 
           
-      - name: Prepare test
+      - name: Install deps
         run: | 
           sudo apt-get update && 
-          sudo apt-get install -y ${{env.LINUX_DEPS}}
+          sudo apt-get install -y ${{env.LINUX_DEPS}} xvfb
 
       - name: Test
         run: flutter test integration_test/ -d linux

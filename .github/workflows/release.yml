@@ -259,5 +259,4 @@ jobs:
           tag_name: ${{ env.TAG }}
           overwrite_files: true
           body_path: .github/release_template.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,37 @@
+display_name: GeoInk
+
+icon: assets/images/launcher_rounded.png
+
+keywords:
+  - GeoInk
+  - OSINT
+  - Map
+  - Mapping
+  - Geospatial
+  - Geolocation
+  - Geospatial Intelligence
+  - OSINT Tool
+  - Intelligence
+  - Coordinates
+  - GeoJSON
+  - Geographic Information
+
+generic_name: GeoInk
+
+categories:
+  - Utility
+  - Geography
+
+startup_notify: true
+
+# app_links setup for Linux
+# https://github.com/llfbandit/app_links/blob/master/doc/README_linux.md
+supported_mime_type:
+
+# You can specify the shared libraries that you want to bundle with your app
+#
+# flutter_distributor automatically detects the shared libraries that your app
+# depends on, but you can also specify them manually here.
+include: []
+
+metainfo: linux/packaging/com.mahdigholamigodarzi.geoink.metainfo.xml

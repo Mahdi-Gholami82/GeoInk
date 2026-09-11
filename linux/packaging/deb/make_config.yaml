@@ -1,0 +1,70 @@
+display_name: GeoInk
+package_name: GeoInk
+maintainer:
+  name: Mahdi Gholami Godarzi
+  email: mahdigholamigodarzi@gmail.com
+
+priority: optional
+section: x11
+installed_size: 6604
+essential: false
+icon: assets/images/launcher_rounded.png
+
+postinstall_scripts:
+  - | 
+    echo "GeoInk setup..."
+    sudo sed -i '/^\[Desktop Entry\]/a StartupWMClass=com.mahdigholamigodarzi.geoink' "/usr/share/applications/GeoInk.desktop"
+    for user_dir in /home/*; do
+      if [ -f "$user_dir/.local/share/applications/geoink.desktop" ]; then
+        rm -f "$user_dir/.local/share/applications/geoink.desktop"
+        echo "Found and removed .desktop from $user_dir .local" 
+      fi
+    done
+    update-desktop-database /usr/share/applications
+
+postuninstall_scripts:
+  - |
+    if [ "$1" = "purge" ]; then
+      DATA_DIR="com.mahdigholamigodarzi.geoink"
+
+      echo "Removing GeoInk user data..."
+
+      for user_dir in /home/*; do
+        if [ -d "$user_dir/.local/share/$DATA_DIR" ]; then
+          rm -rf "$user_dir/.local/share/$DATA_DIR"
+          echo "Removed data from $user_dir"
+        fi
+      done
+
+      rm -rf "/root/.local/share/$DATA_DIR"
+      echo "Cleaned up GeoInk user data."
+    fi
+
+keywords:
+  - GeoInk
+  - OSINT
+  - Map
+  - Mapping
+  - Geospatial
+  - Geolocation
+  - Geospatial Intelligence
+  - OSINT Tool
+  - Intelligence
+  - Coordinates
+  - GeoJSON
+  - Geographic Information
+
+generic_name: GeoInk
+
+categories:
+  - Utility
+  - Geography
+
+startup_notify: true
+
+# app_links setup for Linux
+# https://github.com/llfbandit/app_links/blob/master/doc/README_linux.md
+supported_mime_type:
+
+
+metainfo: linux/packaging/com.mahdigholamigodarzi.geoink.metainfo.xml

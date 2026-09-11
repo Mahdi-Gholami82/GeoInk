@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.mahdigholamigodarzi.geoink</id>
+
+  <name>GeoInk</name>
+  <summary>Cross-platform geospatial intelligence application</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <description>
+    <p>
+      GeoInk is a cross-platform geospatial intelligence application for
+      working with geographic data on interactive maps.
+    </p>
+    <p>
+      Create and manage markers, circles, polygons, and polylines,
+      import GeoJSON data, and parse coordinates from text.
+    </p>
+  </description>
+
+  <categories>
+    <category>Utility</category>
+    <category>Geography</category>
+  </categories>
+
+  <keywords>
+    <keyword>OSINT</keyword>
+    <keyword>Map</keyword>
+    <keyword>Mapping</keyword>
+    <keyword>Geospatial</keyword>
+    <keyword>Geolocation</keyword>
+    <keyword>Coordinates</keyword>
+    <keyword>GeoJSON</keyword>
+  </keywords>
+
+  <url type="homepage">https://github.com/Mahdi-Gholami82/GeoInk</url>
+  <url type="bugtracker">https://github.com/Mahdi-Gholami82/GeoInk/issues</url>
+  <url type="vcs-browser">https://github.com/Mahdi-Gholami82/GeoInk</url>
+
+  <launchable type="desktop-id">com.mahdigholamigodarzi.geoink.desktop</launchable>
+
+  <provides>
+    <binary>GeoInk</binary>
+  </provides>
+</component>

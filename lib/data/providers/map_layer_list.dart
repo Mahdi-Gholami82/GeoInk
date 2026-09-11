@@ -54,22 +54,18 @@ class MapLayerListNotifier extends _$MapLayerListNotifier {
   }
 
   void addMarker(InputCoordinatesResult result) {
-    addLayerIfNotExist(result.layer);
     historyNotifier.actionAddToLayer(result.layer, entry: result.toMarker());
   }
 
   void addPolyLine(InputCoordinatesResult result) {
-    addLayerIfNotExist(result.layer);
     historyNotifier.actionAddToLayer(result.layer, entry: result.toPolyline());
   }
 
   void addPolygon(InputCoordinatesResult result) {
-    addLayerIfNotExist(result.layer);
     historyNotifier.actionAddToLayer(result.layer, entry: result.toPolygon());
   }
 
   void addCircle(InputCoordinatesResult result) {
-    addLayerIfNotExist(result.layer);
     historyNotifier.actionAddToLayer(result.layer, entry: result.toCircle());
   }
 

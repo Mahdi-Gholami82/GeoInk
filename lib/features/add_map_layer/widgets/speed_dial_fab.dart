@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/features/add_map_layer/utils/show_coordinates_bottom_sheet.dart';
 
-class AddMapElementFab extends ConsumerWidget {
-  const AddMapElementFab({super.key, on});
+class AddMapFeatureFab extends ConsumerWidget {
+  const AddMapFeatureFab({super.key, on});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,7 +21,8 @@ class AddMapElementFab extends ConsumerWidget {
       spacing: 3,
       children: [
         SpeedDialChild(
-          child: const Icon(Icons.location_on),
+          key: ValueKey("speedDial${EntryType.marker.name}Add"),
+          child: const Icon(MapIcons.marker),
           label: "Marker",
           onTap: () {
             showCoordinatesButtomSheet(
@@ -36,7 +38,8 @@ class AddMapElementFab extends ConsumerWidget {
           },
         ),
         SpeedDialChild(
-          child: const Icon(Icons.polyline),
+          key: ValueKey("speedDial${EntryType.polyline.name}Add"),
+          child: const Icon(MapIcons.polyline),
           label: "Polyline",
           onTap: () {
             showCoordinatesButtomSheet(
@@ -53,7 +56,8 @@ class AddMapElementFab extends ConsumerWidget {
           },
         ),
         SpeedDialChild(
-          child: const Icon(Icons.adjust),
+          key: ValueKey("speedDial${EntryType.circle.name}Add"),
+          child: const Icon(MapIcons.circle),
           label: "Circle",
           onTap: () {
             showCoordinatesButtomSheet(
@@ -70,7 +74,8 @@ class AddMapElementFab extends ConsumerWidget {
           },
         ),
         SpeedDialChild(
-          child: const Icon(Icons.hexagon_outlined),
+          key: ValueKey("speedDial${EntryType.polygon.name}Add"),
+          child: const Icon(MapIcons.polygon),
           label: "Polygon",
           onTap: () {
             showCoordinatesButtomSheet(

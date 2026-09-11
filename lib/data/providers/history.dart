@@ -101,21 +101,39 @@ class HistoryNotifier extends _$HistoryNotifier {
     forceRebuild();
   }
 
-  void actionAddToLayer(
+  void actionAddToLayerWithNewLayer(
     MapLayer layer, {
     required FlutterMapEntry entry,
-    bool unique = true,
   }) {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          if (unique) {
-            layer.addUnique(entry);
-          } else {
-            layer.add(entry);
-          }
+          _mapLayerList.addUnique(layer);
+          layer.addUnique(entry);
         },
         undoBase: () {
+          layer.items.removeLast();
+        },
+      ),
+    );
+  }
+
+  void actionAddToLayer(MapLayer layer, {required FlutterMapEntry entry}) {
+    bool addedLayer = false;
+    addAndDo(
+      ManualDoable(
+        executeBase: () {
+          var mapLayerList = _mapLayerList;
+          if (!mapLayerList.items.contains(layer)) {
+            mapLayerList.addUnique(layer);
+            addedLayer = true;
+          }
+          layer.addUnique(entry);
+        },
+        undoBase: () {
+          if (addedLayer) {
+            _mapLayerList.items.removeLast();
+          }
           layer.items.removeLast();
         },
       ),

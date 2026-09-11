@@ -147,7 +147,10 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
 
           // if no layer is selected or layer is invalid (deleted) default to main layer
           if (layer == null) {
-            chosenLayers[type] = mapLayerList.createNewDefaultLayer(type);
+            chosenLayers[type] = mapLayerList.createNewDefaultLayer(
+              type,
+              add: true,
+            );
             layer = chosenLayers[type];
             createdLayer = true;
           } else if (layer!.isInvalid) {

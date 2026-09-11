@@ -159,7 +159,7 @@ jobs:
             mv appimagetool /usr/local/bin/
 
       - name: Create Artifacts dir (linux)
-        if: matrix.platform == 'linux'
+        if: matrix.platform == 'linux' || matrix.platform == 'android'
         run: mkdir artifacts
 
       - name: Create Artifacts dir (Windows)

@@ -14,7 +14,10 @@ Future showProjectsSheet(BuildContext context) {
         initialChildSize: 1.0,
         minChildSize: 0.8,
         builder: (context, scrollController) {
-          return ProjectsSheet(scrollController: scrollController);
+          return ProjectsSheet(
+            key: const ValueKey("homeProjectsSheet"),
+            scrollController: scrollController,
+          );
         },
       );
     },

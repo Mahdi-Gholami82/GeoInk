@@ -98,6 +98,7 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
           top: 10,
           left: 10,
           child: IconButton(
+            key: const ValueKey("projectsSheetIconButtonClose"),
             onPressed: () {
               if (openProject == null) {
                 projectNotifier.initNewUnsaved(null);

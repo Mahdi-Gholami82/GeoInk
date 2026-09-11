@@ -130,7 +130,9 @@ class HomePageState extends ConsumerState<HomePage> {
                       drawerController.toggle();
                     },
                   ),
-                  floatingActionButton: AddMapElementFab(),
+                  floatingActionButton: AddMapFeatureFab(
+                    key: const ValueKey("homeAddMapFeatureFab"),
+                  ),
                   body: FlutterMap(
                     mapController: mapController,
                     options: MapOptions(

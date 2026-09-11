@@ -15,7 +15,7 @@ import 'package:window_manager/window_manager.dart';
 
 final httpClient = RetryClient(Client());
 
-void main() async {
+Future<void> initialize() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PrefsState.init();
 
@@ -39,7 +39,10 @@ void main() async {
       await windowManager.focus();
     });
   }
+}
 
+void main() async {
+  await initialize();
   runApp(ProviderScope(child: GeoInkApp()));
 }
 

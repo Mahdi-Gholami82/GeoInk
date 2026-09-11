@@ -13,7 +13,6 @@ icon: assets/images/launcher_rounded.png
 postinstall_scripts:
   - | 
     echo "GeoInk setup..."
-    sudo sed -i '/^\[Desktop Entry\]/a StartupWMClass=com.mahdigholamigodarzi.geoink' "/usr/share/applications/GeoInk.desktop"
     for user_dir in /home/*; do
       if [ -f "$user_dir/.local/share/applications/geoink.desktop" ]; then
         rm -f "$user_dir/.local/share/applications/geoink.desktop"

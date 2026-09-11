@@ -217,7 +217,7 @@ jobs:
           sed -i "/^StartupWMClass.*$/d" $DESKTOP_FILE
           sed -i '/^\[Desktop Entry\]/a StartupWMClass=${{env.APP_ID}}' $DESKTOP_FILE
           rm -rf deb-dir/usr/share/icons/hicolor/*
-          cp -r ../../assets/images/packaging/* deb-dir/usr/share/icons/hicolor/
+          cp -r ../../assets/images/packaging/launcher_rounded/* deb-dir/usr/share/icons/hicolor/
           dpkg-deb -b deb-dir APP.deb
           mv APP.deb ../../artifacts/${{ env.PROJECT_NAME }}-${{ matrix.platform }}-${{ env.TAG }}-${{ matrix.arch }}.deb
 

@@ -87,7 +87,8 @@ class ProjectNotifier extends _$ProjectNotifier {
   }
 
   void initNewUnsaved(String? title) {
-    if (title != null && title.trim().isEmpty) {
+    title = title?.trim();
+    if (title != null && title.isEmpty) {
       title = null;
     }
     if (state != null) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geoink/core/ui/widgets/custom_draggable_sheet.dart';
 import 'package:geoink/features/home/widgets/projects_sheet.dart';
 
-Future showProjectsSheet(BuildContext context) {
+Future<void> showProjectsSheet(BuildContext context) {
   return showModalBottomSheet(
     isDismissible: false,
     isScrollControlled: true,

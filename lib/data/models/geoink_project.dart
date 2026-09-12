@@ -3,47 +3,6 @@ import 'dart:io';
 
 import 'package:geoink/core/utils/process_file_path.dart';
 
-// Future<List<GeoinkProject>> projectsFromFilesUnique(List<File> files) async {
-//   List<GeoinkProject> projects = [];
-//   for (var file in files) {
-//     var decoded = jsonDecode(file.readAsStringSync());
-//     var properties = decoded["properties"];
-//     DateTime lastModified = await file.lastModified();
-//     if (properties == null) {
-//       GeoinkProject.empty(lastModified);
-//     }
-//     projects.add(
-//       GeoinkProject(
-//         file.path,
-//         title: properties["title"] ?? "",
-//         description: properties["description"] ?? "",
-//         lastModified: lastModified,
-//       ),
-//     );
-//   }
-
-//   Map<String, int> preNamesMax = {};
-//   List<String> namesList = projects.map((e) => e.title).toList();
-//   for (var project in projects) {
-//     if (project.title.trim().isEmpty) {
-//       project.title = "Untitiled";
-//       int? preMax = preNamesMax[project.title];
-//       int maxNum = 0;
-//       String title = project.title;
-//       if (preMax == null) {
-//         maxNum = getUniqueMaxNum(title, namesList);
-//       } else {
-//         maxNum = preMax;
-//       }
-//       maxNum++;
-//       preNamesMax[title] = maxNum;
-//       title = "${title} (${maxNum})";
-//       project.title = title;
-//     }
-//   }
-//   return projects;
-// }
-
 String getDefaultFileNameWhenFileSaving(GeoinkProject? project) {
   String fileName = "Untitled.geojson";
   if (project != null) {

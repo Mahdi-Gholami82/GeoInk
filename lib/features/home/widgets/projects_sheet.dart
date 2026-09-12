@@ -10,6 +10,7 @@ import 'package:geoink/core/utils/handle_project_files.dart';
 import 'package:geoink/core/utils/show_simple_snackbar.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/models/prefs_state.dart';
+import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:geoink/data/providers/projects.dart';
 
 class ProjectsSheet extends ConsumerStatefulWidget {
@@ -92,286 +93,297 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
       );
     }
 
-    return Stack(
-      children: [
-        Positioned(
-          top: 10,
-          left: 10,
-          child: IconButton(
-            key: const ValueKey("projectsSheetIconButtonClose"),
-            onPressed: () {
-              if (openProject == null) {
-                projectNotifier.initNewUnsaved(null);
-              }
-              navigator.pop();
-            },
-            icon: const Icon(Icons.close),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop && ref.read(projectProvider) == null) {
+          projectNotifier.initNewUnsaved(null);
+        }
+      },
+      child: Stack(
+        children: [
+          Positioned(
+            top: 10,
+            left: 10,
+            child: IconButton(
+              key: const ValueKey("projectsSheetIconButtonClose"),
+              onPressed: () {
+                navigator.pop();
+              },
+              icon: const Icon(Icons.close),
+            ),
           ),
-        ),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomSheetDragHandle(),
-            Padding(padding: const EdgeInsetsGeometry.all(25)),
-            Expanded(
-              child: CustomScrollView(
-                controller: widget.scrollController,
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsetsGeometry.only(bottom: 20),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomSheetDragHandle(),
+              Padding(padding: const EdgeInsetsGeometry.all(25)),
+              Expanded(
+                child: CustomScrollView(
+                  controller: widget.scrollController,
+                  slivers: [
+                    SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        child: Column(
-                          spacing: 10,
-                          children: [
-                            Align(
-                              alignment: AlignmentGeometry.topCenter,
-                              child: Column(
-                                spacing: 10,
-                                children: [
-                                  Icon(Icons.map_outlined, size: 120),
-                                  Text(
-                                    "Select or create a new project",
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.labelSmall,
-                                    overflow: TextOverflow.ellipsis,
+                        padding: const EdgeInsetsGeometry.only(bottom: 20),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          child: Column(
+                            spacing: 10,
+                            children: [
+                              Align(
+                                alignment: AlignmentGeometry.topCenter,
+                                child: Column(
+                                  spacing: 10,
+                                  children: [
+                                    Icon(Icons.map_outlined, size: 120),
+                                    Text(
+                                      "Select or create a new project",
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.labelSmall,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(padding: const EdgeInsetsGeometry.all(2)),
+                              ConstrainedBox(
+                                constraints: BoxConstraints(maxHeight: 50),
+                                child: SearchBar(
+                                  controller: searchBarController,
+                                  shadowColor: WidgetStatePropertyAll(
+                                    Colors.black12,
                                   ),
-                                ],
-                              ),
-                            ),
-                            Padding(padding: const EdgeInsetsGeometry.all(2)),
-                            ConstrainedBox(
-                              constraints: BoxConstraints(maxHeight: 50),
-                              child: SearchBar(
-                                controller: searchBarController,
-                                shadowColor: WidgetStatePropertyAll(
-                                  Colors.black12,
-                                ),
-                                leading: Padding(
-                                  padding: const EdgeInsets.only(left: 7),
-                                  child: const Icon(Icons.search),
-                                ),
-                                hintText: "Search Projects...",
-                                onChanged: (value) {
-                                  setState(() {
-                                    if (value.isEmpty) {
-                                      filteredProjects = projects;
-                                    } else {
-                                      filteredProjects = projects
-                                          .where(
-                                            (e) => e.title!.contains(
-                                              RegExp(
-                                                value,
-                                                caseSensitive: false,
+                                  leading: Padding(
+                                    padding: const EdgeInsets.only(left: 7),
+                                    child: const Icon(Icons.search),
+                                  ),
+                                  hintText: "Search Projects...",
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if (value.isEmpty) {
+                                        filteredProjects = projects;
+                                      } else {
+                                        filteredProjects = projects
+                                            .where(
+                                              (e) => e.title!.contains(
+                                                RegExp(
+                                                  value,
+                                                  caseSensitive: false,
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                          .toList();
-                                    }
-                                  });
-                                },
+                                            )
+                                            .toList();
+                                      }
+                                    });
+                                  },
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsetsGeometry.symmetric(horizontal: 30),
-                    sliver: FutureBuilder(
-                      future: recentProjectsFuture,
-                      builder: (context, asyncSnapshot) {
-                        if (asyncSnapshot.hasData) {
-                          if (filteredProjects.isEmpty) {
-                            return SliverToBoxAdapter(child: SizedBox.shrink());
-                          }
-                          return SliverFixedExtentList(
-                            itemExtent: 50,
-                            delegate: SliverChildBuilderDelegate(
-                              childCount: filteredProjects.length,
-                              (context, index) {
-                                var currentProject = filteredProjects[index];
-                                return InkWell(
-                                  onTap: () async {
-                                    if (currentProject == openProject) {
-                                      navigator.pop();
-                                      showSimpleSnackBar(
-                                        context,
-                                        message: "Selected the same project",
-                                      );
-                                      return;
-                                    }
-                                    if (openProject != null &&
-                                        openProject!.path == null) {
-                                      bool canceled = false;
-                                      await showUnsavedDialogue(
-                                        onCancel: () {
-                                          canceled = true;
-                                        },
-                                      );
-                                      if (canceled) {
-                                        return;
-                                      }
-                                    }
-                                    try {
-                                      projectNotifier.importFromProject(
-                                        currentProject,
-                                      );
-                                      navigator.pop();
-                                    } on PathNotFoundException {
-                                      filteredProjects.remove(currentProject);
-                                      PrefsState.setRecentProjects(
-                                        filteredProjects,
-                                      );
-                                      if (mounted) {
+                    SliverPadding(
+                      padding: const EdgeInsetsGeometry.symmetric(
+                        horizontal: 30,
+                      ),
+                      sliver: FutureBuilder(
+                        future: recentProjectsFuture,
+                        builder: (context, asyncSnapshot) {
+                          if (asyncSnapshot.hasData) {
+                            if (filteredProjects.isEmpty) {
+                              return SliverToBoxAdapter(
+                                child: SizedBox.shrink(),
+                              );
+                            }
+                            return SliverFixedExtentList(
+                              itemExtent: 50,
+                              delegate: SliverChildBuilderDelegate(
+                                childCount: filteredProjects.length,
+                                (context, index) {
+                                  var currentProject = filteredProjects[index];
+                                  return InkWell(
+                                    onTap: () async {
+                                      if (currentProject == openProject) {
+                                        navigator.pop();
                                         showSimpleSnackBar(
                                           context,
-                                          message: "File not found",
+                                          message: "Selected the same project",
                                         );
+                                        return;
                                       }
-                                    }
-                                  },
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Flexible(
-                                        fit: FlexFit.loose,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Flexible(
-                                              fit: FlexFit.loose,
-                                              flex: 1,
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Icon(
-                                                  Icons.image,
-                                                  size: 50,
+                                      if (openProject != null &&
+                                          openProject!.path == null) {
+                                        bool canceled = false;
+                                        await showUnsavedDialogue(
+                                          onCancel: () {
+                                            canceled = true;
+                                          },
+                                        );
+                                        if (canceled) {
+                                          return;
+                                        }
+                                      }
+                                      try {
+                                        projectNotifier.importFromProject(
+                                          currentProject,
+                                        );
+                                        navigator.pop();
+                                      } on PathNotFoundException {
+                                        filteredProjects.remove(currentProject);
+                                        PrefsState.setRecentProjects(
+                                          filteredProjects,
+                                        );
+                                        if (mounted) {
+                                          showSimpleSnackBar(
+                                            context,
+                                            message: "File not found",
+                                          );
+                                        }
+                                      }
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Flexible(
+                                          fit: FlexFit.loose,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Flexible(
+                                                fit: FlexFit.loose,
+                                                flex: 1,
+                                                child: FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Icon(
+                                                    Icons.image,
+                                                    size: 50,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Flexible(
-                                              fit: FlexFit.loose,
-                                              flex: 2,
-                                              child: LayoutBuilder(
-                                                builder: (context, constraints) {
-                                                  return Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      AutoSizeText(
-                                                        currentProject.title!,
-                                                        maxLines: 1,
-                                                        style: Theme.of(
-                                                          context,
-                                                        ).textTheme.titleMedium,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      AutoSizeText(
-                                                        currentProject
-                                                                .description ??
-                                                            "",
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
+                                              Flexible(
+                                                fit: FlexFit.loose,
+                                                flex: 2,
+                                                child: LayoutBuilder(
+                                                  builder: (context, constraints) {
+                                                    return Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        AutoSizeText(
+                                                          currentProject.title!,
+                                                          maxLines: 1,
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .titleMedium,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                        AutoSizeText(
+                                                          currentProject
+                                                                  .description ??
+                                                              "",
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Flexible(
-                                        fit: FlexFit.loose,
-                                        child: FittedBox(
-                                          child: Row(
-                                            children: [
-                                              const SizedBox(width: 16),
-                                              AutoSizeText(
-                                                "🕔 ${customDateTimeFormat(currentProject.lastModified)}",
-                                              ),
-                                              const SizedBox(width: 8),
-                                              const Icon(Icons.arrow_forward),
                                             ],
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        } else {
-                          return SliverToBoxAdapter(
-                            child: Center(child: CircularProgressIndicator()),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                  SliverPadding(padding: const EdgeInsetsGeometry.all(10)),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (openProject?.path != null) {
-                            showSimpleProgress(context);
-                            await projectNotifier.saveToPath();
-                            navigator.pop();
-                            if (mounted) {
-                              showSimpleSnackBar(
-                                context,
-                                message: "Saved The Previous File",
-                              );
-                            }
-                          } else if (openProject != null) {
-                            showUnsavedDialogue(
-                              onOk: () {
-                                initNewUnsavedAndPop(searchBarController.text);
-                              },
+                                        Flexible(
+                                          fit: FlexFit.loose,
+                                          child: FittedBox(
+                                            child: Row(
+                                              children: [
+                                                const SizedBox(width: 16),
+                                                AutoSizeText(
+                                                  "🕔 ${customDateTimeFormat(currentProject.lastModified)}",
+                                                ),
+                                                const SizedBox(width: 8),
+                                                const Icon(Icons.arrow_forward),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
                             );
-                            return;
+                          } else {
+                            return SliverToBoxAdapter(
+                              child: Center(child: CircularProgressIndicator()),
+                            );
                           }
-                          initNewUnsavedAndPop(searchBarController.text);
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
-                          foregroundColor: Theme.of(
-                            context,
-                          ).colorScheme.onPrimary,
-                          minimumSize: Size.fromHeight(50),
-                        ),
-                        child: Text(
-                          "[+]  Create New Project",
-                          overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SliverPadding(padding: const EdgeInsetsGeometry.all(10)),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (openProject?.path != null) {
+                              showSimpleProgress(context);
+                              await projectNotifier.saveToPath();
+                              navigator.pop();
+                              if (mounted) {
+                                showSimpleSnackBar(
+                                  context,
+                                  message: "Saved The Previous File",
+                                );
+                              }
+                            } else if (openProject != null) {
+                              showUnsavedDialogue(
+                                onOk: () {
+                                  initNewUnsavedAndPop(
+                                    searchBarController.text,
+                                  );
+                                },
+                              );
+                              return;
+                            }
+                            initNewUnsavedAndPop(searchBarController.text);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
+                            minimumSize: Size.fromHeight(50),
+                          ),
+                          child: Text(
+                            "[+]  Create New Project",
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -35,15 +37,11 @@ class HomePageState extends ConsumerState<HomePage> {
   final MapController mapController = MapController();
   final ResponsiveDrawerController drawerController =
       ResponsiveDrawerController();
-  late Future<GeoinkProject?> loadProjectFuture;
   late ProjectNotifier projectNotifier;
   late Function openRichAttributionWidget;
   late ThemeNotifier themeNotifier;
   late final customMapAttributionsController =
       CustomMapAttributionsController();
-  bool showMapAttribution = true;
-  bool shouldShowProjectsSheet = false;
-  bool loading = false;
 
   static HomePageState? maybeOf(BuildContext context) {
     return context.findAncestorStateOfType<HomePageState>();
@@ -58,10 +56,17 @@ class HomePageState extends ConsumerState<HomePage> {
   Future<GeoinkProject?> _loadRecentProject() async {
     var selectedProject = await PrefsState.loadSelectedProject();
     if (selectedProject == null) {
-      showMapAttribution = false;
-      shouldShowProjectsSheet = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showProjectsSheet(context).then((_) async {
+          await Future.delayed(Duration(milliseconds: 200));
+          customMapAttributionsController.open(Duration(seconds: 3));
+        });
+      });
     } else {
-      ref.read(projectProvider.notifier).importFromProject(selectedProject);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(projectProvider.notifier).importFromProject(selectedProject);
+        customMapAttributionsController.open(Duration(seconds: 3));
+      });
     }
     return selectedProject;
   }
@@ -72,8 +77,9 @@ class HomePageState extends ConsumerState<HomePage> {
     history = ref.read(historyProvider);
     projectNotifier = ref.read(projectProvider.notifier);
     themeNotifier = ref.read(themeProvider.notifier);
-    loading = true;
-    loadProjectFuture = _loadRecentProject();
+    if (ref.read(projectProvider) == null) {
+      _loadRecentProject();
+    }
   }
 
   @override
@@ -102,91 +108,77 @@ class HomePageState extends ConsumerState<HomePage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         controller: drawerController,
         drawer: MapDrawer(),
-        body: FutureBuilder(
-          future: loadProjectFuture,
-          builder: (context, asyncSnapshot) {
-            if (shouldShowProjectsSheet) {
-              shouldShowProjectsSheet = false;
-              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                showProjectsSheet(context).then((_) async {
-                  await Future.delayed(Duration(milliseconds: 200));
-                  customMapAttributionsController.open(Duration(seconds: 3));
-                });
-              });
-            }
-            return Stack(
-              children: [
-                Scaffold(
-                  extendBodyBehindAppBar: true,
-                  resizeToAvoidBottomInset: false,
-                  appBar: CustomAppBar(
-                    mapController: mapController,
-                    borderRadius: 16,
-                    drawer: MapDrawer(),
-                    onTapSettings: () async {
-                      Navigator.of(context).pushNamed(SettingsPage.route);
-                    },
-                    onTapDrawer: (context) {
-                      drawerController.toggle();
-                    },
+        body: Stack(
+          children: [
+            Scaffold(
+              extendBodyBehindAppBar: true,
+              resizeToAvoidBottomInset: false,
+              appBar: CustomAppBar(
+                mapController: mapController,
+                borderRadius: 16,
+                drawer: MapDrawer(),
+                onTapSettings: () async {
+                  Navigator.of(context).pushNamed(SettingsPage.route);
+                },
+                onTapDrawer: (context) {
+                  drawerController.toggle();
+                },
+              ),
+              floatingActionButton: AddMapFeatureFab(
+                key: const ValueKey("homeAddMapFeatureFab"),
+              ),
+              body: FlutterMap(
+                mapController: mapController,
+                options: MapOptions(
+                  initialCenter: LatLng(51.5, -0.09),
+                  initialZoom: 5,
+                ),
+                children: [
+                  getOpenStreetMapTileLayer(
+                    darkMode: ref.read(themeProvider).isDark(context),
                   ),
-                  floatingActionButton: AddMapFeatureFab(
-                    key: const ValueKey("homeAddMapFeatureFab"),
-                  ),
-                  body: FlutterMap(
-                    mapController: mapController,
-                    options: MapOptions(
-                      initialCenter: LatLng(51.5, -0.09),
-                      initialZoom: 5,
-                    ),
-                    children: [
-                      getOpenStreetMapTileLayer(
-                        darkMode: ref.read(themeProvider).isDark(context),
-                      ),
-                      ...mapChildren,
-                      Align(
-                        alignment: AlignmentGeometry.bottomLeft,
-                        child: CustomMapAttributions(
-                          initialyOpened: showMapAttribution,
-                          controller: customMapAttributionsController,
-                          children: [
-                            Text.rich(
-                              TextSpan(
-                                text: "© OSM Contributors",
-                                style: TextStyle(
-                                  decoration: TextDecoration.underline,
+                  ...mapChildren,
+                  Align(
+                    alignment: AlignmentGeometry.bottomLeft,
+                    child: CustomMapAttributions(
+                      initialyOpened: false,
+                      controller: customMapAttributionsController,
+                      children: [
+                        Text.rich(
+                          TextSpan(
+                            text: "© OSM Contributors",
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () => launchUrl(
+                                Uri.parse(
+                                  "https://www.openstreetmap.org/about/",
                                 ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () => launchUrl(
-                                    Uri.parse(
-                                      "https://www.openstreetmap.org/about/",
-                                    ),
-                                  ),
                               ),
-                            ),
-                            const Text(
-                              "This attribution is the same throughout this app, except where otherwise specified",
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                        const Text(
+                          "This attribution is the same throughout this app, except where otherwise specified",
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (ref.read(projectProvider) == null)
+              Container(
+                color: Colors.black.withAlpha(40),
+                child: const Center(
+                  child: SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: CircularProgressIndicator(),
                   ),
                 ),
-                if (asyncSnapshot.connectionState != ConnectionState.done)
-                  Container(
-                    color: Colors.black.withAlpha(40),
-                    child: const Center(
-                      child: SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          },
+              ),
+          ],
         ),
       ),
     );

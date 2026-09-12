@@ -448,6 +448,8 @@ class MapLayerList with UniqueNamedItems<MapLayer> {
   MapLayerList deepCopy({List<MapLayer>? newItems}) =>
       MapLayerList()..items.addAll([...newItems ?? items].map((e) => e.copy()));
 
+  bool get isEmpty => items.isEmpty;
+
   GeoJSONFeatureCollection toGeoJsonFeatureCollection() {
     final allFeatures = items
         .expand((entry) => entry.toGeoJsonFeatureCollection().features)

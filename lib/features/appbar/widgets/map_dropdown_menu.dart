@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/lock_screen_on_future.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';
+import 'package:geoink/core/utils/save_geojson.dart';
 import 'package:geoink/core/utils/show_simple_snackbar.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/providers/history.dart';
@@ -76,12 +77,12 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               onPressed: () async {
                 await lockScreenOnFuture(
                   context,
-                  job: () async => FilePicker.platform.saveFile(
+                  job: () async => saveGeoJSONFilePicker(
                     dialogTitle: "Export As GeoJSON",
                     fileName: getDefaultFileNameWhenFileSaving(
                       ref.read(projectProvider),
                     ),
-                    bytes: utf8.encode(projectNotifier.export()),
+                    result: projectNotifier.export(),
                   ),
                 );
               },

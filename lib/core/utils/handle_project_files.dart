@@ -6,21 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/lock_screen_on_future.dart';
 import 'package:geoink/core/utils/process_file_path.dart';
+import 'package:geoink/core/utils/save_geojson.dart';
 import 'package:geoink/core/utils/show_simple_snackbar.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/models/prefs_state.dart';
 import 'package:geoink/data/providers/projects.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<void> _doHandleSaveAs(WidgetRef ref) async {
   ProjectNotifier projectNotifier = ref.read(projectProvider.notifier);
   GeoinkProject? project = ref.read(projectProvider);
   String exportResult = projectNotifier.export();
-  var savedPath = await FilePicker.platform.saveFile(
-    lockParentWindow: true,
+  var savedPath = await saveGeoJSONFilePicker(
     dialogTitle: "Save Project",
     fileName: getDefaultFileNameWhenFileSaving(project),
-    bytes: utf8.encode(exportResult),
+    result: exportResult,
   );
+
   if (savedPath != null) {
     if (project!.title == null) {
       Map decoded = jsonDecode(exportResult);

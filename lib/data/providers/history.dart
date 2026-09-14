@@ -170,12 +170,21 @@ class HistoryNotifier extends _$HistoryNotifier {
     MapLayer layer, {
     required List<FlutterMapEntry> entries,
   }) {
+    bool addedLayer = false;
     addAndDo(
       ManualDoable(
         executeBase: () {
+          var mapLayerList = _mapLayerList;
+          if (!mapLayerList.items.contains(layer)) {
+            mapLayerList.addUnique(layer);
+            addedLayer = true;
+          }
           layer.addAllUnique(entries);
         },
         undoBase: () {
+          if (addedLayer) {
+            _mapLayerList.items.removeLast();
+          }
           int length = layer.items.length;
           layer.items.removeRange(length - entries.length, length);
         },

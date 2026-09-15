@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geoink/core/ui/lock_screen_on_future.dart';
 import 'package:geoink/core/ui/map_features_icons.dart';
 import 'package:geoink/core/utils/save_geojson.dart';
-import 'package:geoink/core/utils/show_simple_snackbar.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/providers/history.dart';
 import 'package:geoink/data/providers/projects.dart';
@@ -39,6 +37,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
 
   @override
   Widget build(BuildContext context) {
+    var overLay = Overlay.of(context);
     return AppbarMenu(
       title: const Text("Map"),
       menuChildren: [
@@ -55,7 +54,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               leadingIcon: const Icon(Icons.file_download),
               onPressed: () async {
                 await lockScreenOnFuture(
-                  context,
+                  overLay,
                   job: () async {
                     FilePickerResult? result = await FilePicker.platform
                         .pickFiles(dialogTitle: "Import From GeoJSON");
@@ -66,7 +65,11 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                     }
                   },
                   onError: () {
-                    showSimpleSnackBar(context, message: "Error on import");
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error on import")),
+                      );
+                    }
                   },
                 );
               },
@@ -76,7 +79,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
               leadingIcon: const Icon(Icons.file_upload),
               onPressed: () async {
                 await lockScreenOnFuture(
-                  context,
+                  overLay,
                   job: () async => saveGeoJSONFilePicker(
                     dialogTitle: "Export As GeoJSON",
                     fileName: getDefaultFileNameWhenFileSaving(
@@ -100,6 +103,7 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                   initialChildSize: 0.8,
                 ).then((value) {
                   if (value != null) {
+                    debugPrint("${value.toBulkMarker()}");
                     ref
                         .read(historyProvider.notifier)
                         .actionAddAllToLayer(

@@ -254,21 +254,6 @@ class HistoryNotifier extends _$HistoryNotifier {
     );
   }
 
-  void actionListRemoveLast<T>(List<T> inputList) {
-    T? data;
-    addAndDo(
-      ManualDoable(
-        executeBase: () {
-          data = inputList.removeLast();
-        },
-        undoBase: () {
-          assert(data != null);
-          inputList.add(data!);
-        },
-      ),
-    );
-  }
-
   void actionReorderLayer(int oldIndex, int newIndex) {
     addAndDo(
       ManualDoable(

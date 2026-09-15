@@ -45,13 +45,21 @@ class PrefsState {
     instance.setString("selectedProject", project.path!);
   }
 
+  static List<String> get recentProjectsPaths =>
+      instance.getStringList("recentProjectsPaths") ?? [];
+
+  static set recentProjectsPaths(List<String> value) {
+    instance.setStringList("recentProjectsPaths", value);
+  }
+
+  static List<String> get deletedProjectsAndroidPaths =>
+      instance.getStringList("deletedProjectsAndroidPaths") ?? [];
+
+  static set deletedProjectsAndroidPaths(List<String> value) {
+    instance.setStringList("deletedProjectsAndroidPaths", value);
+  }
+
   static Future<List<GeoinkProject>> loadRecentProjects() async {
-    List<String>? recentProjectsPaths = instance.getStringList(
-      "recentProjectsPaths",
-    );
-    if (recentProjectsPaths == null) {
-      return [];
-    }
     List<File> recentProjectsFiles = recentProjectsPaths
         .map((e) => File(e))
         .where((e) => e.existsSync())
@@ -75,22 +83,17 @@ class PrefsState {
 
   static void addToRecentProjectsIfNotExists(GeoinkProject project) {
     assert(project.path != null);
-    List<String>? recentProjectsPaths = instance.getStringList(
-      "recentProjectsPaths",
-    );
-    if (!(recentProjectsPaths?.contains(project.path) ?? false)) {
-      recentProjectsPaths?.add(project.path!);
-      if (recentProjectsPaths != null &&
-          recentProjectsPaths.length > recentProjectsCountLimit) {
-        recentProjectsPaths.removeRange(
+    List<String>? recentProjects = recentProjectsPaths;
+    if (!recentProjects.contains(project.path)) {
+      recentProjects.add(project.path!);
+      if (!Platform.isAndroid &&
+          recentProjects.length > recentProjectsCountLimit) {
+        recentProjects.removeRange(
           0,
-          recentProjectsPaths.length - recentProjectsCountLimit,
+          recentProjects.length - recentProjectsCountLimit,
         );
       }
-      instance.setStringList(
-        "recentProjectsPaths",
-        recentProjectsPaths ?? [project.path!],
-      );
+      instance.setStringList("recentProjectsPaths", recentProjects);
     }
   }
 }

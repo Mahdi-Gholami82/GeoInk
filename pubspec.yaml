@@ -53,6 +53,8 @@ dependencies:
   url_launcher: ^6.3.2
   flex_color_scheme: ^8.4.0
   flutter_launcher_icons: ^0.14.4
+  path_provider: ^2.1.6
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:

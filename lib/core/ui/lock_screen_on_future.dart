@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 Future<T> lockScreenOnFuture<T>(
-  BuildContext context, {
+  OverlayState overLayState, {
   required Future<T> Function() job,
   Function? onError,
 }) {
@@ -10,7 +10,7 @@ Future<T> lockScreenOnFuture<T>(
         const ModalBarrier(dismissible: false, color: Colors.black26),
   );
 
-  Overlay.of(context).insert(overLayEntry);
+  overLayState.insert(overLayEntry);
   return job().then(
     (value) async {
       overLayEntry.remove();

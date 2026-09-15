@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:geoink/core/utils/project_storage.dart';
 import 'package:geoink/data/models/prefs_state.dart';
 import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/features/freestyle/page.dart';
@@ -18,6 +19,12 @@ final httpClient = RetryClient(Client());
 Future<void> initialize() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PrefsState.init();
+
+  if (Platform.isAndroid) {
+    await AndroidProjectStore.ensureInitialized();
+  }
+
+  await AndroidProjectStore.processDeletedProjects();
 
   // Clear preferences on start if in debug mode
   if (kDebugMode) {

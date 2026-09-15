@@ -84,14 +84,30 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      await tester.pumpAndSettle();
-      // Expect projetcs bottom sheet to be open when opening app for the first time
-      expect(find.byKey(const ValueKey("homeProjectsSheet")), findsOneWidget);
+      await tester.pump();
 
-      await tester.tap(
-        find.byKey(const ValueKey("projectsSheetIconButtonClose")),
+      final closeButton = find.byKey(
+        const ValueKey("projectsSheetIconButtonClose"),
       );
-      await tester.pumpAndSettle();
+
+      final timeout = DateTime.now().add(const Duration(seconds: 10));
+
+      while (closeButton.evaluate().isEmpty) {
+        if (DateTime.now().isAfter(timeout)) {
+          fail("Timed out waiting for projects sheet close button");
+        }
+
+        debugPrint("waiting for close button...");
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+
+      expect(closeButton, findsOneWidget);
+      await tester.pump();
+      await tester.tap(closeButton, warnIfMissed: true);
+
+      await tester.pump();
+
+      debugPrint("close button tapped");
 
       for (var entryType in EntryType.values) {
         debugPrint("Testing $entryType");

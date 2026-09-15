@@ -1,3 +1,4 @@
+import 'package:geoink/core/ui/widgets/bottom_sheet_buttons.dart';
 import 'package:geoink/features/add_map_layer/widgets/custom_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -107,33 +108,14 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                             if (inputListState.isBulk ||
                                 inputListState.type == EntryType.polygon ||
                                 inputListState.type == EntryType.polyline)
-                              OutlinedButton(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.surface,
-                                  minimumSize: const Size(110, 50),
-                                  shape: const StadiumBorder(),
-                                ),
+                              BottomSheetOutlinedBotton(
                                 onPressed: () {
                                   inputListNotifier.addCoordinatesField();
                                 },
-                                child: Text(
-                                  "Add Coordinates",
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                ),
+                                child: Text("Add Coordinates"),
                               ),
 
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                                minimumSize: Size(110, 50),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                              ),
+                            BottomSheetElevatedButton(
                               onPressed: () {
                                 if (formGlobalKey.currentState!.validate()) {
                                   inputListNotifier.setColor(chosenColor);
@@ -142,15 +124,7 @@ class _CoordinatesSheetState extends ConsumerState<CoordinatesSheet> {
                                   ).pop(inputListNotifier.takeFinalResult());
                                 }
                               },
-                              child: Text(
-                                "Apply",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimary,
-                                ),
-                              ),
+                              child: Text("Apply"),
                             ),
                           ],
                         ),

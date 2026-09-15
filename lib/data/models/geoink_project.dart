@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:geoink/core/utils/process_file_path.dart';
 
 String getDefaultFileNameWhenFileSaving(GeoinkProject? project) {
-  String fileName = "Untitled.geojson";
+  String fileName = "${GeoinkProject.defaultName}.geojson";
   if (project != null) {
     if (project.path != null) {
       fileName = getFileNameFromPath(project.path!);
@@ -24,6 +24,8 @@ class GeoinkProject {
     String? description,
     required this.lastModified,
   }) : description = description ?? "";
+
+  static String defaultName = "Untitled";
 
   GeoinkProject.empty(DateTime lastModified)
     : this("", title: "", description: "", lastModified: lastModified);

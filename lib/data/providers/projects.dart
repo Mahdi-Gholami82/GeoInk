@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:geoink/core/utils/process_file_path.dart';
+import 'package:geoink/core/utils/project_storage.dart';
+import 'package:geoink/core/utils/save_geojson.dart';
 import 'package:geoink/data/models/flutter_map_entry.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/models/prefs_state.dart';
@@ -18,10 +22,25 @@ class ProjectNotifier extends _$ProjectNotifier {
     return null;
   }
 
-  MapLayerListNotifier get mapLayerListNotifier =>
+  MapLayerListNotifier get _mapLayerListNotifier =>
       ref.read(mapLayerListProvider.notifier);
 
-  void update(GeoinkProject project) {
+  void update(GeoinkProject newProject) {
+    if (Platform.isAndroid &&
+        newProject.title != state?.title &&
+        newProject.path == state?.path) {
+      if (state?.path != null) {
+        PrefsState.deletedProjectsAndroidPaths =
+            PrefsState.deletedProjectsAndroidPaths..add(state!.path!);
+      }
+      state = newProject;
+      saveToPathAuto();
+      return;
+    }
+    state = newProject;
+  }
+
+  void switchProject(GeoinkProject project) {
     PrefsState.setSelectedProject(project);
     PrefsState.addToRecentProjectsIfNotExists(project);
     state = project;
@@ -46,7 +65,7 @@ class ProjectNotifier extends _$ProjectNotifier {
 
   void import(String fileText) {
     var featureCollection = GeoJSONFeatureCollection.fromJSON(fileText);
-    var mapLayerListNotifier = ref.read(mapLayerListProvider.notifier);
+    var mapLayerListNotifier = _mapLayerListNotifier;
     mapLayerListNotifier.reset();
     var localLayerList = EntryType.values
         .map((e) => MapLayer(name: "${e.name} import", entryType: e))
@@ -72,18 +91,29 @@ class ProjectNotifier extends _$ProjectNotifier {
     if (!File(project.path!).existsSync()) {
       throw PathNotFoundException;
     }
-    mapLayerListNotifier.reset();
+    _mapLayerListNotifier.reset();
     import(File(project.path!).readAsStringSync());
-    update(project);
+    switchProject(project);
   }
 
-  Future<void> saveToPath() async {
-    assert(state != null && state!.path != null && state!.title != null);
-    File file = File(state!.path!);
-    if (!await file.exists()) {
-      file.create(recursive: true);
+  Future<void> saveToPathAuto() async {
+    assert(state != null);
+    if (!Platform.isAndroid) {
+      assert(state!.path != null && state!.title != null);
+      File file = File(state!.path!);
+      if (!await file.exists()) {
+        file.create(recursive: true);
+      }
+      await file.writeAsString(export());
+    } else {
+      var result = await AndroidProjectStore.save(
+        fileName: state!.title ?? GeoinkProject.defaultName,
+        content: export(),
+        overWrite: state!.path != null,
+      );
+
+      state = state!.copyWith(title: result.savedName);
     }
-    await file.writeAsString(export());
   }
 
   void initNewUnsaved(String? title) {
@@ -92,7 +122,7 @@ class ProjectNotifier extends _$ProjectNotifier {
       title = null;
     }
     if (state != null) {
-      mapLayerListNotifier.reset();
+      _mapLayerListNotifier.reset();
     }
     state = GeoinkProject(
       null,
@@ -100,5 +130,52 @@ class ProjectNotifier extends _$ProjectNotifier {
       description: "",
       lastModified: DateTime.now(),
     );
+  }
+
+  Future<void> handleSaveAs() async {
+    if (state == null) {
+      initNewUnsaved(null);
+    }
+    GeoinkProject project = state!;
+    String exportResult = export();
+    var savedPath = await saveGeoJSONFilePicker(
+      dialogTitle: "Save Project",
+      fileName: getDefaultFileNameWhenFileSaving(project),
+      result: exportResult,
+    );
+
+    if (Platform.isAndroid) {
+      savedPath = project.path!;
+    }
+
+    if (savedPath != null) {
+      if (project.title == null) {
+        Map decoded = jsonDecode(exportResult);
+        String name = getNameFromPath(savedPath);
+        decoded["properties"]["title"] = name;
+        File(savedPath).writeAsString(jsonEncode(decoded));
+        switchProject(project.copyWith(title: name, path: savedPath));
+      } else {
+        updatePath(savedPath);
+      }
+      PrefsState.addToRecentProjectsIfNotExists(state!);
+    }
+  }
+
+  Future<bool> handleSave(BuildContext context) async {
+    GeoinkProject? project = state;
+    assert(project != null);
+    String? path = project?.path;
+    if (path == null) {
+      if (!Platform.isAndroid) {
+        await handleSaveAs();
+        return false;
+      } else {
+        await saveToPathAuto();
+      }
+    } else {
+      await saveToPathAuto();
+    }
+    return true;
   }
 }

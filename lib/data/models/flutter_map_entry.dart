@@ -8,7 +8,6 @@ import 'package:geoink/core/utils/color_tools.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/core/utils/map_colors.dart';
-import 'package:unique_list/unique_list.dart';
 
 typedef LayerEntryMap = Map<MapLayer, List<FlutterMapEntry>>;
 
@@ -20,7 +19,7 @@ abstract class FlutterMapEntry extends WithNameField {
   bool visible;
 
   /// will be overridden in each entry subclass.
-  get flutterMapFeature;
+  dynamic get flutterMapFeature;
   GeoJSONGeometry get geoJasonObject;
   GeoJSONFeature toGeoJsonFeature(String layerName);
 
@@ -449,6 +448,7 @@ class MapLayerList with UniqueNamedItems<MapLayer> {
       MapLayerList()..items.addAll([...newItems ?? items].map((e) => e.copy()));
 
   bool get isEmpty => items.isEmpty;
+  bool get isNotEmpty => items.isNotEmpty;
 
   GeoJSONFeatureCollection toGeoJsonFeatureCollection() {
     final allFeatures = items
@@ -476,12 +476,6 @@ class MapLayerList with UniqueNamedItems<MapLayer> {
   MapLayer getDefaultLayerEntryGeneric<T extends FlutterMapEntry>() {
     EntryType type = EntryType.fromType(T);
     return getDefaultLayerEntry(type);
-  }
-
-  void addLayerIgnoreIfExists(MapLayer layerEntry) {
-    try {
-      items.add(layerEntry);
-    } on DuplicateValueError {}
   }
 
   void addWithLayer<T extends FlutterMapEntry>(T entry, {MapLayer? layer}) {

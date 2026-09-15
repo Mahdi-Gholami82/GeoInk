@@ -1,6 +1,7 @@
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/features/appbar/widgets/edit_dropdown_manu.dart';
 import 'package:geoink/features/appbar/widgets/file_menu.dart';
@@ -81,7 +82,8 @@ class _CustomAppBarState extends ConsumerState<CustomAppBar> {
                         child: ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: 150),
                           child: Text(
-                            ref.watch(projectProvider)?.title ?? "Untitled",
+                            ref.watch(projectProvider)?.title ??
+                                GeoinkProject.defaultName,
                             style: Theme.of(context).textTheme.titleMedium,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

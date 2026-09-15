@@ -43,7 +43,7 @@ dependencies:
   flutter_riverpod: ^3.0.3
   riverpod_annotation: ^3.0.3
   geojson_vi: ^2.2.5
-  file_picker: ^10.3.8
+  file_picker: ^13.1.0
   collection: ^1.19.1
   pool: ^1.5.2
   flutter_map_math: ^0.2.4

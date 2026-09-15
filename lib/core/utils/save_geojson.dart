@@ -7,13 +7,12 @@ Future<String?> saveGeoJSONFilePicker({
   required String dialogTitle,
   required String result,
 }) async {
-  var savedPath = await FilePicker.platform.saveFile(
-    lockParentWindow: true,
+  var savedPath = await FilePicker.saveFile(
     type: FileType.custom,
     dialogTitle: dialogTitle,
     allowedExtensions: ["geojson"],
     fileName: fileName,
     bytes: utf8.encode(result),
   );
-  return savedPath;
+  return savedPath?.path;
 }

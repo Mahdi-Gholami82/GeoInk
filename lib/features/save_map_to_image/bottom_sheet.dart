@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:geoink/core/services/tile_providers.dart';
 import 'package:geoink/core/ui/widgets/custom_sheet_drag_handle.dart';
 import 'package:geoink/core/utils/map_to_image.dart';
 import 'package:geoink/core/ui/widgets/load_error.dart';
+import 'package:geoink/data/providers/projects.dart';
 import 'package:geoink/data/providers/theme.dart';
 
 class SaveToImageButtomSheet extends ConsumerStatefulWidget {
@@ -108,11 +110,14 @@ class _SaveToImageButtomSheetState
                   ),
                   onPressed: () {
                     if (mapImage != null) {
-                      FilePicker.platform
-                          .saveFile(bytes: mapImage, type: FileType.image)
-                          .then((_) {
-                            if (context.mounted) Navigator.of(context).pop();
-                          });
+                      FilePicker.saveFile(
+                        fileName:
+                            "${ref.read(projectProvider)?.title ?? GeoinkProject.defaultName}.png",
+                        bytes: mapImage!,
+                        type: FileType.image,
+                      ).then((_) {
+                        if (context.mounted) Navigator.of(context).pop();
+                      });
                     }
                   },
                   child: Text(

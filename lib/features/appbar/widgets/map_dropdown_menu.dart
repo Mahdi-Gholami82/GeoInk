@@ -56,11 +56,12 @@ class _MapDropdownMenuState extends ConsumerState<MapDropdownMenu> {
                 await lockScreenOnFuture(
                   overLay,
                   job: () async {
-                    FilePickerResult? result = await FilePicker.platform
-                        .pickFiles(dialogTitle: "Import From GeoJSON");
-                    if (result != null) {
+                    List<PlatformFile> files = await FilePicker.pickFiles(
+                      dialogTitle: "Import From GeoJSON",
+                    );
+                    if (files.isNotEmpty) {
                       projectNotifier.import(
-                        File(result.files.single.path!).readAsStringSync(),
+                        File(files.first.path!).readAsStringSync(),
                       );
                     }
                   },

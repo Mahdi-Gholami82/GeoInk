@@ -24,11 +24,11 @@ class FileMenu extends ConsumerWidget {
             lockScreenOnFuture(
               Overlay.of(context),
               job: () async {
-                var result = await FilePicker.platform.pickFiles(
+                var files = await FilePicker.pickFiles(
                   dialogTitle: "Open Project",
                 );
-                if (result != null) {
-                  var file = File(result.files.single.path!);
+                if (files.isNotEmpty) {
+                  var file = File(files.first.path!);
                   await projectNotifier.importProjectFromFile(file);
                 }
               },

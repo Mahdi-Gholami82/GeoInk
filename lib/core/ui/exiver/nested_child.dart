@@ -11,6 +11,7 @@ class NestedChild extends StatefulWidget {
     required this.childCount,
     required this.index,
     required this.onReorder,
+    this.reversed = false,
   });
   final Widget Function(
     BuildContext context,
@@ -22,6 +23,7 @@ class NestedChild extends StatefulWidget {
   final NestedReorderCallback onReorder;
   final int childCount;
   final int index;
+  final bool reversed;
 
   NestedChild copyWithIndex(int newIndex) => NestedChild(
     builder,
@@ -113,7 +115,7 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
       }
       final isHeader = targetType == DragTargetType.header;
 
-      final reverse = isHeader ? _exiverListState.widget.reverse : false;
+      final reversed = widget.reversed;
 
       final movingIndex = isHeader ? widget.index : builderIndex;
 
@@ -205,14 +207,14 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                 }
               }
               if (currentDragIndicator != null) {
-                if ((mousePositionY > _startDragY) ^ reverse) {
+                if ((mousePositionY > _startDragY) ^ reversed) {
                   int maxIndex = length - 1;
                   var maxTarget = targets[maxIndex];
                   if (maxTarget == null) {
                     return;
                   }
                   updateDragIndicatorMarkDirty(
-                    DragIndicatorState(index: maxIndex, isUpperHalf: reverse),
+                    DragIndicatorState(index: maxIndex, isUpperHalf: reversed),
                   );
                 } else {
                   var minIndex = 0;
@@ -221,7 +223,7 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                     return;
                   }
                   updateDragIndicatorMarkDirty(
-                    DragIndicatorState(index: minIndex, isUpperHalf: !reverse),
+                    DragIndicatorState(index: minIndex, isUpperHalf: !reversed),
                   );
                 }
               }
@@ -236,7 +238,7 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
                   fromIndex,
                   toIndex,
                   isUpperHalf,
-                  reverse: reverse,
+                  reverse: reversed,
                 );
                 onReorder(
                   fromIndex,
@@ -284,7 +286,10 @@ class NestedChildState extends State<NestedChild> with TargetHolder {
       targets: targets,
       onReorder: widget.onReorder,
       targetType: DragTargetType.child,
-    )(context, localIndex);
+    )(
+      context,
+      widget.reversed ? widget.childCount - 1 - localIndex : localIndex,
+    );
   }
 
   @override

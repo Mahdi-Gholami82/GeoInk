@@ -33,8 +33,16 @@ extension<T> on List<T> {
     insert(index, removeLast());
   }
 
+  void moveIndexToLast(int index) {
+    add(removeAt(index));
+  }
+
   void moveFirstToIndex(int index) {
     insert(index, removeAt(0));
+  }
+
+  void moveIndexToFirst(int index) {
+    insert(0, removeAt(index));
   }
 }
 
@@ -99,23 +107,6 @@ class HistoryNotifier extends _$HistoryNotifier {
   void addAndDo(Doable doable) {
     state.addAndDo(doable);
     forceRebuild();
-  }
-
-  void actionAddToLayerWithNewLayer(
-    MapLayer layer, {
-    required FlutterMapEntry entry,
-  }) {
-    addAndDo(
-      ManualDoable(
-        executeBase: () {
-          _mapLayerList.addUnique(layer);
-          layer.addUnique(entry);
-        },
-        undoBase: () {
-          layer.items.removeLast();
-        },
-      ),
-    );
   }
 
   void actionAddToLayer(MapLayer layer, {required FlutterMapEntry entry}) {
@@ -295,11 +286,11 @@ class HistoryNotifier extends _$HistoryNotifier {
     );
   }
 
-  void actionToggleLayerVisibility(MapLayer layer) {
+  void actionToggleLayerVisibility(int layerIndex) {
     addAndDo(
       ManualDoable(
-        executeBase: layer.toggleVisiblity,
-        undoBase: layer.toggleVisiblity,
+        executeBase: () => _mapLayerList.items[layerIndex].toggleVisiblity(),
+        undoBase: () => _mapLayerList.items[layerIndex].toggleVisiblity(),
       ),
     );
   }
@@ -319,74 +310,73 @@ class HistoryNotifier extends _$HistoryNotifier {
     );
   }
 
-  void actionRemoveEntryFromLayer(FlutterMapEntry entry, MapLayer layer) {
+  void actionRemoveEntryFromLayer(FlutterMapEntry entry, int layerIndex) {
     FlutterMapEntry? data;
     int? index;
     addAndDo(
       ManualDoable(
         executeBase: () {
+          var layer = _mapLayerList.items[layerIndex];
           data = entry;
           index = layer.items.indexOf(entry);
           layer.items.removeAt(index!);
         },
         undoBase: () {
-          layer.items.insert(index!, data!);
+          _mapLayerList.items[layerIndex].items.insert(index!, data!);
         },
       ),
     );
   }
 
-  void actionMoveEntryToBottom(FlutterMapEntry entry, MapLayer layer) {
-    int? index;
+  void actionMoveEntryToBottom(int entryIndex, int layerIndex) {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          index = layer.items.moveToLastGetIndex(entry);
+          _mapLayerList.items[layerIndex].items.moveLastToIndex(entryIndex);
         },
         undoBase: () {
-          layer.items.moveLastToIndex(index!);
+          _mapLayerList.items[layerIndex].items.moveIndexToLast(entryIndex);
         },
       ),
     );
   }
 
-  void actionMoveEntryToTop(FlutterMapEntry entry, MapLayer layer) {
-    int? index;
+  void actionMoveEntryToTop(int entryIndex, int layerIndex) {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          index = layer.items.moveToFirstGetIndex(entry);
+          _mapLayerList.items[layerIndex].items.moveIndexToFirst(entryIndex);
         },
         undoBase: () {
-          layer.items.moveFirstToIndex(index!);
+          _mapLayerList.items[layerIndex].items.moveFirstToIndex(entryIndex);
         },
       ),
     );
   }
 
-  void actionMoveLayerToBottom(MapLayer layer) {
-    int? index;
+  void actionMoveLayerToTop(int layerIndex) {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          index = _mapLayerList.items.moveToLastGetIndex(layer);
+          var items = _mapLayerList.items;
+          items.moveIndexToLast(layerIndex);
         },
         undoBase: () {
-          _mapLayerList.items.moveLastToIndex(index!);
+          var items = _mapLayerList.items;
+          items.moveIndexToLast(layerIndex);
         },
       ),
     );
   }
 
-  void actionMoveLayerToTop(MapLayer layer) {
-    int? index;
+  void actionMoveLayerToBottom(int layerIndex) {
     addAndDo(
       ManualDoable(
         executeBase: () {
-          index = _mapLayerList.items.moveToFirstGetIndex(layer);
+          _mapLayerList.items.moveIndexToFirst(layerIndex);
         },
         undoBase: () {
-          _mapLayerList.items.moveFirstToIndex(index!);
+          _mapLayerList.items.moveFirstToIndex(layerIndex);
         },
       ),
     );

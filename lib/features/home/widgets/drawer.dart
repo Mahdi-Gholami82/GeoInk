@@ -55,6 +55,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
         key: ValueKey(currentLayer.name),
         (context, childIndex) {
           FlutterMapEntry entry = currentLayer.items[childIndex];
+          int entryIndex = childIndex;
 
           List<Widget> menu = [
             MenuItemButton(
@@ -115,7 +116,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                   if (value!) {
                     historyNotifier.actionRemoveEntryFromLayer(
                       entry,
-                      currentLayer,
+                      layerIndex,
                     );
                   }
                 });
@@ -125,14 +126,14 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
               leadingIcon: const Icon(Icons.arrow_upward),
               child: const Text("Move to top"),
               onPressed: () {
-                historyNotifier.actionMoveEntryToTop(entry, currentLayer);
+                historyNotifier.actionMoveEntryToTop(entryIndex, layerIndex);
               },
             ),
             MenuItemButton(
               leadingIcon: const Icon(Icons.arrow_downward),
               child: const Text("Move to bottom"),
               onPressed: () {
-                historyNotifier.actionMoveEntryToBottom(entry, currentLayer);
+                historyNotifier.actionMoveEntryToBottom(entryIndex, layerIndex);
               },
             ),
             // TODO: Change properties impl in menu
@@ -215,7 +216,7 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                   ),
                   child: const Text("Visibility"),
                   onPressed: () {
-                    historyNotifier.actionToggleLayerVisibility(currentLayer);
+                    historyNotifier.actionToggleLayerVisibility(layerIndex);
                   },
                 ),
                 MenuItemButton(
@@ -275,14 +276,14 @@ class _MapDrawerState extends ConsumerState<MapDrawer> {
                   leadingIcon: const Icon(Icons.arrow_upward),
                   child: const Text("Move to top"),
                   onPressed: () {
-                    historyNotifier.actionMoveLayerToTop(currentLayer);
+                    historyNotifier.actionMoveLayerToTop(layerIndex);
                   },
                 ),
                 MenuItemButton(
                   leadingIcon: const Icon(Icons.arrow_downward),
                   child: const Text("Move to bottom"),
                   onPressed: () {
-                    historyNotifier.actionMoveLayerToBottom(currentLayer);
+                    historyNotifier.actionMoveLayerToBottom(layerIndex);
                   },
                 ),
               ],

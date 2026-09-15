@@ -1,4 +1,4 @@
-name: Release
+name: Test & Release
 on:
   # I dont want to run this on every tag push for now
   # Also this prevents the workflow from accessing the gradle cache from other builds

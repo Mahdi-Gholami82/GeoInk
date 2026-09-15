@@ -9,6 +9,10 @@ import 'package:geojson_vi/geojson_vi.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geoink/core/utils/map_colors.dart';
 
+extension MapEntries on Color {
+  Color get halfAlpha => withAlpha(128);
+}
+
 typedef LayerEntryMap = Map<MapLayer, List<FlutterMapEntry>>;
 
 /// Data models to keep track of map features or layers.
@@ -82,6 +86,7 @@ class MarkerEntry extends FlutterMapEntry {
   @override
   Marker get flutterMapFeature => Marker(
     point: point,
+    rotate: true,
     width: 64,
     height: 64,
     child: Align(
@@ -131,7 +136,7 @@ class PolygonEntry extends FlutterMapMultiPointEntry {
     this.borderWidth = 2.0,
     super.description,
     super.visible,
-  }) : borderColor = borderColor ?? MapDefaultColors.polygon.withAlpha(128);
+  }) : borderColor = borderColor ?? MapDefaultColors.polygon.halfAlpha;
 
   PolygonEntry.withDefaults({
     super.name = "polygon",
@@ -143,8 +148,7 @@ class PolygonEntry extends FlutterMapMultiPointEntry {
     String? description,
   }) : fillColor =
            fillColor ??
-           (borderColor?.withAlpha(128) ??
-               MapDefaultColors.polygon.withAlpha(128)),
+           (borderColor?.halfAlpha ?? MapDefaultColors.polygon.halfAlpha),
        borderColor = borderColor ?? MapDefaultColors.polygon,
 
        borderWidth = (borderWidth ?? 2.0).toDouble(),
@@ -272,8 +276,7 @@ class CircleEntry extends FlutterMapEntry {
     String? description,
   }) : fillColor =
            fillColor ??
-           (borderColor?.withAlpha(128) ??
-               MapDefaultColors.circle.withAlpha(128)),
+           (borderColor?.halfAlpha ?? MapDefaultColors.circle.halfAlpha),
        borderColor = borderColor ?? MapDefaultColors.circle,
        borderWidth = (borderWidth ?? 2.0).toDouble(),
        super(visible: visible ?? true, description: description ?? "");
@@ -286,7 +289,7 @@ class CircleEntry extends FlutterMapEntry {
     radius: radius,
     borderColor: borderColor,
     borderStrokeWidth: borderWidth,
-    color: fillColor.withAlpha(128),
+    color: fillColor,
     hitValue: HitReference(this),
   );
 

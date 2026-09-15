@@ -7,6 +7,7 @@ import 'package:geoink/core/ui/widgets/custom_sheet_drag_handle.dart';
 import 'package:geoink/core/utils/date_time_format.dart';
 import 'package:geoink/core/utils/project_storage.dart';
 import 'package:geoink/core/utils/cross_project_management.dart';
+import 'package:geoink/core/utils/standard_name.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 import 'package:geoink/data/models/prefs_state.dart';
 import 'package:geoink/data/providers/map_layer_list.dart';
@@ -174,7 +175,7 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                                     padding: const EdgeInsets.only(left: 7),
                                     child: const Icon(Icons.search),
                                   ),
-                                  hintText: "Search Projects...",
+                                  hintText: "Enter a name..",
                                   onChanged: (value) {
                                     setState(() {
                                       doFilterProjects(value);
@@ -439,6 +440,19 @@ class _ProjectsSheetState extends ConsumerState<ProjectsSheet> {
                         padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: ElevatedButton(
                           onPressed: () async {
+                            String? validationResult = titleValidator(
+                              searchBarController.text,
+                            );
+                            if (validationResult != null) {
+                              if (context.mounted) {
+                                var messenger = ScaffoldMessenger.of(context);
+                                messenger.hideCurrentSnackBar();
+                                messenger.showSnackBar(
+                                  SnackBar(content: Text(validationResult)),
+                                );
+                              }
+                              return;
+                            }
                             if (ref.read(mapLayerListProvider).isNotEmpty) {
                               if (openProject?.path != null) {
                                 showSimpleProgress(context);

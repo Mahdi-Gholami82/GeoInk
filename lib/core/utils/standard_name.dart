@@ -1,26 +1,29 @@
+import 'dart:io';
+
 import 'package:geoink/data/models/flutter_map_entry.dart';
 
 /// Max Number of charachters allowed in name
 const int maxCharInName = 20;
 
-/// Matches only part of the name (20 charachters max)
-// We probably dont want the name to be too long
-final String standardNamePartialPattern =
-    r"^[ \t]*(?:(?<!=[ \t])((?:[^\n]|[ \t]){0," +
-    maxCharInName.toString() +
-    r"}(?!=[ \t])))";
+String standardNamePatternWithLength(int? length, {bool onlyChar = true}) {
+  String firstPart =
+      r"^[ \t]*(?:(?<![ \t])((?:" +
+      (onlyChar ? r"[\p{L}\p{Nd}_&()-]" : r"[^\n]") +
+      r"|[ \t])";
+  String secondPart = r"(?![ \t])))[ \t]*$";
+  if (length == null) {
+    return "$firstPart+$secondPart";
+  }
+  return firstPart + r"{0," + length.toString() + r"}" + secondPart;
+}
 
-/// Matches only part of the name (20 charachters max)
-/// Group 1 gets the name without surrounding spaces and tabs
-final RegExp standardNamePartialRegex = RegExp(
-  standardNamePartialPattern,
-  unicode: true,
-);
+const String invalidMessage =
+    "Invalid name, only letters, numbers and _&()- are allowed";
 
 /// Matches the name with any character but new line
 /// Group 1 gets the name without surrounding spaces and tabs
 final RegExp standardNameRegex = RegExp(
-  standardNamePartialPattern + r"[ \t]*$",
+  standardNamePatternWithLength(maxCharInName),
   unicode: true,
 );
 
@@ -35,7 +38,7 @@ String? standarNameValidatorForLayersDuplicateAllowed(String? value) {
   }
   var name = processToStandardName(value);
   if (name == null) {
-    return "Invalid name";
+    return invalidMessage;
   }
   return null;
 }
@@ -50,7 +53,7 @@ String? standarNameValidatorForLayers(
   }
   var name = processToStandardName(value);
   if (name == null) {
-    return "Invalid name";
+    return invalidMessage;
   }
   if (!duplicateAllowed && mapLayers.any((e) => e.name == name)) {
     return "Duplicate name";
@@ -67,10 +70,55 @@ String? standarNameValidatorForEntries(
   }
   var name = processToStandardName(value);
   if (name == null) {
-    return "Invalid name";
+    return invalidMessage;
   }
   if (mapEntries.any((e) => e.name == name)) {
     return "Duplicate name";
+  }
+  return null;
+}
+
+String? titleValidator(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return "Please enter a name";
+  }
+
+  const Set<String> windowsReserved = {
+    "CON",
+    "PRN",
+    "AUX",
+    "NUL",
+    "COM1",
+    "COM2",
+    "COM3",
+    "COM4",
+    "COM5",
+    "COM6",
+    "COM7",
+    "COM8",
+    "COM9",
+    "LPT1",
+    "LPT2",
+    "LPT3",
+    "LPT4",
+    "LPT5",
+    "LPT6",
+    "LPT7",
+    "LPT8",
+    "LPT9",
+  };
+
+  if (Platform.isWindows && windowsReserved.contains(value)) {
+    return "Windows reserved name";
+  }
+
+  const int maxFileNameLength = 255;
+  var match = RegExp(
+    standardNamePatternWithLength(maxFileNameLength),
+    unicode: true,
+  ).firstMatch(value);
+  if (match?.group(1) == null) {
+    return invalidMessage;
   }
   return null;
 }

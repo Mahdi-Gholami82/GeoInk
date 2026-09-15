@@ -3,6 +3,7 @@ import 'package:geoink/core/ui/widgets/bottom_sheet_buttons.dart';
 import 'package:geoink/core/ui/widgets/custom_draggable_sheet.dart';
 import 'package:geoink/core/ui/widgets/custom_sheet_drag_handle.dart';
 import 'package:geoink/core/utils/date_time_format.dart';
+import 'package:geoink/core/utils/standard_name.dart';
 import 'package:geoink/data/models/geoink_project.dart';
 
 class ProjectEditSheet extends StatefulWidget {
@@ -87,13 +88,7 @@ class _ProjectEditSheetState extends State<ProjectEditSheet> {
                                         labelText: "Title",
                                         border: OutlineInputBorder(),
                                       ),
-                                      validator: (value) {
-                                        if (value == null ||
-                                            value.trim().isEmpty) {
-                                          return "Title cannot be empty";
-                                        }
-                                        return null;
-                                      },
+                                      validator: titleValidator,
                                     ),
                                     const SizedBox(height: 16),
 

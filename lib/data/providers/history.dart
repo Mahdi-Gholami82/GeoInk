@@ -13,22 +13,6 @@ extension<T> on List<T> {
     insert(newIndex, removeAt(oldIndex));
   }
 
-  int moveToFirstGetIndex(T element) {
-    int index = indexOf(element);
-    assert(index != -1);
-    removeAt(index);
-    insert(0, element);
-    return index;
-  }
-
-  int moveToLastGetIndex(T element) {
-    int index = indexOf(element);
-    assert(index != -1);
-    removeAt(index);
-    add(element);
-    return index;
-  }
-
   void moveLastToIndex(int index) {
     insert(index, removeLast());
   }
@@ -115,9 +99,12 @@ class HistoryNotifier extends _$HistoryNotifier {
       ManualDoable(
         executeBase: () {
           var mapLayerList = _mapLayerList;
-          if (!mapLayerList.items.contains(layer)) {
+          int layerIndex = mapLayerList.items.indexOf(layer);
+          if (layerIndex == -1) {
             mapLayerList.addUnique(layer);
             addedLayer = true;
+          } else {
+            layer = mapLayerList.items[layerIndex];
           }
           layer.addUnique(entry);
         },
@@ -166,9 +153,12 @@ class HistoryNotifier extends _$HistoryNotifier {
       ManualDoable(
         executeBase: () {
           var mapLayerList = _mapLayerList;
-          if (!mapLayerList.items.contains(layer)) {
+          int layerIndex = mapLayerList.items.indexOf(layer);
+          if (layerIndex == -1) {
             mapLayerList.addUnique(layer);
             addedLayer = true;
+          } else {
+            layer = mapLayerList.items[layerIndex];
           }
           layer.addAllUnique(entries);
         },

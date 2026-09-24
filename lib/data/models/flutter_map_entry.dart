@@ -473,7 +473,7 @@ class MapLayerList with UniqueNamedItems<MapLayer> {
 
   MapLayer getDefaultLayerEntry(EntryType type) {
     MapLayer? layerEntry = getDefaultLayerEntryOrNull(type);
-    return layerEntry ?? createNewDefaultLayer(type);
+    return layerEntry ?? createNewDefaultLayer(type, add: true);
   }
 
   MapLayer getDefaultLayerEntryGeneric<T extends FlutterMapEntry>() {

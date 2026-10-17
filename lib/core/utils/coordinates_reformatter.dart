@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
+import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
 enum CoordinatesFormatTypes {
@@ -45,8 +46,9 @@ const String trailingLat = r"(?:\s*(?<northOrSouth_trailing_LAT>[NS]))";
 const String leadingLong = r"(?:(?<eastOrWest_leading_LONG>[EW])\s*)";
 const String trailingLong = r"(?:\s*(?<eastOrWest_trailing_LONG>[EW]))";
 const String defaultSeperatorPattern =
-    r"(?:(?:\s{0,3},\s{0,3}|\s)|(?<=[NWES])|(?=[NWES]))";
-const String defaultSeperatorPatternNonEmpty = r"(?:(?:\s{0,3},\s{0,3}|\s))";
+    r"(?:(?:[^\S\r\n]{0,3},[^\S\r\n]{0,3}|[^\S\r\n])|(?<=[NWES])|(?=[NWES]))";
+const String defaultSeperatorPatternNonEmpty =
+    r"(?:(?:[^\S\r\n]{0,3},[^\S\r\n]{0,3}|[^\S\r\n]))";
 
 const String _coordinatesMainGroupNamePostFix =
     r"_(?<LatOrLong>(?:LAT|LONG))(?:_(?<LeadingOrTrailing>TD|LD))?";
@@ -387,7 +389,9 @@ String fullPatternWithSeperator({
 }) {
   List patterns = [];
   nonDirectionalSeperator ??= seperator;
-  for (var matcher in matchers.values) {
+  for (var matcher in matchers.values.where(
+    (element) => element.formatType == CoordinatesFormatTypes.decimalDegrees,
+  )) {
     if (matcher.isDirectional) {
       patterns.add("(?:${matcher.withSeperatorPattern(seperator)})");
     } else {

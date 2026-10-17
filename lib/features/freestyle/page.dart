@@ -159,6 +159,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
               add: true,
             );
             layer = chosenLayers[type];
+            createdLayer = true;
           }
           layer!.addUnique(entry);
         },
@@ -166,6 +167,7 @@ class _FreeStylePageState extends ConsumerState<FreeStylePage> {
           debugPrint(
             "Undoing _addToLayerWithHistory with {\nentry : ${entry.name}, type : $type}",
           );
+          debugPrint("FUCK YOU: $createdLayer");
           if (createdLayer) {
             mapLayerList.items.remove(layer);
             // Mark invalid to notify other entries on redo
